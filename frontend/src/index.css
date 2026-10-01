@@ -1,0 +1,123 @@
+:root {
+  --bg: #0d1117;
+  --panel: #131722;
+  --panel-2: #161b22;
+  --input: #0b0f17;
+  --border: #1e222d;
+  --border-2: #2a2e39;
+  --text: #e6edf3;
+  --text-2: #d1d4dc;
+  --muted: #787b86;
+  --muted-2: #94a3b8;
+  --accent: #2962ff;
+  --green: #089981;
+  --red: #f23645;
+  --amber: #f59e0b;
+  --violet: #a78bfa;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Trebuchet MS", sans-serif;
+  font-size: 13px;
+}
+
+/* Les champs de formulaire n'héritent pas de la police par défaut : on force pour éviter l'« écriture bizarre » */
+input, select, button, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+input, select {
+  background: var(--input);
+  border: 1px solid var(--border-2);
+  border-radius: 5px;
+  color: #fff;
+  padding: 6px 8px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .15s;
+}
+input:focus, select:focus { border-color: var(--accent); }
+input::placeholder { color: #4b5563; }
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.7); cursor: pointer; }
+
+/* Retire les flèches des champs numériques */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .6; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 7px 14px; border-radius: 5px; border: 1px solid var(--border-2);
+  background: transparent; color: var(--muted-2); font-size: 12px; font-weight: 500;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.btn:hover:not(:disabled) { background: #1e222d; color: #fff; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.btn-primary:hover:not(:disabled) { background: #1e53e5; }
+
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 5px; border: none;
+  background: transparent; color: #6b7280; transition: background .15s, color .15s;
+}
+.icon-btn:hover, .icon-btn.active { background: #1e222d; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.label {
+  display: block; font-size: 11px; color: var(--muted); margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: .04em; font-weight: 600;
+}
+
+.segmented {
+  display: inline-flex; gap: 2px; background: var(--input);
+  padding: 2px; border-radius: 6px; border: 1px solid var(--border-2);
+}
+.segmented button {
+  padding: 5px 10px; border-radius: 4px; border: none; background: transparent;
+  color: var(--muted); font-size: 12px; display: inline-flex; align-items: center; gap: 6px;
+}
+.segmented button.on { background: var(--accent); color: #fff; font-weight: 600; }
+.segmented button:not(.on):hover { color: #fff; }
+
+.table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.table th {
+  text-align: left; padding: 8px 10px; color: var(--muted); font-weight: 600; white-space: nowrap;
+  border-bottom: 1px solid var(--border-2); position: sticky; top: 0; background: var(--panel); z-index: 1;
+}
+.table td { padding: 7px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.table tbody tr:hover { background: #1a1f2b; }
+.num { text-align: right !important; font-variant-numeric: tabular-nums; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #2a2e39; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3f4b; }
+
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+
+.error-box {
+  padding: 10px 14px; background: #f2364522; border: 1px solid var(--red); color: #fca5a5;
+  border-radius: 6px; margin-bottom: 16px; font-size: 13px;
+}
+
+[hidden] { display: none !important; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; }
