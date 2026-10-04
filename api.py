@@ -36,6 +36,29 @@ app.add_middleware(
 app.add_middleware(GZipMiddleware, minimum_size=2000)
 
 
+# Filet de sécurité : une valeur infinie ou NaN dans une réponse est envoyée comme null au lieu de faire planter le serveur
+from fastapi.responses import JSONResponse as _BaseJSONResponse
+import math as _math
+
+
+def _clean(o):
+    if isinstance(o, float):
+        return o if _math.isfinite(o) else None
+    if isinstance(o, dict):
+        return {k: _clean(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [_clean(v) for v in o]
+    return o
+
+
+class SafeJSONResponse(_BaseJSONResponse):
+    def render(self, content) -> bytes:
+        return super().render(_clean(content))
+
+
+app.router.default_response_class = SafeJSONResponse
+
+
 @app.middleware("http")
 async def language_middleware(request: Request, call_next):
     """?lang=en sur n'importe quelle route : les textes générés (interprétations, explications, erreurs) passent en anglais."""
@@ -98,7 +121,9 @@ def _normalize_ohlc(raw: pd.DataFrame) -> pd.DataFrame:
     for col in ("Open", "High", "Low"):
         df[col] = raw[col].astype(float) if col in raw.columns else df["Close"]
     df["Volume"] = raw["Volume"].astype(float) if "Volume" in raw.columns else 0.0
+    # Cours nuls ou négatifs (premières cotations de certaines cryptos sur Yahoo) : inutilisables, ils créaient des divisions par zéro
     df = df.dropna(subset=["Close"])
+    df = df[df["Close"] > 0]
     for col in ("Open", "High", "Low"):
         df[col] = df[col].fillna(df["Close"])
     df.index = pd.to_datetime(df.index).tz_localize(None) if getattr(df.index, "tz", None) else pd.to_datetime(df.index)
