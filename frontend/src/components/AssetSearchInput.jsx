@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { getAsset, searchAssets, DEFAULT_SUGGESTIONS, ASSET_DATABASE } from '../tickerDatabase';
 import { TAG_COLORS, fmtInt } from '../format';
+import { themed } from '../theme';
 import { useLang, trName } from '../i18n';
 
 /** Ticker correspondant exactement au texte tapé (symbole ou nom complet), sinon le texte tel quel en majuscules. */
@@ -21,8 +22,9 @@ function resolveTicker(val) {
  * onEnter() sur Entrée sans suggestion surlignée : le symbole tapé est conservé tel quel.
  * Champ vide + focus : suggestions populaires sous un titre explicite. Champ rempli + focus : liste fermée.
  */
-export default function AssetSearchInput({ value, onChange, onSelect, onEnter, placeholder = 'Nom ou symbole…', autoFocus = false }) {
+export default function AssetSearchInput({ value, onChange, onSelect, onEnter, placeholder = 'Nom ou symbole…', autoFocus = false, label = 'Rechercher un actif (nom ou symbole)' }) {
   const { t } = useLang();
+  const listId = useId();
   const [text, setText] = useState(() => getAsset(value)?.name ?? value ?? '');
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
@@ -99,29 +101,31 @@ export default function AssetSearchInput({ value, onChange, onSelect, onEnter, p
     <div ref={wrapperRef} style={{ position: 'relative', width: '100%' }}>
       <input type="text" value={text} placeholder={t(placeholder)} autoFocus={autoFocus}
         onChange={handleChange} onFocus={(e) => { e.target.select(); if (!text.trim()) refresh('', true); }} onBlur={() => setOpen(false)} onKeyDown={handleKeyDown}
-        style={{ width: '100%' }} spellCheck={false} autoComplete="off" />
+        style={{ width: '100%' }} spellCheck={false} autoComplete="off"
+        role="combobox" aria-label={t(label)} aria-autocomplete="list" aria-expanded={open} aria-controls={listId}
+        aria-activedescendant={open && active >= 0 ? `${listId}-${active}` : undefined} />
 
       {open && (
         // mousedown neutralisé : cliquer dans la liste (suggestion, barre de défilement, lien) ne fait pas perdre le focus
         <div onMouseDown={(e) => e.preventDefault()} style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: 'max(100%, 320px)', maxWidth: '90vw',
-          background: 'var(--panel-2)', border: '1px solid var(--border-2)', borderRadius: 6, boxShadow: '0 8px 24px rgba(0,0,0,.7)', zIndex: 1000,
+          background: 'var(--panel)', border: '1px solid var(--border-2)', borderRadius: 6, boxShadow: '0 8px 24px rgba(0,0,0,.16)', zIndex: 1000,
         }}>
-          {!text.trim() && <div style={{ padding: '7px 12px 5px', fontSize: 10, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--muted)' }}>{t('Suggestions populaires')}</div>}
-          <div ref={listRef} style={{ maxHeight: 300, overflowY: 'auto' }}>
+          {!text.trim() && <div style={{ padding: '7px 12px 5px', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--muted)' }}>{t('Suggestions populaires')}</div>}
+          <div ref={listRef} id={listId} role="listbox" aria-label={t('Suggestions')} style={{ maxHeight: 300, overflowY: 'auto' }}>
             {results.length === 0 && (
               <div style={{ padding: '10px 12px', fontSize: 12, color: 'var(--muted-2)' }}>
                 {t('Aucun résultat dans la bibliothèque. Le symbole « {s} » sera utilisé tel quel.', { s: text.trim().toUpperCase() })}
               </div>
             )}
             {results.map((item, i) => {
-              const c = TAG_COLORS[item.category] || '#94a3b8';
+              const c = themed(TAG_COLORS[item.category] || '#69716c');
               return (
-                <div key={item.ticker} onMouseDown={(e) => { e.preventDefault(); choose(item); }} onMouseEnter={() => setActive(i)}
+                <div key={item.ticker} id={`${listId}-${i}`} role="option" aria-selected={i === active} onMouseDown={(e) => { e.preventDefault(); choose(item); }} onMouseEnter={() => setActive(i)}
                   style={{ padding: '7px 12px', cursor: 'pointer', borderBottom: '1px solid var(--border)', background: i === active ? 'var(--raised)' : 'transparent' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'space-between' }}>
-                    <strong style={{ color: '#fff', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{trName(item.name)}</strong>
-                    <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 3, background: `${c}22`, color: c, border: `1px solid ${c}44`, flexShrink: 0 }}>{t(item.category)}</span>
+                    <strong style={{ color: 'var(--text)', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{trName(item.name)}</strong>
+                    <span style={{ fontSize: 11, padding: '1px 6px', borderRadius: 3, background: `${c}22`, color: c, border: `1px solid ${c}44`, flexShrink: 0 }}>{t(item.category)}</span>
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--muted-2)', marginTop: 1 }}>
                     <span style={{ color: 'var(--accent-text)', fontWeight: 600 }}>{item.ticker}</span>
@@ -131,7 +135,7 @@ export default function AssetSearchInput({ value, onChange, onSelect, onEnter, p
               );
             })}
           </div>
-          <div style={{ padding: '6px 12px', background: 'var(--input)', borderTop: '1px solid var(--border)', fontSize: 11, color: '#64748b', display: 'flex', justifyContent: 'space-between', borderRadius: '0 0 6px 6px' }}>
+          <div style={{ padding: '6px 12px', background: 'var(--input)', borderTop: '1px solid var(--border)', fontSize: 11.5, color: 'var(--muted)', display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap', borderRadius: '0 0 6px 6px' }}>
             <span>{t('{n} actifs · ↑↓ Entrée', { n: fmtInt(ASSET_DATABASE.length) })}</span>
             <a href="https://finance.yahoo.com/lookup" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>
               {t('Autre symbole sur Yahoo')} <ExternalLink size={10} style={{ display: 'inline' }} />

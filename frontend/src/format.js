@@ -1,8 +1,9 @@
 import { getLocale, tr } from './i18n';
 
-export const API = 'http://127.0.0.1:8000';
+// Adresse de l'API : réglée par VITE_API_URL une fois en ligne (ex. https://api.mondomaine.com), le serveur local sinon
+export const API = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 
-export const COLORS = ['#e0a43a', '#2bb3a3', '#e8735a', '#7f9cc4', '#a3b84a', '#c98fb0', '#d9c27a', '#5fa37a', '#b0805a', '#9a9aa2'];
+export const COLORS = ['#1e7145', '#2e75b6', '#c55a11', '#7f6000', '#7030a0', '#c00000', '#00a2c7', '#548235', '#bf9000', '#7f7f7f'];
 
 // Formateurs mis en cache par langue + nombre de décimales
 const formatters = new Map();
@@ -51,8 +52,8 @@ export const fmtInt = (v) => (v === null || v === undefined ? '—' : Number(v).
 export const signColor = (v) => (v === null || v === undefined ? undefined : v >= 0 ? 'var(--green)' : 'var(--red)');
 
 export const TAG_COLORS = {
-  'Actions': '#9fb4cc', 'Indices': '#d2d2d6', 'ETF': '#5fbf8f', 'Crypto': '#e0a43a',
-  'Matières 1ères': '#c98f5a', 'Forex': '#2bb3a3',
+  'Actions': '#2e75b6', 'Indices': '#595959', 'ETF': '#1e7145', 'Crypto': '#b85c00',
+  'Matières 1ères': '#7f6000', 'Forex': '#00838f',
 };
 
 export const BENCHMARKS = [
@@ -66,9 +67,9 @@ export const BENCHMARKS = [
 ];
 
 export const PERIODS = [
-  { value: '1mo', label: '1M' }, { value: '6mo', label: '6M' }, { value: 'ytd', label: 'YTD' },
-  { value: '1y', label: '1A' }, { value: '2y', label: '2A' }, { value: '5y', label: '5A' },
-  { value: '10y', label: '10A' }, { value: 'max', label: 'MAX' },
+  { value: '1mo', label: '1M', title: '1 mois' }, { value: '6mo', label: '6M', title: '6 mois' }, { value: 'ytd', label: 'YTD', title: 'Depuis le 1er janvier' },
+  { value: '1y', label: '1A', title: '1 an' }, { value: '2y', label: '2A', title: '2 ans' }, { value: '5y', label: '5A', title: '5 ans' },
+  { value: '10y', label: '10A', title: '10 ans' }, { value: 'max', label: 'MAX', title: 'Tout l’historique disponible' },
 ];
 
 export const HORIZONS = [

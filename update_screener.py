@@ -25,7 +25,7 @@ BENCHMARKS = {"US": "^GSPC", "Europe": "^STOXX", "Crypto": "BTC-USD"}
 def market_label(asset: dict) -> str:
     cat = asset["category"]
     if cat == "Actions":
-        return "US" if asset["market"] == "US" else "Europe"
+        return asset["market"] if asset["market"] in ("US", "Europe", "Amériques", "Asie") else "Europe"
     return cat
 
 
@@ -44,7 +44,18 @@ def extract(raw: pd.DataFrame, ticker: str) -> pd.DataFrame:
     return df.dropna(subset=["Close"])
 
 
+def market_risk_free() -> float:
+    """Taux du bon du Trésor US à 3 mois (copie FRED de l'onglet Obligations), 2 % à défaut."""
+    try:
+        data = json.load(open(os.path.join(ROOT, "bonds_cache.json"), encoding="utf-8"))
+        return float(data["risk_free_3m"]) / 100
+    except Exception:
+        return backend.RISK_FREE_RATE
+
+
 def build_screener_database():
+    backend.set_risk_free(market_risk_free())
+    print(f"Taux sans risque utilisé : {backend.risk_free() * 100:.2f} %")
     print("Construction de l'univers...")
     try:
         assets = universe.build_universe(verbose=False)

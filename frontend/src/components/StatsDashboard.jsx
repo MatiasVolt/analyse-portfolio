@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useId, useState, memo } from 'react';
 import { StatCell } from './ui';
 import { DEFINITIONS, METRICS, METRIC_TABS, ASSET_CLASS_LABELS } from '../definitions';
 import { parseNum, fmtMillions } from '../format';
@@ -37,6 +37,7 @@ function MetricGrid({ keys, metrics, interpretations, confLabel }) {
 function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, varInput, onVarChange, onVarSubmit, confUsed, footer }) {
   const { t, lang } = useLang();
   const [tab, setTab] = useState('overview');
+  const uid = useId();
   const tabs = [
     ...METRIC_TABS,
     ...(classMetrics?.length ? [{ id: 'specific', label: `${t('Spécifique')} ${t(ASSET_CLASS_LABELS[assetClass] || '')}`.trim() }] : []),
@@ -60,12 +61,12 @@ function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, va
             title={t("Taux utilisé pour le Sharpe, le Sortino et l'alpha. Cliquez pour basculer entre le taux du marché et l'ancien taux fixe de 2 %.")}>
             {t('Taux sans risque :')} {getRfMode() === 'fixed' ? t('2 % fixe') : t('marché {v} %', { v: String(metrics.risk_free_pct ?? '…').replace('.', lang === 'fr' ? ',' : '.') })}
           </button>
-          <span style={{ fontSize: 12, color: 'var(--muted-2)' }}>{t('Confiance VaR')}</span>
-          <input type="text" inputMode="decimal" value={varInput} onChange={(e) => onVarChange(e.target.value)}
+          <label htmlFor={`${uid}-var`} style={{ fontSize: 12, color: 'var(--muted-2)' }}>{t('Confiance VaR')}</label>
+          <input id={`${uid}-var`} type="text" inputMode="decimal" value={varInput} onChange={(e) => onVarChange(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onVarSubmit()}
             title={t('Entre 50 et 99,9 — appuyez sur Entrée pour recalculer')}
-            style={{ width: 54, padding: '3px 6px', textAlign: 'center', fontWeight: 700, fontSize: 12 }} />
-          <span style={{ fontSize: 12, color: 'var(--muted-2)' }}>%</span>
+            style={{ width: 54, padding: '3px 6px', textAlign: 'center', fontWeight: 700, fontSize: 12 }} aria-describedby={`${uid}-unit`} />
+          <span id={`${uid}-unit`} style={{ fontSize: 12, color: 'var(--muted-2)' }}>%</span>
         </div>
       </div>
 

@@ -34,7 +34,12 @@ function EventRow({ e, isPast, open, onToggle, onAnalyze }) {
             {e.reaction?.length ? e.reaction.slice(0, 2).map(r => <ReactionChip key={r.ticker} r={r} />) : <span className="hint">{isPast ? '' : countdown(e.timestamp)}</span>}
           </div>
         </td>
-        <td><ChevronRight size={14} className="ev-chevron" /></td>
+        <td>
+          <button type="button" className="icon-btn" aria-expanded={open} aria-label={t('Voir le détail de l’annonce')} title={t('Voir le détail de l’annonce')}
+            onClick={(ev) => { ev.stopPropagation(); onToggle(); }}>
+            <ChevronRight size={14} className="ev-chevron" />
+          </button>
+        </td>
       </tr>
       {open && (
         <tr className="ev-detail">
@@ -143,7 +148,7 @@ function CalendarView({ active, onAnalyze }) {
 
   return (
     <div>
-      <div className="result-head" style={{ marginTop: 0 }}>
+      <div className="result-head">
         <div className="result-title">
           <h1>{t('Calendrier économique')}</h1>
           {data && <span className="tag">{t('{n} annonces', { n: data.events.length })}</span>}
@@ -151,8 +156,8 @@ function CalendarView({ active, onAnalyze }) {
         <div className="result-meta">{range} · {t('heures de votre fuseau')} · {t('source')} {data?.source || '…'}{loadedAt && ` · ${t('actualisé à {h}', { h: loadedAt.toLocaleTimeString(getLocale(), { hour: '2-digit', minute: '2-digit' }) })}`}</div>
       </div>
 
-      {error && <div className="error-box">{error}</div>}
-      {!data && !error && <EmptyState icon={CalendarDays} title="Chargement du calendrier…" />}
+      {error && <div className="error-box" role="alert">{error}</div>}
+      {!data && !error && <EmptyState icon={CalendarDays} busy title="Chargement du calendrier…" />}
 
       {data && (<>
         <div className="cal-top">
@@ -176,17 +181,17 @@ function CalendarView({ active, onAnalyze }) {
         <div className="panel" style={{ marginBottom: 16 }}>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
             <div className="search-box">
-              <Search size={14} style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)' }} />
-              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('Rechercher une annonce…')} style={{ width: '100%', paddingLeft: 28 }} />
+              <Search size={14} aria-hidden="true" style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)' }} />
+              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('Rechercher une annonce…')} aria-label={t('Rechercher une annonce…')} style={{ width: '100%', paddingLeft: 28 }} />
             </div>
             <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               {Object.keys(data.currencies).map(c => (
-                <button key={c} type="button" className={`btn btn-sm ${ccys.includes(c) ? 'is-on' : ''}`} title={data.currencies[c]} onClick={() => toggle(ccys, setCcys, c)}>{c}</button>
+                <button key={c} type="button" className={`btn btn-sm ${ccys.includes(c) ? 'is-on' : ''}`} title={data.currencies[c]} aria-pressed={ccys.includes(c)} onClick={() => toggle(ccys, setCcys, c)}>{c}</button>
               ))}
             </div>
             <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               {Object.entries(IMPACT).map(([k, m]) => (
-                <button key={k} type="button" className={`btn btn-sm impact-toggle ${impacts.includes(k) ? 'is-on' : ''}`} style={{ '--impact': m.color }} onClick={() => toggle(impacts, setImpacts, k)}>
+                <button key={k} type="button" className={`btn btn-sm impact-toggle ${impacts.includes(k) ? 'is-on' : ''}`} style={{ '--impact': m.color }} aria-pressed={impacts.includes(k)} onClick={() => toggle(impacts, setImpacts, k)}>
                   <span className="impact-dot" /> {t(m.label)}
                 </button>
               ))}
@@ -201,6 +206,9 @@ function CalendarView({ active, onAnalyze }) {
           </div>
         </div>
 
+        <div className="hint" style={{ margin: '0 0 10px' }}>
+          {t("Cliquez sur une annonce pour voir son explication et les actifs qu'elle fait bouger. « ×2,1 » = l'actif a bougé 2,1 fois plus qu'un jour normal (médiane des 60 dernières séances). ▲ / ▼ : chiffre publié supérieur / inférieur à la prévision.")}
+        </div>
         <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
           {sections.length === 0 ? (
             <div style={{ padding: 30, textAlign: 'center', color: 'var(--muted)' }}>{t('Aucune annonce ne correspond aux filtres.')}</div>
@@ -233,9 +241,6 @@ function CalendarView({ active, onAnalyze }) {
               </table>
             </div>
           )}
-        </div>
-        <div className="hint" style={{ marginTop: 8 }}>
-          {t("Cliquez sur une annonce pour voir son explication et les actifs qu'elle fait bouger. « ×2,1 » = l'actif a bougé 2,1 fois plus qu'un jour normal (médiane des 60 dernières séances). ▲ / ▼ : chiffre publié supérieur / inférieur à la prévision.")}
         </div>
       </>)}
     </div>

@@ -1,14 +1,16 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
-import { RefreshCw, RotateCcw, ArrowUp, ArrowDown, ChevronDown, ChevronRight, ArrowRight, Search, SlidersHorizontal } from 'lucide-react';
+import { RefreshCw, RotateCcw, ArrowUp, ArrowDown, ChevronDown, ChevronRight, ArrowRight, Search, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { HelpButtons, EmptyState } from '../components/ui';
 import { SCREENER_GROUPS, SCREENER_METRICS, SCREENER_DEFAULT_COLUMNS } from '../definitions';
 import { API, fmt, fmtInt, fmtMillions, parseNum, TAG_COLORS } from '../format';
 import { useLang, tr, trName } from '../i18n';
+import ExportButton from '../components/ExportButton';
+import { exportScreener } from '../export/builders';
 
 const PAGE = 100;
-const MARKET_LABELS = { US: 'Actions US', Europe: 'Actions Europe' };
-const MARKET_COLORS = { US: TAG_COLORS.Actions, Europe: '#c9b28a', ...TAG_COLORS };
+const MARKET_LABELS = { US: 'Actions US', Europe: 'Actions Europe', 'Amériques': 'Actions Amériques', Asie: 'Actions Asie' };
+const MARKET_COLORS = { US: TAG_COLORS.Actions, Europe: '#8a6d1f', ...TAG_COLORS };
 
 const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
@@ -24,8 +26,8 @@ function formatCell(key, v) {
 function cellColor(key, v) {
   if (v === null || v === undefined) return undefined;
   if (SCREENER_METRICS[key]?.signed) return v >= 0 ? 'var(--green)' : 'var(--red)';
-  if (/drawdown|var_|cvar|worst/.test(key)) return '#f87171';
-  if (key === 'sharpe' || key === 'sortino') return v >= 1 ? 'var(--green)' : v < 0 ? '#f87171' : undefined;
+  if (/drawdown|var_|cvar|worst/.test(key)) return 'var(--red)';
+  if (key === 'sharpe' || key === 'sortino') return v >= 1 ? 'var(--green)' : v < 0 ? 'var(--red)' : undefined;
   if (key === 'rsi_14') return v >= 70 || v <= 30 ? 'var(--amber)' : undefined;
   return undefined;
 }
@@ -214,10 +216,11 @@ function ScreenerView({ active, onAnalyze }) {
   const sortBy = (key) => setSort(s => ({ key, dir: s.key === key && s.dir === 'desc' ? 'asc' : 'desc' }));
 
   const SortHeader = ({ k, label, num = true }) => (
-    <th className={num ? 'num' : ''} onClick={() => sortBy(k)} style={{ cursor: 'pointer', userSelect: 'none', color: sort.key === k ? '#fff' : undefined }}>
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-        {t(label)}{sort.key === k && (sort.dir === 'desc' ? <ArrowDown size={12} /> : <ArrowUp size={12} />)}
-      </span>
+    <th className={num ? 'num' : ''} style={{ userSelect: 'none', color: sort.key === k ? 'var(--text)' : undefined }}
+      aria-sort={sort.key === k ? (sort.dir === 'desc' ? 'descending' : 'ascending') : undefined}>
+      <button type="button" className="th-sort" onClick={() => sortBy(k)} title={t('Trier par cette colonne')}>
+        {t(label)}{sort.key === k && (sort.dir === 'desc' ? <ArrowDown size={12} aria-hidden="true" /> : <ArrowUp size={12} aria-hidden="true" />)}
+      </button>
     </th>
   );
 
@@ -227,7 +230,7 @@ function ScreenerView({ active, onAnalyze }) {
     <div>
       {/* Bandeau statut */}
       <div style={{ marginBottom: 16 }}>
-        <div className="result-head" style={{ marginTop: 0, alignItems: 'center' }}>
+        <div className="result-head" style={{ alignItems: 'center' }}>
           <div className="result-title">
             <h2>Screener</h2>
             <span className="tag">{t('{n} actifs', { n: payload ? fmtInt(payload.total) : '…' })}</span>
@@ -236,7 +239,7 @@ function ScreenerView({ active, onAnalyze }) {
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-            {(refreshMsg || (running && status.progress_text)) && <span style={{ fontSize: 11, color: 'var(--amber)' }}>{refreshMsg || status.progress_text}</span>}
+            {(refreshMsg || (running && status.progress_text)) && <span role="status" style={{ fontSize: 12, color: 'var(--amber)' }}>{refreshMsg || status.progress_text}</span>}
             <button type="button" className="btn" onClick={refresh} disabled={running || status?.can_refresh === false}
               title={status?.can_refresh === false && !running ? t('Une actualisation a déjà eu lieu il y a moins de 4 h') : t('Re-télécharge tout l’univers (2 à 4 minutes)')}>
               <RefreshCw size={13} className={running ? 'spin' : ''} /> {running ? `${t('Actualisation…')} ${status.progress_pct} %` : status?.can_refresh === false ? t('À jour') : t('Actualiser les données')}
@@ -250,41 +253,42 @@ function ScreenerView({ active, onAnalyze }) {
         )}
       </div>
 
-      {error && <div className="error-box">{error}</div>}
-      {!payload && loading && <EmptyState>{'Chargement de la base du screener…'}</EmptyState>}
+      {error && <div className="error-box" role="alert">{error}</div>}
+      {!payload && loading && <EmptyState icon={Loader2} busy title="Chargement de la base du screener…" />}
 
       {payload && (<>
         {/* Univers */}
         <div className="panel" style={{ marginBottom: 16 }}>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
             <div className="search-box">
-              <Search size={14} style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)' }} />
-              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('Nom ou symbole…')} style={{ width: '100%', paddingLeft: 28 }} />
+              <Search size={14} aria-hidden="true" style={{ position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)' }} />
+              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('Nom ou symbole…')} aria-label={t('Rechercher un actif (nom ou symbole)')} style={{ width: '100%', paddingLeft: 28 }} />
             </div>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
               {payload.markets.map(mk => {
                 const on = markets.includes(mk);
-                const c = MARKET_COLORS[mk] || '#94a3b8';
+                const c = MARKET_COLORS[mk] || '#69716c';
                 return (
-                  <button key={mk} type="button" onClick={() => toggleMarket(mk)} className="btn"
-                    style={{ padding: '4px 10px', fontSize: 12, ...(on ? { background: `${c}26`, borderColor: c, color: '#fff' } : {}) }}>
+                  <button key={mk} type="button" onClick={() => toggleMarket(mk)} className="btn" aria-pressed={on}
+                    style={{ padding: '4px 10px', fontSize: 12, ...(on ? { background: `${c}26`, borderColor: c, color: 'var(--text)' } : {}) }}>
                     {t(MARKET_LABELS[mk] || mk)}
                   </button>
                 );
               })}
             </div>
             {countries.length > 1 && (
-              <select value={country} onChange={(e) => setCountry(e.target.value)} style={{ fontSize: 12 }}>
+              <select value={country} onChange={(e) => setCountry(e.target.value)} style={{ fontSize: 12 }} aria-label={t('Pays')}>
                 <option value="">{t('Tous les pays')}</option>
                 {countries.map(c => <option key={c} value={c}>{trName(c)}</option>)}
               </select>
             )}
             <div style={{ flex: 1 }} />
-            <button type="button" className="btn" onClick={() => setShowFilters(s => !s)}>
+            <button type="button" className="btn" onClick={() => setShowFilters(s => !s)} aria-expanded={showFilters}>
               <SlidersHorizontal size={13} /> {t('Filtres')}{activeFilters.length > 0 && <span className="count-badge">{activeFilters.length}</span>}
               <ChevronDown size={13} style={{ transform: showFilters ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }} />
             </button>
             <button type="button" className="btn" onClick={resetAll}><RotateCcw size={13} /> {t('Réinitialiser')}</button>
+            <ExportButton onExport={() => exportScreener(filtered, (mk) => tr(MARKET_LABELS[mk] || mk))} label="Exporter les résultats" disabled={!filtered.length} />
           </div>
 
           {showFilters && (
@@ -302,12 +306,15 @@ function ScreenerView({ active, onAnalyze }) {
         <div className="panel">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10, flexWrap: 'wrap', gap: 8 }}>
             <h3 style={{ margin: 0, fontSize: 14, color: 'var(--muted)' }}>
-              <span style={{ color: '#fff', fontWeight: 700 }}>{fmtInt(filtered.length)}</span> {t(filtered.length > 1 ? 'actifs correspondants' : 'actif correspondant')}
+              <span style={{ color: 'var(--text)', fontWeight: 700 }}>{fmtInt(filtered.length)}</span> {t(filtered.length > 1 ? 'actifs correspondants' : 'actif correspondant')}
             </h3>
-            <span style={{ fontSize: 11, color: 'var(--muted)' }}>{t("Cliquez sur un en-tête pour trier · une métrique filtrée s'ajoute automatiquement en colonne")}</span>
+            <span className="hint">{t("Cliquez sur un en-tête pour trier · une métrique filtrée s'ajoute automatiquement en colonne")}</span>
           </div>
           {filtered.length === 0 ? (
-            <div style={{ padding: 30, textAlign: 'center', color: 'var(--muted)' }}>{t('Aucun actif ne passe tous les filtres. Élargissez une borne ou réinitialisez.')}</div>
+            <div style={{ padding: 30, textAlign: 'center', color: 'var(--muted-2)' }}>
+              {t('Aucun actif ne passe tous les filtres. Élargissez une borne ou réinitialisez.')}
+              <div style={{ marginTop: 10 }}><button type="button" className="btn btn-sm" onClick={resetAll}><RotateCcw size={12} /> {t('Réinitialiser')}</button></div>
+            </div>
           ) : (
             <div style={{ overflow: 'auto', maxHeight: '70vh' }}>
               <table className="table">
@@ -324,7 +331,7 @@ function ScreenerView({ active, onAnalyze }) {
                   {filtered.slice(0, shown).map(r => (
                     <tr key={r.ticker}>
                       <td style={{ maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis' }} title={r.name}>
-                        <strong style={{ color: '#e6edf3' }}>{r.name || r.ticker}</strong> <span style={{ color: 'var(--accent-text)', fontSize: 11 }}>{r.ticker}</span>
+                        <strong style={{ color: 'var(--text)' }}>{r.name || r.ticker}</strong> <span style={{ color: 'var(--accent-text)', fontSize: 11 }}>{r.ticker}</span>
                       </td>
                       <td style={{ color: 'var(--muted-2)' }}>{t(MARKET_LABELS[r.market] || r.market)}{r.country && r.market !== 'Crypto' && r.market !== 'Forex' ? ` · ${trName(r.country)}` : ''}</td>
                       <td className="num">{formatCell('last_price', r.last_price)}</td>

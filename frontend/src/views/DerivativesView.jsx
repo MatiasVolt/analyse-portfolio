@@ -1,7 +1,7 @@
 import { memo, useMemo, useState } from 'react';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine, ReferenceArea, Legend } from 'recharts';
-import { Sigma, AlertTriangle, Plus, Trash2, Download, Table2 } from 'lucide-react';
+import { Sigma, AlertTriangle, Plus, Trash2, Download, Table2, Loader2 } from 'lucide-react';
 import AssetSearchInput from '../components/AssetSearchInput';
 import { Field, StatCell, EmptyState } from '../components/ui';
 import { blackScholes, impliedVol, legPayoff, legValueNow, STRATEGIES } from '../finance/optionsMath';
@@ -10,9 +10,11 @@ import { API, fmt, fmtInt, parseNum } from '../format';
 import { useLang, trName, getLocale } from '../i18n';
 import { GREEKS } from '../definitions';
 
-const AXIS = { stroke: '#88888f', fontSize: 11 };
-const TOOLTIP = { contentStyle: { backgroundColor: '#1b1b1e', borderColor: '#323237', color: '#fff', fontSize: 12 } };
+const AXIS = { stroke: '#69716c', fontSize: 11 };
+const TOOLTIP = { contentStyle: { backgroundColor: '#ffffff', borderColor: '#c6c9c6', color: 'var(--text)', fontSize: 12 } };
 let legSeq = 0;
+// Exemples en un clic (actions et ETF américains avec une chaîne d'options cotée)
+const EXAMPLES = [['AAPL', 'Apple'], ['SPY', 'S&P 500 (SPY)'], ['QQQ', 'Nasdaq 100 (QQQ)'], ['NVDA', 'Nvidia']];
 const newLeg = (l) => ({ id: `leg${Date.now().toString(36)}${legSeq++}`, qty: 1, ...l });
 
 
@@ -39,8 +41,9 @@ function DerivativesView({ onAnalyze }) {
   const [legs, setLegs] = useState([]);
   const [showChain, setShowChain] = useState(true);
 
-  const load = async (t = ticker, expiry) => {
-    const tk = (t || '').trim().toUpperCase();
+  // (paramètre nommé « sym » : « t » masquerait la fonction de traduction et ferait planter les messages d'erreur)
+  const load = async (sym = ticker, expiry) => {
+    const tk = (sym || '').trim().toUpperCase();
     if (!tk) { setError(t('Choisissez un sous-jacent.')); return; }
     setLoading(true); setError(null);
     try {
@@ -56,6 +59,7 @@ function DerivativesView({ onAnalyze }) {
       if (!strike || !expiry) setStrike(String(roundStrike(data.spot, data.calls.map(c => c.strike))));
     } catch (err) {
       setError(err.response?.data?.detail || t("Impossible de charger le sous-jacent (le serveur Python est-il lancé ?)."));
+      if (!expiry) setMkt(null); // pas de données d'un autre actif affichées sous un message d'erreur
     } finally { setLoading(false); }
   };
 
@@ -121,9 +125,11 @@ function DerivativesView({ onAnalyze }) {
 
   return (
     <div>
-      <div className="result-head" style={{ marginTop: 0 }}>
+      <div className="result-head">
         <div className="result-title"><h1>{t('Dérivés · options')}</h1></div>
-        <div className="result-meta">{t("Modèle de Black-Scholes · chaînes d'options Yahoo (actions et ETF américains)")}</div>
+        <div className="result-meta" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <span>{t("Modèle de Black-Scholes · chaînes d'options Yahoo (actions et ETF américains)")}</span>
+        </div>
       </div>
 
       <div className="warn-box">
@@ -133,8 +139,8 @@ function DerivativesView({ onAnalyze }) {
 
       <div className="panel" style={{ marginBottom: 16 }}>
         <div className="form-row">
-          <Field label="Sous-jacent" style={{ width: 280 }}>
-            <AssetSearchInput value={ticker} onChange={setTicker} onSelect={(t) => { setTicker(t); load(t); }} onEnter={() => load()} />
+          <Field label="Sous-jacent (action ou ETF)" style={{ width: 280 }}>
+            <AssetSearchInput value={ticker} onChange={setTicker} onSelect={(tk) => { setTicker(tk); load(tk); }} onEnter={() => load()} />
           </Field>
           <button type="button" className="btn btn-primary" onClick={() => load()} disabled={loading}><Download size={14} /> {loading ? t('Chargement…') : t('Charger le marché')}</button>
           {mkt && (
@@ -145,7 +151,7 @@ function DerivativesView({ onAnalyze }) {
             </div>
           )}
         </div>
-        {error && <div className="error-box" style={{ marginTop: 12, marginBottom: 0 }}>{error}</div>}
+        {error && <div className="error-box" role="alert" style={{ marginTop: 12, marginBottom: 0 }}>{error}</div>}
 
         <div className="bond-form" style={{ marginTop: 16 }}>
           <Field label="Cours du sous-jacent"><input type="text" inputMode="decimal" value={S} onChange={(e) => setS(e.target.value)} /></Field>
@@ -176,10 +182,10 @@ function DerivativesView({ onAnalyze }) {
       <div className="panel" style={{ marginBottom: 16 }}>
         <div className="panel-head">
           <h3 className="section-title"><Sigma size={15} /> {t('Prix théorique et grecques')}</h3>
-          <Field label="" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span className="hint">Strike</span>
-            <input type="text" inputMode="decimal" value={strike} onChange={(e) => setStrike(e.target.value)} style={{ width: 110 }} />
-          </Field>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <label className="hint" htmlFor="deriv-strike" title={t("Prix auquel l'option permet d'acheter (call) ou de vendre (put)")}>{t("Prix d'exercice (strike)")}</label>
+            <input id="deriv-strike" type="text" inputMode="decimal" value={strike} onChange={(e) => setStrike(e.target.value)} style={{ width: 110 }} />
+          </div>
         </div>
         {!call ? (
           <div className="hint">{t('Chargez un sous-jacent ou renseignez cours, volatilité, échéance et strike.')}</div>
@@ -195,7 +201,7 @@ function DerivativesView({ onAnalyze }) {
                     <span className="kpi-value">{fmt(g.price, 2)}</span>
                     {mid ? <span className="hint">{t('marché')} {fmt(mid, 2)}{iv ? ` · ${t('vol. implicite')} ${fmt(iv * 100, 1)} %` : ''}</span> : null}
                   </div>
-                  <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))' }}>
+                  <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(165px, 1fr))', columnGap: 24 }}>
                     <StatCell label="Delta" value={g.delta} nd={3} definition={GREEKS.delta} />
                     <StatCell label="Gamma" value={g.gamma} nd={4} definition={GREEKS.gamma} />
                     <StatCell label="Vega" value={g.vega} nd={3} definition={GREEKS.vega} />
@@ -215,7 +221,7 @@ function DerivativesView({ onAnalyze }) {
         <div className="panel-head">
           <h3 className="section-title">{t('Construire une stratégie')}</h3>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            <select value="" onChange={(e) => applyStrategy(e.target.value)} disabled={!baseOk} style={{ fontSize: 12 }}>
+            <select value="" onChange={(e) => applyStrategy(e.target.value)} disabled={!baseOk} style={{ fontSize: 12 }} aria-label={t('Stratégies classiques…')}>
               <option value="">{t('Stratégies classiques…')}</option>
               {STRATEGIES.map(s => <option key={s.id} value={s.id}>{t(s.label)}</option>)}
             </select>
@@ -233,13 +239,13 @@ function DerivativesView({ onAnalyze }) {
               <tbody>
                 {legs.map(l => (
                   <tr key={l.id}>
-                    <td><select value={l.side} onChange={(e) => updateLeg(l.id, 'side', Number(e.target.value))}><option value={1}>{t('Achat')}</option><option value={-1}>{t('Vente')}</option></select></td>
-                    <td><select value={l.kind} onChange={(e) => updateLeg(l.id, 'kind', e.target.value)}><option value="call">Call</option><option value="put">Put</option><option value="stock">{t('Action')}</option></select></td>
-                    <td className="num">{l.kind === 'stock' ? '—' : <input type="text" inputMode="decimal" value={l.strike ?? ''} onChange={(e) => updateLeg(l.id, 'strike', e.target.value)} style={{ width: 80, textAlign: 'right' }} />}</td>
-                    <td className="num"><input type="text" inputMode="decimal" value={l.qty} onChange={(e) => updateLeg(l.id, 'qty', e.target.value)} style={{ width: 60, textAlign: 'right' }} /></td>
-                    <td className="num"><input type="text" inputMode="decimal" value={l.premium ?? ''} onChange={(e) => updateLeg(l.id, 'premium', e.target.value)} style={{ width: 80, textAlign: 'right' }} /></td>
+                    <td><select aria-label={t('Sens')} value={l.side} onChange={(e) => updateLeg(l.id, 'side', Number(e.target.value))}><option value={1}>{t('Achat')}</option><option value={-1}>{t('Vente')}</option></select></td>
+                    <td><select aria-label="Instrument" value={l.kind} onChange={(e) => updateLeg(l.id, 'kind', e.target.value)}><option value="call">Call</option><option value="put">Put</option><option value="stock">{t('Action')}</option></select></td>
+                    <td className="num">{l.kind === 'stock' ? '—' : <input type="text" inputMode="decimal" aria-label="Strike" value={l.strike ?? ''} onChange={(e) => updateLeg(l.id, 'strike', e.target.value)} style={{ width: 80, textAlign: 'right' }} />}</td>
+                    <td className="num"><input type="text" inputMode="decimal" aria-label={t('Quantité')} value={l.qty} onChange={(e) => updateLeg(l.id, 'qty', e.target.value)} style={{ width: 60, textAlign: 'right' }} /></td>
+                    <td className="num"><input type="text" inputMode="decimal" aria-label={t('Prime / prix')} value={l.premium ?? ''} onChange={(e) => updateLeg(l.id, 'premium', e.target.value)} style={{ width: 80, textAlign: 'right' }} /></td>
                     <td className="num hint">{l.kind === 'stock' ? fmt(p.S, 2) : fmt(theo(l.kind, parseNum(l.strike)), 2)}</td>
-                    <td><button type="button" className="icon-btn" onClick={() => setLegs(ls => ls.filter(x => x.id !== l.id))}><Trash2 size={14} /></button></td>
+                    <td><button type="button" className="icon-btn" aria-label={t('Supprimer la ligne')} title={t('Supprimer la ligne')} onClick={() => setLegs(ls => ls.filter(x => x.id !== l.id))}><Trash2 size={14} /></button></td>
                   </tr>
                 ))}
               </tbody>
@@ -257,20 +263,20 @@ function DerivativesView({ onAnalyze }) {
             <div style={{ height: 320 }}>
               <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10}>
                 <LineChart data={payoff.pts} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#222226" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e6e8e6" />
                   <XAxis dataKey="price" type="number" domain={['dataMin', 'dataMax']} {...AXIS} tickFormatter={(v) => fmt(v, 0)} />
                   <YAxis {...AXIS} width={56} tickFormatter={(v) => fmt(v, 0)} />
                   <Tooltip {...TOOLTIP} labelFormatter={(v) => `${t('Cours')} ${fmt(v, 2)}`} formatter={(v, n) => [fmt(v, 2), n]} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <ReferenceArea x1={p.S - payoff.sd} x2={p.S + payoff.sd} fill="rgba(224,164,58,.07)" />
-                  <ReferenceLine y={0} stroke="#55555c" />
-                  <ReferenceLine x={p.S} stroke="#88888f" strokeDasharray="4 4" label={{ value: t('cours actuel'), fill: '#88888f', fontSize: 10, position: 'top' }} />
-                  <Line dataKey="today" name={t("Valeur aujourd'hui (théorique)")} stroke="#7f9cc4" strokeDasharray="5 4" dot={false} isAnimationActive={false} />
-                  <Line dataKey="expiry" name={t("Gain / perte à l'échéance")} stroke="#e0a43a" strokeWidth={2.2} dot={false} isAnimationActive={false} />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <ReferenceArea x1={p.S - payoff.sd} x2={p.S + payoff.sd} fill="rgba(30,113,69,.07)" />
+                  <ReferenceLine y={0} stroke="#9aa29d" />
+                  <ReferenceLine x={p.S} stroke="#69716c" strokeDasharray="4 4" label={{ value: t('cours actuel'), fill: '#69716c', fontSize: 10, position: 'top' }} />
+                  <Line dataKey="today" name={t("Valeur aujourd'hui (théorique)")} stroke="#2e75b6" strokeDasharray="5 4" dot={false} isAnimationActive={false} />
+                  <Line dataKey="expiry" name={t("Gain / perte à l'échéance")} stroke="#1e7145" strokeWidth={2.2} dot={false} isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
-            <div className="hint" style={{ marginTop: 4 }}>{t("Zone ambrée : fourchette de cours à l'échéance dans environ 2 cas sur 3 selon la volatilité saisie (± 1 écart-type).")}</div>
+            <div className="hint" style={{ marginTop: 4 }}>{t("Zone verte : fourchette de cours à l'échéance dans environ 2 cas sur 3 selon la volatilité saisie (± 1 écart-type).")}</div>
           </>)}
         </>)}
       </div>
@@ -280,7 +286,7 @@ function DerivativesView({ onAnalyze }) {
         <div className="panel" style={{ marginBottom: 24 }}>
           <div className="panel-head">
             <h3 className="section-title"><Table2 size={15} /> {t("Chaîne d'options · échéance")} {new Date(`${mkt.expiry}T12:00:00`).toLocaleDateString(getLocale(), { day: 'numeric', month: 'long', year: 'numeric' })}</h3>
-            <button type="button" className="btn btn-sm" onClick={() => setShowChain(s => !s)}>{showChain ? t('Masquer') : t('Afficher')}</button>
+            <button type="button" className="btn btn-sm" onClick={() => setShowChain(s => !s)} aria-expanded={showChain}>{showChain ? t('Masquer') : t('Afficher')}</button>
           </div>
           {showChain && (
             <div style={{ overflow: 'auto', maxHeight: 460 }}>
@@ -301,7 +307,7 @@ function DerivativesView({ onAnalyze }) {
                         <td className={`num ${c.itm ? 'itm' : ''}`}>{fmt(c.bid, 2)}</td>
                         <td className={`num ${c.itm ? 'itm' : ''}`}>{fmt(c.ask, 2)}</td>
                         <td className={`num ${c.itm ? 'itm' : ''}`}><button type="button" className="row-action" onClick={() => addFromChain('call', c)}>+ call</button></td>
-                        <td className="num strike-col" onClick={() => setStrike(String(c.strike))} title={t('Utiliser ce strike dans le calculateur')}>{fmt(c.strike, 2)}</td>
+                        <td className="num strike-col"><button type="button" className="th-sort" onClick={() => setStrike(String(c.strike))} title={t('Utiliser ce strike dans le calculateur')}>{fmt(c.strike, 2)}</button></td>
                         <td className={pt?.itm ? 'itm' : ''}>{pt && <button type="button" className="row-action" onClick={() => addFromChain('put', pt)}>+ put</button>}</td>
                         <td className={`num ${pt?.itm ? 'itm' : ''}`}>{pt ? fmt(pt.bid, 2) : '—'}</td>
                         <td className={`num ${pt?.itm ? 'itm' : ''}`}>{pt ? fmt(pt.ask, 2) : '—'}</td>
@@ -317,7 +323,16 @@ function DerivativesView({ onAnalyze }) {
           <div className="hint" style={{ marginTop: 8 }}>{t('Fond teinté : option dans la monnaie. Ligne encadrée : strike le plus proche du cours. « + call / + put » ajoute une jambe achetée au prix milieu (changez le sens dans le tableau pour la vendre).')}</div>
         </div>
       )}
-      {!mkt && !loading && <EmptyState icon={Sigma} title="Choisissez un sous-jacent">Les actions et ETF américains (Apple, SPY, QQQ…) ont une chaîne d'options cotée. Pour les autres, le calculateur fonctionne avec vos propres paramètres.</EmptyState>}
+      {!mkt && loading && <EmptyState icon={Loader2} busy title="Chargement du marché…">{"Récupération du cours, de la volatilité et de la chaîne d'options."}</EmptyState>}
+      {!mkt && !loading && (
+        <EmptyState icon={Sigma} title="Choisissez un sous-jacent"
+          actions={<>
+            <span className="label">{t('Essayer avec :')}</span>
+            {EXAMPLES.map(([tk, label]) => <button key={tk} type="button" className="btn btn-sm" onClick={() => { setTicker(tk); load(tk); }}>{t(label)}</button>)}
+          </>}>
+          {"Une option donne le droit d'acheter (call) ou de vendre (put) un actif à un prix fixé d'avance. Choisissez une action ou un ETF américain pour charger les prix du marché, ou renseignez vous-même les paramètres ci-dessus."}
+        </EmptyState>
+      )}
     </div>
   );
 }

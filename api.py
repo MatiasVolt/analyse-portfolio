@@ -626,3 +626,35 @@ def get_options(ticker: str, expiry: Optional[str] = None):
         raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+
+# -------------------------------------------------------------
+# 6. RAPPORT DE COMPARAISON (.xlsx avec graphiques)
+# -------------------------------------------------------------
+import report
+from fastapi.responses import Response
+
+
+class ComparisonRequest(BaseModel):
+    portfolios: List[dict]
+    period: Optional[str] = "5y"
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    benchmark: Optional[str] = "^GSPC"
+    capital: Optional[float] = 10000.0
+
+
+@app.post("/api/export/comparison")
+def export_comparison(req: ComparisonRequest):
+    try:
+        if len(req.portfolios) < 1:
+            raise ValueError(T("Aucun portefeuille à exporter.", "No portfolio to export."))
+        content = report.build_comparison(req.portfolios, fetch_many, period=req.period, start=req.start_date, end=req.end_date,
+                                          benchmark=(req.benchmark or "^GSPC").upper(), capital=req.capital or 10000.0)
+        return Response(content, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        headers={"Content-Disposition": 'attachment; filename="comparaison.xlsx"'})
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

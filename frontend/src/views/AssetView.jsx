@@ -22,7 +22,7 @@ const QUICK = [
 const CHART_TYPES = [
   { value: 'line', label: 'Courbe', icon: <Activity size={13} /> },
   { value: 'candle', label: 'Chandeliers', icon: <BarChart2 size={13} /> },
-  { value: 'drawdown', label: 'Drawdown', icon: <ShieldAlert size={13} />, accent: '#e5484d' },
+  { value: 'drawdown', label: 'Drawdown', icon: <ShieldAlert size={13} />, accent: 'var(--red)' },
 ];
 
 function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
@@ -100,8 +100,8 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
           <Field label="Actif" style={{ flex: '0 1 300px' }}>
             <AssetSearchInput value={ticker} onChange={setTicker} onSelect={pick} onEnter={() => run()} />
           </Field>
-          <Field label="Benchmark">
-            <select value={benchmark} onChange={(e) => { setBenchmark(e.target.value); if (data) run({ benchmark: e.target.value }); }}>
+          <Field label="Comparer à">
+            <select aria-label={t('Comparer à')} title={t("Indice de référence (benchmark) utilisé pour le bêta, l'alpha et la comparaison")} value={benchmark} onChange={(e) => { setBenchmark(e.target.value); if (data) run({ benchmark: e.target.value }); }}>
               <option value="">{t('Automatique')}</option>
               {BENCHMARKS.map(b => <option key={b.value} value={b.value}>{b.label}</option>)}
             </select>
@@ -118,21 +118,21 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
           <span className="label" style={{ margin: '0 6px 0 0' }}>{t('Accès rapide')}</span>
           {QUICK.map(q => (
             <button key={q.ticker} type="button" onClick={() => pick(q.ticker)}
-              className={`btn btn-sm${ticker === q.ticker ? ' is-on' : ''}`}>
+              className={`btn btn-sm${ticker === q.ticker ? ' is-on' : ''}`} aria-pressed={ticker === q.ticker}>
               {t(q.label)}
             </button>
           ))}
         </div>
       </div>
 
-      {error && <div className="error-box">{error}</div>}
+      {error && <div className="error-box" role="alert">{error}</div>}
 
       {!data && !loading && (
-        <EmptyState icon={ChartLine} title="Aucun actif analysé">
-          {"Recherchez une action, un ETF, un indice ou une crypto ci-dessus, ou cliquez sur un accès rapide : performance, risque et projection Monte-Carlo s'afficheront ici."}
+        <EmptyState icon={ChartLine} title="Par où commencer ?">
+          {"Tapez le nom d'une action, d'un ETF, d'un indice ou d'une crypto dans le champ « Actif », ou cliquez simplement sur un accès rapide (Apple, S&P 500…). Vous verrez ici sa performance, son niveau de risque et une projection de son évolution possible."}
         </EmptyState>
       )}
-      {!data && loading && <EmptyState icon={Loader2} title="Analyse en cours…">{'Téléchargement des cours et calcul des indicateurs.'}</EmptyState>}
+      {!data && loading && <EmptyState icon={Loader2} busy title="Analyse en cours…">{'Téléchargement des cours et calcul des indicateurs.'}</EmptyState>}
 
       {data && (
         <div style={{ opacity: loading ? 0.55 : 1, transition: 'opacity .15s' }}>
@@ -142,8 +142,8 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
               <span className="ticker">{data.ticker}</span>
               <span className="tag">{t(ASSET_CLASS_LABELS[data.asset_class] || data.asset_class)}</span>
             </div>
-            <div className="result-meta">
-              {t('Du {a} au {b}', { a: fmtDate(data.period_start), b: fmtDate(data.period_end) })} · {t('Référence :')} <strong>{data.benchmark_label}</strong>
+            <div className="result-meta" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <span>{t('Du {a} au {b}', { a: fmtDate(data.period_start), b: fmtDate(data.period_end) })} · {t('Référence :')} <strong>{data.benchmark_label}</strong></span>
             </div>
           </div>
 
@@ -174,8 +174,8 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
           <div className="grid-2" style={{ marginBottom: 24 }}>
             <div className="panel" style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, gap: 10, flexWrap: 'wrap' }}>
-                <Segmented options={CHART_TYPES} value={chartType} onChange={setChartType} />
-                <button type="button" className="icon-btn" title={t('Plein écran')}
+                <Segmented options={CHART_TYPES} value={chartType} onChange={setChartType} label="Type de graphique" />
+                <button type="button" className="icon-btn" title={t('Plein écran')} aria-label={t('Plein écran')}
                   onClick={() => onFullscreen({ kind: 'chart', title: trName(getAsset(data.ticker)?.name) || data.ticker, props: { data: data.chart_data, type: chartType, isMoney: isMoneyChart, currency } })}>
                   <Maximize2 size={15} />
                 </button>

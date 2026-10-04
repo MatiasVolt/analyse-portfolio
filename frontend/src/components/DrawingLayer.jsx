@@ -17,7 +17,7 @@ const TOOLS = [
   { id: 'free', label: 'Crayon libre', icon: PenLine },
   { id: 'erase', label: 'Gomme (cliquer sur un tracé)', icon: Eraser },
 ];
-const COLORS = ['#e8e8ea', '#e0a43a', '#22a06b', '#e5484d', '#7f9cc4'];
+const COLORS = ['#1f2421', '#1e7145', '#107c41', '#c42b1c', '#2e75b6'];
 
 const load = (key) => {
   try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
@@ -129,7 +129,7 @@ export default function DrawingLayer({ api, storageKey }) {
           <line x1={0} x2={w} y1={pts[0].y} y2={pts[0].y} {...common} strokeDasharray="6 4" />
           <line x1={0} x2={w} y1={pts[0].y} y2={pts[0].y} stroke="transparent" strokeWidth={10} style={common.style} onClick={common.onClick} />
           <rect x={w - 64} y={pts[0].y - 9} width={62} height={18} rx={3} fill={d.color} />
-          <text x={w - 33} y={pts[0].y + 4} textAnchor="middle" fontSize="11" fill="#111" fontWeight="700">{fmt(d.pts[0].p, d.pts[0].p < 10 ? 4 : 2)}</text>
+          <text x={w - 33} y={pts[0].y + 4} textAnchor="middle" fontSize="11" fill="#ffffff" fontWeight="700">{fmt(d.pts[0].p, d.pts[0].p < 10 ? 4 : 2)}</text>
         </g>
       );
     }

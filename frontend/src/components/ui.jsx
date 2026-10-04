@@ -1,4 +1,4 @@
-import { useRef, useState, memo } from 'react';
+import { cloneElement, isValidElement, useId, useRef, useState, memo } from 'react';
 import { Info, BookOpen } from 'lucide-react';
 import { fmt } from '../format';
 import { useLang } from '../i18n';
@@ -15,6 +15,7 @@ export function HelpButtons({ interpretation, definition, size = 15 }) {
   const [open, setOpen] = useState(null); // 'analysis' | 'definition' | null
   const [alignRight, setAlignRight] = useState(false);
   const ref = useRef(null);
+  const bubbleId = useId();
 
   const show = (kind) => {
     if (ref.current) {
@@ -27,31 +28,33 @@ export function HelpButtons({ interpretation, definition, size = 15 }) {
   if (!interpretation && !definition) return null;
 
   return (
-    <span ref={ref} style={{ position: 'relative', display: 'inline-flex', gap: 2 }} onMouseLeave={() => setOpen(null)}>
+    <span ref={ref} style={{ position: 'relative', display: 'inline-flex', gap: 2 }} onMouseLeave={() => setOpen(null)}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setOpen(null); }}
+      onKeyDown={(e) => { if (e.key === 'Escape' && open) { e.stopPropagation(); setOpen(null); } }}>
       {interpretation && (
         <button type="button" className={`icon-btn ${open === 'analysis' ? 'active' : ''}`}
-          aria-label={t('Interprétation')} onMouseEnter={() => show('analysis')} onClick={() => show(open === 'analysis' ? null : 'analysis')}
+          aria-label={t('Interprétation')} aria-expanded={open === 'analysis'} aria-describedby={open === 'analysis' ? bubbleId : undefined} onMouseEnter={() => show('analysis')} onClick={() => show(open === 'analysis' ? null : 'analysis')}
           style={{ color: open === 'analysis' ? 'var(--accent-text)' : undefined }}>
           <Info size={size} />
         </button>
       )}
       {definition && (
         <button type="button" className={`icon-btn ${open === 'definition' ? 'active' : ''}`}
-          aria-label={t('Définition')} onMouseEnter={() => show('definition')} onClick={() => show(open === 'definition' ? null : 'definition')}
-          style={{ color: open === 'definition' ? '#fff' : undefined }}>
+          aria-label={t('Définition')} aria-expanded={open === 'definition'} aria-describedby={open === 'definition' ? bubbleId : undefined} onMouseEnter={() => show('definition')} onClick={() => show(open === 'definition' ? null : 'definition')}
+          style={{ color: open === 'definition' ? 'var(--text)' : undefined }}>
           <BookOpen size={size} />
         </button>
       )}
       {open && (
-        <div style={{
+        <div id={bubbleId} role="tooltip" style={{
           position: 'absolute', top: 'calc(100% + 4px)', [alignRight ? 'right' : 'left']: 0, zIndex: 200,
           width: 300, maxWidth: '85vw', background: 'var(--raised)', border: '1px solid var(--border-2)',
           borderLeft: `3px solid ${open === 'analysis' ? 'var(--accent)' : 'var(--muted)'}`,
-          padding: '9px 11px', borderRadius: 6, fontSize: 12, lineHeight: 1.5,
-          color: 'var(--text-2)', boxShadow: '0 8px 24px rgba(0,0,0,.6)',
+          padding: '10px 12px', borderRadius: 6, fontSize: 12.5, lineHeight: 1.55,
+          color: 'var(--text-2)', boxShadow: '0 6px 20px rgba(0,0,0,.14)',
           pointerEvents: 'none', textTransform: 'none', letterSpacing: 0, fontWeight: 400, whiteSpace: 'normal',
         }}>
-          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 3, color: open === 'analysis' ? 'var(--accent-text)' : 'var(--muted-2)' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 3, color: open === 'analysis' ? 'var(--accent-text)' : 'var(--muted-2)' }}>
             {open === 'analysis' ? t('Interprétation') : t('Définition')}
           </div>
           {txt(t, open === 'analysis' ? interpretation : definition)}
@@ -84,12 +87,12 @@ export const StatCell = memo(function StatCell({ label, value, unit, nd = 2, sig
   );
 });
 
-export function Segmented({ options, value, onChange, accent }) {
+export function Segmented({ options, value, onChange, accent, label }) {
   const { t } = useLang();
   return (
-    <div className="segmented">
+    <div className="segmented" role="group" aria-label={label ? txt(t, label) : undefined}>
       {options.map(o => (
-        <button key={o.value} type="button" className={value === o.value ? 'on' : ''} onClick={() => onChange(o.value)}
+        <button key={o.value} type="button" className={value === o.value ? 'on' : ''} onClick={() => onChange(o.value)} aria-pressed={value === o.value}
           style={value === o.value && (o.accent || accent) ? { background: o.accent || accent } : undefined}>
           {o.icon}{txt(t, o.label)}
         </button>
@@ -98,23 +101,41 @@ export function Segmented({ options, value, onChange, accent }) {
   );
 }
 
+/**
+ * Champ avec libellé. Un <input>/<select> seul est relié à son libellé (clic sur le libellé = focus, lecteurs d'écran) ;
+ * un contenu composé est annoncé comme un groupe portant ce libellé.
+ */
 export function Field({ label, children, style }) {
   const { t } = useLang();
+  const id = useId();
+  const single = isValidElement(children) && (children.type === 'input' || children.type === 'select');
+  if (!label) return <div style={style}>{children}</div>;
+  if (single) {
+    const inputId = children.props.id || `${id}-in`;
+    return (
+      <div style={style}>
+        <label className="label" htmlFor={inputId}>{txt(t, label)}</label>
+        {cloneElement(children, { id: inputId })}
+      </div>
+    );
+  }
   return (
-    <div style={style}>
-      {label && <span className="label">{txt(t, label)}</span>}
+    <div style={style} role="group" aria-labelledby={`${id}-lb`}>
+      <span className="label" id={`${id}-lb`}>{txt(t, label)}</span>
       {children}
     </div>
   );
 }
 
-export function EmptyState({ icon: Icon, title, children }) {
+/** État vide : icône, titre, explication et, si fourni, des actions en un clic (exemples, modèles…). */
+export function EmptyState({ icon: Icon, title, children, actions, busy = false }) {
   const { t } = useLang();
   return (
-    <div className="panel empty-state">
-      {Icon && <span className="empty-icon"><Icon size={20} /></span>}
+    <div className="panel empty-state" role={busy ? 'status' : undefined} aria-live={busy ? 'polite' : undefined}>
+      {Icon && <span className="empty-icon" aria-hidden="true"><Icon size={20} className={busy ? 'spin' : undefined} /></span>}
       {title && <div className="empty-title">{txt(t, title)}</div>}
       {children && <div className="empty-text">{txt(t, children)}</div>}
+      {actions && <div className="empty-actions">{actions}</div>}
     </div>
   );
 }

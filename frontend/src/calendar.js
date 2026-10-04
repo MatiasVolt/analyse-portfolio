@@ -4,14 +4,14 @@ import { getLang, getLocale, tr } from './i18n';
 
 // Code couleur inspiré de Forex Factory : rouge = fort, orange = moyen, jaune = faible, gris = férié
 export const IMPACT = {
-  High: { label: 'Fort', color: '#e5484d', rank: 3 },
-  Medium: { label: 'Moyen', color: '#f08c3c', rank: 2 },
-  Low: { label: 'Faible', color: '#d9c27a', rank: 1 },
-  Holiday: { label: 'Férié', color: '#88888f', rank: 0 },
+  High: { label: 'Fort', color: '#c42b1c', rank: 3 },
+  Medium: { label: 'Moyen', color: '#d86b00', rank: 2 },
+  Low: { label: 'Faible', color: '#b89a00', rank: 1 },
+  Holiday: { label: 'Férié', color: '#8a8f8b', rank: 0 },
 };
 // Le libellé est traduit à l'affichage (clé française)
 export const impactOf = (i) => {
-  const m = IMPACT[i] || { label: i, color: '#88888f', rank: 0 };
+  const m = IMPACT[i] || { label: i, color: '#69716c', rank: 0 };
   return { ...m, label: tr(m.label) };
 };
 

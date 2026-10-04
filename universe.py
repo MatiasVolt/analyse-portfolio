@@ -36,13 +36,19 @@ WIKI_SOURCES = [
     ("aex", "https://en.wikipedia.org/wiki/AEX_index", "Europe", ".AS", "Pays-Bas"),
     ("ibex", "https://en.wikipedia.org/wiki/IBEX_35", "Europe", ".MC", "Espagne"),
     ("mib", "https://en.wikipedia.org/wiki/FTSE_MIB", "Europe", ".MI", "Italie"),
+    ("sp600", "https://en.wikipedia.org/wiki/List_of_S%26P_600_companies", "US", "", "États-Unis"),
+    ("omxs30", "https://en.wikipedia.org/wiki/OMX_Stockholm_30", "Europe", ".ST", "Suède"),
+    ("psi", "https://en.wikipedia.org/wiki/PSI-20", "Europe", ".LS", "Portugal"),
+    ("tsx60", "https://en.wikipedia.org/wiki/S%26P/TSX_60", "Amériques", ".TO", "Canada"),
+    ("ibov", "https://en.wikipedia.org/wiki/List_of_companies_listed_on_B3", "Amériques", ".SA", "Brésil"),
+    ("nifty50", "https://en.wikipedia.org/wiki/NIFTY_50", "Asie", ".NS", "Inde"),
 ]
 
 SUFFIX_COUNTRY = {
     ".PA": "France", ".DE": "Allemagne", ".F": "Allemagne", ".L": "Royaume-Uni", ".SW": "Suisse",
     ".AS": "Pays-Bas", ".MC": "Espagne", ".MI": "Italie", ".BR": "Belgique", ".HE": "Finlande",
     ".CO": "Danemark", ".ST": "Suède", ".OL": "Norvège", ".LS": "Portugal", ".IR": "Irlande",
-    ".VI": "Autriche",
+    ".VI": "Autriche", ".TO": "Canada", ".SA": "Brésil", ".NS": "Inde",
 }
 
 # --- Compléments actions (hors indices scrapés) -----------------------------
@@ -224,7 +230,7 @@ def _pick_columns(df):
     return tick, name, sector
 
 
-KNOWN_SUFFIXES = {"PA", "DE", "L", "SW", "AS", "MC", "MI", "F", "BR", "HE", "CO", "ST", "IR", "LS", "VI", "OL"}
+KNOWN_SUFFIXES = {"PA", "DE", "L", "SW", "AS", "MC", "MI", "F", "BR", "HE", "CO", "ST", "IR", "LS", "VI", "OL", "TO", "SA", "NS"}
 
 
 def _normalize_ticker(raw, suffix):

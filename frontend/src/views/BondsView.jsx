@@ -8,8 +8,8 @@ import { API, fmt, parseNum } from '../format';
 import { useLang, tr } from '../i18n';
 import { BOND_DEFS as DEF } from '../definitions';
 
-const AXIS = { stroke: '#88888f', fontSize: 11 };
-const TOOLTIP = { contentStyle: { backgroundColor: '#1b1b1e', borderColor: '#323237', color: '#fff', fontSize: 12 } };
+const AXIS = { stroke: '#69716c', fontSize: 11 };
+const TOOLTIP = { contentStyle: { backgroundColor: '#ffffff', borderColor: '#c6c9c6', color: 'var(--text)', fontSize: 12 } };
 
 
 
@@ -90,7 +90,7 @@ function BondCalculator({ market }) {
         </Field>
         <Field label="Échéance (années)"><input type="text" inputMode="decimal" value={years} onChange={(e) => setYears(e.target.value)} /></Field>
         <Field label="Je connais">
-          <Segmented value={mode} onChange={setMode} options={[{ value: 'yield', label: 'le rendement' }, { value: 'price', label: 'le prix' }]} />
+          <Segmented label="Je connais" value={mode} onChange={setMode} options={[{ value: 'yield', label: 'le rendement' }, { value: 'price', label: 'le prix' }]} />
         </Field>
         {mode === 'yield'
           ? <Field label="Rendement (% / an)"><input type="text" inputMode="decimal" value={yieldIn} onChange={(e) => setYieldIn(e.target.value)} /></Field>
@@ -128,13 +128,13 @@ function BondCalculator({ market }) {
             <div style={{ height: 230 }}>
               <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10}>
                 <LineChart data={curve} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#222226" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e6e8e6" />
                   <XAxis dataKey="yield" {...AXIS} tickFormatter={(v) => `${fmt(v, 1)} %`} minTickGap={30} type="number" domain={['dataMin', 'dataMax']} />
                   <YAxis {...AXIS} width={52} tickFormatter={(v) => fmt(v, 0)} domain={['auto', 'auto']} />
                   <Tooltip {...TOOLTIP} formatter={(v) => [`${fmt(v, 2)} %`, tr('Prix')]} labelFormatter={(v) => `${tr('Rendement')} ${fmt(v, 2)} %`} />
-                  <ReferenceLine y={100} stroke="#45454b" strokeDasharray="3 3" />
-                  <Line type="monotone" dataKey="price" stroke="#e0a43a" dot={false} strokeWidth={2} isAnimationActive={false} />
-                  <ReferenceDot x={Math.round(yieldPct * 100) / 100} y={res.pricePct} r={5} fill="#e0a43a" stroke="#161618" />
+                  <ReferenceLine y={100} stroke="#9aa29d" strokeDasharray="3 3" />
+                  <Line type="monotone" dataKey="price" stroke="#1e7145" dot={false} strokeWidth={2} isAnimationActive={false} />
+                  <ReferenceDot x={Math.round(yieldPct * 100) / 100} y={res.pricePct} r={5} fill="#1e7145" stroke="#ffffff" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -144,12 +144,12 @@ function BondCalculator({ market }) {
             <div style={{ height: 230 }}>
               <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10}>
                 <BarChart data={res.rows.map(r => ({ t: fmt(r.t, 1), coupon: r.coupon, principal: r.principal, pv: r.pv }))} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#222226" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e6e8e6" />
                   <XAxis dataKey="t" {...AXIS} minTickGap={20} />
                   <YAxis {...AXIS} width={52} tickFormatter={(v) => fmt(v, 0)} scale="sqrt" />
                   <Tooltip {...TOOLTIP} formatter={(v, n) => [fmt(v, 2), tr(n === 'coupon' ? 'Coupon' : n === 'principal' ? 'Remboursement' : 'Valeur actuelle')]} labelFormatter={(v) => `${tr('Année')} ${v}`} />
-                  <Bar dataKey="coupon" stackId="a" fill="#e0a43a" isAnimationActive={false} />
-                  <Bar dataKey="principal" stackId="a" fill="#7f9cc4" isAnimationActive={false} />
+                  <Bar dataKey="coupon" stackId="a" fill="#1e7145" isAnimationActive={false} />
+                  <Bar dataKey="principal" stackId="a" fill="#2e75b6" isAnimationActive={false} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -182,12 +182,14 @@ function BondsView({ active, onAnalyze }) {
 
   return (
     <div>
-      <div className="result-head" style={{ marginTop: 0 }}>
+      <div className="result-head">
         <div className="result-title"><h1>{t('Obligations')}</h1></div>
-        <div className="result-meta">{t("Taux d'État et écarts de crédit · source FRED (Réserve fédérale de Saint-Louis)")}{data && ` · ${t('données du {d}', { d: data.updated })}`}{data?.stale && ` · ${t('copie locale')}`}</div>
+        <div className="result-meta" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <span>{t("Taux d'État et écarts de crédit · source FRED (Réserve fédérale de Saint-Louis)")}{data && ` · ${t('données du {d}', { d: data.updated })}`}{data?.stale && ` · ${t('copie locale')}`}</span>
+        </div>
       </div>
-      {error && <div className="error-box">{error}</div>}
-      {!data && !error && <EmptyState icon={Landmark} title="Chargement des taux…" />}
+      {error && <div className="error-box" role="alert">{error}</div>}
+      {!data && !error && <EmptyState icon={Landmark} busy title="Chargement des taux…" />}
 
       {data && (<>
         <div className="panel kpi-strip">
@@ -211,14 +213,14 @@ function BondsView({ active, onAnalyze }) {
             <div style={{ height: 270 }}>
               <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10}>
                 <LineChart data={curveData} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#222226" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e6e8e6" />
                   <XAxis dataKey="tenor" {...AXIS} />
                   <YAxis {...AXIS} width={44} domain={['auto', 'auto']} tickFormatter={(v) => `${fmt(v, 1)}`} />
                   <Tooltip {...TOOLTIP} formatter={(v, n) => [`${fmt(v, 2)} %`, n]} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Line dataKey="year" name={t('Il y a 1 an')} stroke="#55555c" strokeDasharray="4 4" dot={false} isAnimationActive={false} />
-                  <Line dataKey="month" name={t('Il y a 1 mois')} stroke="#88888f" dot={false} isAnimationActive={false} />
-                  <Line dataKey="now" name={t("Aujourd'hui")} stroke="#e0a43a" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Line dataKey="year" name={t('Il y a 1 an')} stroke="#9aa29d" strokeDasharray="4 4" dot={false} isAnimationActive={false} />
+                  <Line dataKey="month" name={t('Il y a 1 mois')} stroke="#69716c" dot={false} isAnimationActive={false} />
+                  <Line dataKey="now" name={t("Aujourd'hui")} stroke="#1e7145" strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -228,12 +230,12 @@ function BondsView({ active, onAnalyze }) {
             <div style={{ height: 270 }}>
               <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10}>
                 <AreaChart data={s.s10_2_history} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#222226" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e6e8e6" />
                   <XAxis dataKey="date" {...AXIS} minTickGap={50} tickFormatter={(d) => d.slice(0, 4)} />
                   <YAxis {...AXIS} width={44} tickFormatter={(v) => fmt(v, 1)} />
                   <Tooltip {...TOOLTIP} formatter={(v) => [`${fmt(v, 2)} ${tr('pt')}`, tr('Écart')]} />
-                  <ReferenceLine y={0} stroke="#e5484d" strokeDasharray="4 4" label={{ value: t('inversion'), fill: '#e5484d', fontSize: 10, position: 'insideBottomLeft' }} />
-                  <Area dataKey="value" stroke="#e0a43a" fill="rgba(224,164,58,.15)" isAnimationActive={false} />
+                  <ReferenceLine y={0} stroke="#c42b1c" strokeDasharray="4 4" label={{ value: t('inversion'), fill: '#c42b1c', fontSize: 10, position: 'insideBottomLeft' }} />
+                  <Area dataKey="value" stroke="#1e7145" fill="rgba(30,113,69,.12)" isAnimationActive={false} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -274,7 +276,7 @@ function BondsView({ active, onAnalyze }) {
                       <td className="num">{fmt(e.duration, 1)} {t('ans')}</td>
                       <td className="num" style={{ color: e.perf_1y_pct >= 0 ? 'var(--green)' : 'var(--red)' }}>{fmt(e.perf_1y_pct, 2, true)} %</td>
                       <td className="num">{fmt(e.volatility_pct, 1)} %</td>
-                      <td className="num" style={{ color: '#f07075' }}>{fmt(e.max_drawdown_pct, 1)} %</td>
+                      <td className="num" style={{ color: 'var(--red)' }}>{fmt(e.max_drawdown_pct, 1)} %</td>
                       <td><button type="button" className="row-action" onClick={() => onAnalyze(e.ticker)}>{t('Analyser')} <ArrowRight size={11} /></button></td>
                     </tr>
                   ))}

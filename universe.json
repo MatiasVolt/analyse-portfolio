@@ -7088,7 +7088,8 @@
 "sector": "Health Care",
 "aliases": [],
 "indices": [
-"sp400"
+"sp400",
+"sp600"
 ]
 },
 {
@@ -7412,7 +7413,8 @@
 "sector": "Consumer Discretionary",
 "aliases": [],
 "indices": [
-"sp400"
+"sp400",
+"sp600"
 ]
 },
 {
@@ -18075,6 +18077,10158 @@
 ]
 },
 {
+"ticker": "AAMI",
+"name": "Acadian Asset Management Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AAP",
+"name": "Advance Auto Parts, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AAT",
+"name": "American Assets Trust",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ABCB",
+"name": "Ameris Bancorp",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ABG",
+"name": "Asbury Automotive Group",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ABM",
+"name": "ABM Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ABR",
+"name": "Arbor Realty Trust",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ACA",
+"name": "Arcosa, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ACAD",
+"name": "Acadia Pharmaceuticals",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ACHC",
+"name": "Acadia Healthcare",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ACIW",
+"name": "ACI Worldwide",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ACLS",
+"name": "Axcelis Technologies, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ACMR",
+"name": "ACM Research, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ACT",
+"name": "Enact Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ADAM",
+"name": "Adamas Trust, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ADEA",
+"name": "Adeia, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ADIG",
+"name": "ADI Global Distribution",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ADMA",
+"name": "ADMA Biologics, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ADNT",
+"name": "Adient",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ADT",
+"name": "ADT Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ADUS",
+"name": "Addus HomeCare Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AEO",
+"name": "American Eagle Outfitters",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AESI",
+"name": "Atlas Energy Solutions, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AGNT",
+"name": "eXp World Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AGO",
+"name": "Assured Guaranty Ltd.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AGX",
+"name": "Argan, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AGYS",
+"name": "Agilysys, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AHCO",
+"name": "AdaptHealth Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AIN",
+"name": "Albany International Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AIR",
+"name": "AAR Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AKR",
+"name": "Acadia Realty Trust",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ALG",
+"name": "Alamo Group",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ALGT",
+"name": "Allegiant Travel Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ALHC",
+"name": "Alignment Healthcare, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ALKS",
+"name": "Alkermes plc",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ALRM",
+"name": "Alarm.Com, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AMN",
+"name": "Amn Healthcare Services, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AMPH",
+"name": "Amphstar Pharmaceuticals, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AMR",
+"name": "Alpha Metallurgical Resources, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AMRX",
+"name": "Amneal Pharmaceuticals",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AMSF",
+"name": "Amerisafe, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AMTM",
+"name": "Amentum",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ANDE",
+"name": "The Andersons, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ANIP",
+"name": "ANI Pharmaceuticals, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AORT",
+"name": "Artivion",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AOSL",
+"name": "Alpha and Omega Semiconductor, Ltd.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "APAM",
+"name": "Artisan Partners Asset Management, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "APLE",
+"name": "Apple Hospitality REIT, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "APOG",
+"name": "Apogee Enterprises, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ARCB",
+"name": "ArcBest Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ARLO",
+"name": "Arlo Technologies",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AROC",
+"name": "Archrock, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ARR",
+"name": "Armour Residential REIT",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ASO",
+"name": "Academy Sports + Outdoors",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ASTE",
+"name": "Astec Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ASTH",
+"name": "Astrana Health, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ATEN",
+"name": "A10 Networks, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ATMU",
+"name": "Atmus Filtration Technologies Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AUB",
+"name": "Atlantic Union Bankshares, Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AVA",
+"name": "Avista Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AWI",
+"name": "Armstrong World Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AWR",
+"name": "American States Water Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AX",
+"name": "Axos Financial, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AZTA",
+"name": "Azenta, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "AZZ",
+"name": "AZZ, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BANC",
+"name": "Banc Of California, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BANF",
+"name": "Bancfirst Corp",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BANR",
+"name": "Banner Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BBT",
+"name": "Beacon Financial Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BCC",
+"name": "Boise Cascade",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BCPC",
+"name": "Balchem Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BFAM",
+"name": "Bright Horizons Family Solutions Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BFH",
+"name": "Bread Financial Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BFS",
+"name": "Saul Centers, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BGC",
+"name": "BGC Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BHE",
+"name": "Benchmark Electronics, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BJRI",
+"name": "BJ's Restaurants, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BKE",
+"name": "The Buckle, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BKU",
+"name": "BankUnited, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BL",
+"name": "BlackLine Systems, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BLFS",
+"name": "BioLife Solutions, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BLKB",
+"name": "Blackbaud",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BMI",
+"name": "Badger Meter, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BNL",
+"name": "Broadstone Net Lease, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BOH",
+"name": "Bank of Hawaii",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BOOT",
+"name": "Boot Barn Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BOX",
+"name": "Box, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BRC",
+"name": "Brady Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BTU",
+"name": "Peabody Energy, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "BXMT",
+"name": "Blackstone Mortgage Trust, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CACC",
+"name": "Credit Acceptance",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CAG",
+"name": "Conagra Brands",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CAKE",
+"name": "The Cheesecake Factory, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CALM",
+"name": "Cal-Maine Foods, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CALX",
+"name": "Calix",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CALY",
+"name": "Callaway Golf Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CARG",
+"name": "CarGurus",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CASH",
+"name": "Pathward Financial, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CATY",
+"name": "Cathay General Bancorp",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CBRL",
+"name": "Cracker Barrel",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CBU",
+"name": "Community Bank System, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CC",
+"name": "Chemours",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CCOI",
+"name": "Cogent Communications Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CCS",
+"name": "Century Communities, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CE",
+"name": "Celanese",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CENT",
+"name": "Central Garden & Pet Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CENTA",
+"name": "Central Garden & Pet Company (Class A)",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CENX",
+"name": "Century Aluminum Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CERT",
+"name": "Certara, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CFFN",
+"name": "Capitol Federal Savings Bank",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CHCO",
+"name": "City Holding Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CHEF",
+"name": "Chefs' Warehouse, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CLSK",
+"name": "CleanSpark, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CNK",
+"name": "Cinemark Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CNMD",
+"name": "CONMED Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CNR",
+"name": "Core Natural Resources, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CNS",
+"name": "Cohen & Steers, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CNXC",
+"name": "Concentrix",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CNXN",
+"name": "PC Connection, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "COCO",
+"name": "The Vita Coco Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "COHU",
+"name": "Cohu, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "COLL",
+"name": "Collegium Pharmaceutical, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CON",
+"name": "Concentra Group Holdings Parent, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "COTY",
+"name": "Coty",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CPB",
+"name": "The Campbell's Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CPF",
+"name": "Central Pacific Financial Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CPK",
+"name": "Chesapeake Utilities Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CRC",
+"name": "California Resources Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CRGY",
+"name": "Crescent Energy Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CRI",
+"name": "Carter's, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CRK",
+"name": "Comstock Resources, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CRSR",
+"name": "Corsair Gaming",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CRVL",
+"name": "CorVel Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CSR",
+"name": "Centerspace Trust",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CSW",
+"name": "CSW Industrials, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CTS",
+"name": "CTS Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CUBI",
+"name": "Customers Bancorp, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CURB",
+"name": "Curbline Properties Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CVBF",
+"name": "CVB Financial Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CVCO",
+"name": "Cavco Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CVI",
+"name": "CVR Energy, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CVSA",
+"name": "Covista Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CWEN",
+"name": "Clearway Energy, Inc. (Class C)",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CWEN-A",
+"name": "Clearway Energy, Inc. (Class A)",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CWK",
+"name": "Cushman & Wakefield plc",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CWST",
+"name": "Casella Waste Systems, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CWT",
+"name": "California Water Service Group",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CXM",
+"name": "Sprinklr, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CXW",
+"name": "CoreCivic",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "CZR",
+"name": "Caesars Entertainment",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DAN",
+"name": "Dana Incorporated",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DAVE",
+"name": "Dave, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DBD",
+"name": "Diebold Nixdorf",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DCH",
+"name": "Dauch Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DCOM",
+"name": "Dime Community Bancshares, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DEA",
+"name": "Easterly Government Properties, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DEI",
+"name": "Douglas Emmett",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DFH",
+"name": "Dream Finders Homes, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DFIN",
+"name": "Donnelley Financial Solutions, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DGII",
+"name": "Digi International Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DIOD",
+"name": "Diodes Incorporated",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DLX",
+"name": "Deluxe Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DMC",
+"name": "Del Monte Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DNOW",
+"name": "NOW Inc",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DORM",
+"name": "Dorman Products, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DRH",
+"name": "DiamondRock Hospitality Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DV",
+"name": "DoubleVerify Holdings Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DXC",
+"name": "DXC Technology",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "DXPE",
+"name": "DXP Enterprises, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EBC",
+"name": "Eastern Bankshares, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ECG",
+"name": "Everus Construction Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ECPG",
+"name": "Encore Capital Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EFC",
+"name": "Ellington Financial, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EFOR",
+"name": "Everforth Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EGBN",
+"name": "Eagle Bancorp Inc",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EIG",
+"name": "Employers Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EMN",
+"name": "Eastman Chemical Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ENOV",
+"name": "Enovis",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ENPH",
+"name": "Enphase Energy",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ENR",
+"name": "Energizer",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ENVA",
+"name": "Enova International, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EPAC",
+"name": "Enerpac Tool Group",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EPAM",
+"name": "EPAM Systems",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EPC",
+"name": "Edgewell Personal Care",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EPRT",
+"name": "Essential Properties Realty Trust, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ESE",
+"name": "ESCO Technologies Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ESI",
+"name": "Element Solutions",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ETSY",
+"name": "Etsy",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EVTC",
+"name": "EVERTEC, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EXTR",
+"name": "Extreme Networks, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EYE",
+"name": "National Vision Holdings",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "EZPW",
+"name": "EZCORP, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FA",
+"name": "First Advantage Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FBK",
+"name": "FB Financial Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FBNC",
+"name": "First Bancorp (Southern Pines NC)",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FBP",
+"name": "First BanCorp (Puerto Rico)",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FBRT",
+"name": "Franklin BSP Realty Trust, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FCF",
+"name": "First Commonwealth Financial, Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FCPT",
+"name": "Four Corners Property Trust, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FELE",
+"name": "Franklin Electric",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FFBC",
+"name": "First Financial Bancorp",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FG",
+"name": "F&G Annuities & Life, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FHB",
+"name": "First Hawaiian, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FIBK",
+"name": "First Interstate BancSystem, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FIVN",
+"name": "Five9, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FIZZ",
+"name": "National Beverage Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FLO",
+"name": "Flowers Foods",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FMC",
+"name": "FMC Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FORM",
+"name": "FormFactor, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FOXF",
+"name": "Fox Factory",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FRPT",
+"name": "Freshpet",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FSS",
+"name": "Federal Signal Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FTDR",
+"name": "Frontdoor, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FTRE",
+"name": "Fortrea",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FUL",
+"name": "H.B. Fuller Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FULT",
+"name": "Fulton Financial Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "FUN",
+"name": "Six Flags",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GBX",
+"name": "The Greenbrier Companies, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GEO",
+"name": "GEO Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GFF",
+"name": "Griffon Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GIII",
+"name": "G-III Apparel Group, Ltd.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GKOS",
+"name": "Glaukos Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GNL",
+"name": "Global Net Lease, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GNW",
+"name": "Genworth Financial, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GO",
+"name": "Grocery Outlet",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GOLF",
+"name": "Acushnet Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GPI",
+"name": "Group 1 Automotive, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GPOR",
+"name": "Gulfport Energy Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GRBK",
+"name": "Green Brick Partners, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GSHD",
+"name": "Goosehead Insurance, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GT",
+"name": "Goodyear Tire and Rubber Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GTES",
+"name": "Gates Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GTM",
+"name": "ZoomInfo",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GTY",
+"name": "Getty Realty Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "GVA",
+"name": "Granite Construction, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HAFC",
+"name": "Hanmi Financial Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HASI",
+"name": "Hannon Armstrong Sustainable Infrastructure Capital, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HAYW",
+"name": "Hayward Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HCC",
+"name": "Warrior Met Coal, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HCI",
+"name": "HCI Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HCSG",
+"name": "Healthcare Services Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HE",
+"name": "Hawaiian Electric Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HFWA",
+"name": "Heritage Financial Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HIW",
+"name": "Highwoods Properties",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HLIT",
+"name": "Harmonic Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HLX",
+"name": "Helix Energy Solutions Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HMN",
+"name": "Horace Mann Educators Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HNI",
+"name": "HNI Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HOPE",
+"name": "Hope Bancorp, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HP",
+"name": "Helmerich & Payne, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HRMY",
+"name": "Harmony Biosciences Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HSTM",
+"name": "HealthStream, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HTH",
+"name": "Hilltop Holdings Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HTLD",
+"name": "Heartland Express, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HTO",
+"name": "H2O America",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HUBG",
+"name": "Hub Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HWKN",
+"name": "Hawkins, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "HZO",
+"name": "MarineMax, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "IART",
+"name": "Integra Lifesciences Holdings",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "IBP",
+"name": "Installed Building Products, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ICHR",
+"name": "Ichor Holdings, Ltd.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ICUI",
+"name": "ICU Medical",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "IIPR",
+"name": "Innovative Industrial Properties, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "INDB",
+"name": "Independent Bank Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "INDV",
+"name": "Indivior",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "INSP",
+"name": "Inspire Medical Systems, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "INSW",
+"name": "International Seaways, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "INVA",
+"name": "Innoviva, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "INVX",
+"name": "Innovex International, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "IOSP",
+"name": "Innospec, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "IPAR",
+"name": "Inter Parfums, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "IRDM",
+"name": "Iridium Communications",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ITGR",
+"name": "Integer Holdings Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ITRI",
+"name": "Itron, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "IVT",
+"name": "InvenTrust Properties",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "JBGS",
+"name": "JBG Smith",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "JBLU",
+"name": "JetBlue",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "JBSS",
+"name": "John B. Sanfilippo & Son, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "JBTM",
+"name": "JBT Marel Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "JJSF",
+"name": "J&J Snack Foods Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "JOE",
+"name": "St. Joe Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "JXN",
+"name": "Jackson Financial, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KAI",
+"name": "Kadant Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KALU",
+"name": "Kaiser Aluminum Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KFY",
+"name": "Korn/Ferry International",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KGS",
+"name": "Kodiak Gas Services, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KLIC",
+"name": "Kulicke and Soffa Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KMPR",
+"name": "Kemper Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KMT",
+"name": "Kennametal",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KMX",
+"name": "CarMax, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KN",
+"name": "Knowles Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KNTK",
+"name": "Kinetik Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KOP",
+"name": "Koppers Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KRMN",
+"name": "Karman Holdings",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KSS",
+"name": "Kohl's Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KTB",
+"name": "Kontoor Brands",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "KWR",
+"name": "Quaker Chemical Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LAUR",
+"name": "Laureate Education, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LAZ",
+"name": "Lazard",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LBRT",
+"name": "Liberty Energy, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LCII",
+"name": "LCI Industries",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LEG",
+"name": "Leggett & Platt",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LEU",
+"name": "Centrus Energy Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LFST",
+"name": "Lifestance Health",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LGIH",
+"name": "LGI Homes",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LIF",
+"name": "Life360",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LGND",
+"name": "Ligand Pharmaceuticals, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LKFN",
+"name": "Lakeland Financial",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LKQ",
+"name": "LKQ Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LMAT",
+"name": "LeMaitre Vascular",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LNC",
+"name": "Lincoln Financial",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LNN",
+"name": "Lindsay Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LPG",
+"name": "Dorian LPG Ltd.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LQDA",
+"name": "Liquidia Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LQDT",
+"name": "Liquidity Services, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LRN",
+"name": "Stride, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LTC",
+"name": "LTC Properties, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LTH",
+"name": "Life Time Group Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LUMN",
+"name": "Lumen Technologies",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LW",
+"name": "Lamb Weston",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LXP",
+"name": "Lexington Realty Trust",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LYFT",
+"name": "Lyft, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LZ",
+"name": "LegalZoom.com, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "LZB",
+"name": "La-Z-Boy, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MAC",
+"name": "Macerich",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MAN",
+"name": "ManpowerGroup",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MARA",
+"name": "MARA Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MATW",
+"name": "Matthews International Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MATX",
+"name": "Matson, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MBC",
+"name": "MasterBrand, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MBGL",
+"name": "Mobility Global, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MBIN",
+"name": "Merchants Bancorp",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MC",
+"name": "Moelis & Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MCRI",
+"name": "Monarch Casino & Resort, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MCY",
+"name": "Mercury General",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MD",
+"name": "Pediatrix Medical Group",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MDU",
+"name": "MDU Resources Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MFP",
+"name": "Midera Food Processing, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MGEE",
+"name": "MGE Energy, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MGY",
+"name": "Magnolia Oil & Gas, Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MHK",
+"name": "Mohawk Industries",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MHO",
+"name": "M/I Homes, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MIR",
+"name": "Mirion Technologies, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MKTX",
+"name": "MarketAxess",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MLKN",
+"name": "MillerKnoll, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MMI",
+"name": "Marcus & Millichap, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MMSI",
+"name": "Merit Medical Systems, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MPT",
+"name": "Medical Properties Trust",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MRCY",
+"name": "Mercury Systems",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MRP",
+"name": "Millrose Properties, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MRTN",
+"name": "Marten Transport, Ltd.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MSEX",
+"name": "Middlesex Water Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MSGS",
+"name": "Madison Square Garden Sports Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MTCH",
+"name": "Match Group",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MTH",
+"name": "Meritage Homes Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MTRN",
+"name": "Materion Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MTUS",
+"name": "Metallus Inc",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MTX",
+"name": "Minerals Technologies",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MWA",
+"name": "Mueller Water Products",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MXL",
+"name": "MaxLinear, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "MYRG",
+"name": "MYR Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NABL",
+"name": "N-able, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NATL",
+"name": "NCR Atleos",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NAVI",
+"name": "Navient",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NBHC",
+"name": "National Bank Holdings Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NBTB",
+"name": "NBT Bancorp, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NE",
+"name": "Noble Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NEO",
+"name": "NeoGenomics Laboratories, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NEOG",
+"name": "Neogen",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NGVT",
+"name": "Ingevity, Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NHC",
+"name": "National Healthcare, Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NHI",
+"name": "National Health Investors, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NIC",
+"name": "Nicolet Bankshares",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NMIH",
+"name": "NMI Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NOG",
+"name": "Northern Oil and Gas, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NPK",
+"name": "National Presto Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NPO",
+"name": "EnPro Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NSIT",
+"name": "Insight Enterprises, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NSP",
+"name": "Insperity",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NSSC",
+"name": "Napco Security Technologies",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NTCT",
+"name": "NETSCOUT Systems, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NTST",
+"name": "NETSTREIT Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NWBI",
+"name": "Northwest Bancshares, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NWL",
+"name": "Newell Brands",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NWN",
+"name": "NW Natural",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NX",
+"name": "Quanex Building Products Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "NXRT",
+"name": "NexPoint Residential Trust, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "OFG",
+"name": "OFG Bancorp",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "OGN",
+"name": "Organon & Co.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "OI",
+"name": "O-I Glass, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "OII",
+"name": "Oceaneering International, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "OMCL",
+"name": "Omnicell",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "OPLN",
+"name": "OPENLANE, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "OSIS",
+"name": "OSI Systems, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "OSW",
+"name": "OneSpaWorld Holdings Limited",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "OTTR",
+"name": "Otter Tail Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "OUT",
+"name": "Outfront Media",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PAHC",
+"name": "Phibro Animal Health",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PARR",
+"name": "Par Pacific Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PAYC",
+"name": "Paycom",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PAYO",
+"name": "Payoneer Global Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PATK",
+"name": "Patrick Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PBH",
+"name": "Prestige Consumer Healthcare",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PBI",
+"name": "Pitney Bowes, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PCRX",
+"name": "Pacira BioSciences, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PDFS",
+"name": "PDF Solutions, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PEB",
+"name": "Pebblebrook Hotel Trust",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PECO",
+"name": "Phillips Edison & Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PENG",
+"name": "Penguin Solutions, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PENN",
+"name": "Penn Entertainment",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PFBC",
+"name": "Preferred Bank",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PFS",
+"name": "Provident Financial Services, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PGNY",
+"name": "Progyny, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PHIN",
+"name": "PHINIA, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PI",
+"name": "Impinj, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PIPR",
+"name": "Piper Sandler Companies",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PJT",
+"name": "PJT Partners, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PLAB",
+"name": "Photronics, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PLMR",
+"name": "Palomar Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PLUS",
+"name": "ePlus, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PLXS",
+"name": "Plexus Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PMT",
+"name": "PennyMac Mortgage Investment Trust",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "POOL",
+"name": "Pool Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "POWI",
+"name": "Power Integrations",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "POWL",
+"name": "Powell Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PPLI",
+"name": "People Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PRDO",
+"name": "Perdoceo Education Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PRG",
+"name": "PROG Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PRGO",
+"name": "Perrigo",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PRGS",
+"name": "Progress Software Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PRIM",
+"name": "Primoris Services Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PRK",
+"name": "Park National Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PRKS",
+"name": "United Parks & Resorts",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PRLB",
+"name": "Protolabs",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PRSU",
+"name": "Pursuit Attractions & Hospitality, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PRVA",
+"name": "Privia Health Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PSMT",
+"name": "PriceSmart",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PTCT",
+"name": "PTC Therapeutics, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PTEN",
+"name": "Patterson-UTI Energy, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PTGX",
+"name": "Protagonist Therapeutics, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PTON",
+"name": "Peloton Interactive, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "PZZA",
+"name": "Papa John's Pizza",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "QDEL",
+"name": "QuidelOrtho",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "QNST",
+"name": "QuinStreet, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "QRVO",
+"name": "Qorvo",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "QTWO",
+"name": "Q2 Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RAMP",
+"name": "LiveRamp Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RAL",
+"name": "Ralliant Corp",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RCUS",
+"name": "Arcus Biosciences, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RDN",
+"name": "Radian Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RDNT",
+"name": "RadNet, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RELY",
+"name": "Remitly",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RES",
+"name": "RPC, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "REYN",
+"name": "Reynolds Consumer Products",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "REX",
+"name": "REX American Resources Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "REZI",
+"name": "Resideo Technologies, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RHI",
+"name": "Robert Half",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RHP",
+"name": "Ryman Hospitality Properties",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RITM",
+"name": "Rithm Capital",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RNG",
+"name": "RingCentral, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RNST",
+"name": "Renasant Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ROAD",
+"name": "Construction Partners, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ROCK",
+"name": "Gibraltar Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ROG",
+"name": "Rogers Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RRR",
+"name": "Red Rock Resorts, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RSI",
+"name": "Rush Street Interactive, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RUN",
+"name": "Sunrun",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RUSHA",
+"name": "Rush Enterprises",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "RXO",
+"name": "RXO, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SAFE",
+"name": "Safehold, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SABR",
+"name": "Sabre",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SAFT",
+"name": "Safety Insurance Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SAH",
+"name": "Sonic Automotive, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SBCF",
+"name": "Seacoast Banking Corporation of Florida",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SBH",
+"name": "Sally Beauty Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SBSI",
+"name": "Southside Bancshares, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SCHL",
+"name": "Scholastic Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SCL",
+"name": "Stepan Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SCSC",
+"name": "ScanSource, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SDGR",
+"name": "Schrödinger, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SEDG",
+"name": "SolarEdge",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SEI",
+"name": "Solaris Energy Infrastructure, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SEZL",
+"name": "Sezzle",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SFBS",
+"name": "ServisFirst Bancshares, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SFNC",
+"name": "Simmons First National Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SHAK",
+"name": "Shake Shack, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SHEN",
+"name": "Shenandoah Telecommunications Co",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SHO",
+"name": "Sunstone Hotel Investors, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SHOO",
+"name": "Steven Madden, Ltd.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SIG",
+"name": "Signet Jewelers",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SKT",
+"name": "Tanger Factory Outlet Centers, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SKY",
+"name": "Champion Homes, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SKYW",
+"name": "SkyWest, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SLG",
+"name": "SL Green Realty",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SLVM",
+"name": "Sylvamo Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SM",
+"name": "SM Energy Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SMP",
+"name": "Standard Motor Products, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SMPL",
+"name": "Simply Good Foods Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SNDR",
+"name": "Schneider National",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SNEX",
+"name": "StoneX Group Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SONO",
+"name": "Sonos, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SPHR",
+"name": "Sphere Entertainment",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SPNT",
+"name": "SiriusPoint Ltd.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SPSC",
+"name": "SPS Commerce, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SRPT",
+"name": "Sarepta Therapeutics",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "STAA",
+"name": "STAAR Surgical Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "STBA",
+"name": "S&T Bancorp, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "STC",
+"name": "Stewart Information Services Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "STEP",
+"name": "StepStone Group",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "STRA",
+"name": "Strategic Education, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SUPN",
+"name": "Supernus Pharmaceuticals, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SXI",
+"name": "Standex International Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "SXT",
+"name": "Sensient Technologies",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TALO",
+"name": "Talos Energy, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TBBK",
+"name": "The Bancorp, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TDC",
+"name": "Teradata",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TDS",
+"name": "Telephone and Data Systems, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TDW",
+"name": "Tidewater, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TFIN",
+"name": "Triumph Bancorp, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TFX",
+"name": "Teleflex",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TGTX",
+"name": "TG Therapeutics, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "THRM",
+"name": "Gentherm Incorporated",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TILE",
+"name": "Interface, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TMDX",
+"name": "TransMedics Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TMP",
+"name": "Tompkins Financial Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TNC",
+"name": "Tennant Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TNDM",
+"name": "Tandem Diabetes Care",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TPC",
+"name": "Tutor Perini Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TR",
+"name": "Tootsie Roll Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TRIP",
+"name": "TripAdvisor",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TRMK",
+"name": "Trustmark Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TRN",
+"name": "Trinity Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TRNO",
+"name": "Terreno Realty Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TRST",
+"name": "TrustCo Bank Corp NY",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "TRUP",
+"name": "Trupanion",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UA",
+"name": "Under Armour (Class C)",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UAA",
+"name": "Under Armour (Class A)",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UCB",
+"name": "United Community Banks, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UCTT",
+"name": "Ultra Clean Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UE",
+"name": "Urban Edge Properties",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UFCS",
+"name": "United Fire Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UFPT",
+"name": "UFP Technologies, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UNF",
+"name": "UniFirst Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UNFI",
+"name": "United Natural Foods Inc",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UNIT",
+"name": "Uniti Group",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UPBD",
+"name": "Upbound Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UPWK",
+"name": "Upwork, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "URBN",
+"name": "Urban Outfitters, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "USLM",
+"name": "United States Lime & Minerals, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "USPH",
+"name": "U.S. Physical Therapy, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UTI",
+"name": "Universal Technical Institute",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UTL",
+"name": "Unitil Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "UVV",
+"name": "Universal Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VAC",
+"name": "Marriott Vacations Worldwide",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VCEL",
+"name": "Vericel",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VCTR",
+"name": "Victory Capital Holdings, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VCYT",
+"name": "Veracyte, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VECO",
+"name": "Veeco Instruments Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VGNT",
+"name": "Versigent PLC",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VIR",
+"name": "Vir Biotechnology, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VIRT",
+"name": "Virtu Financial, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VRRM",
+"name": "Verra Mobility Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VRTS",
+"name": "Virtus Investment Partners, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VSAT",
+"name": "Viasat, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VSEC",
+"name": "VSE Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VSH",
+"name": "Vishay Intertechnology",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VSNT",
+"name": "Versant Media Group, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VSTS",
+"name": "Vestis",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VSXY",
+"name": "Victoria's Secret",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VTOL",
+"name": "Bristow Group Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VVX",
+"name": "V2X, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "VYX",
+"name": "NCR Voyix",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WABC",
+"name": "Westamerica Bank",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WAFD",
+"name": "WaFd, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WAY",
+"name": "Waystar Holding Corp",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WD",
+"name": "Walker & Dunlop, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WDFC",
+"name": "WD-40 Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WEN",
+"name": "The Wendy's Company",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WERN",
+"name": "Werner Enterprises",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WGO",
+"name": "Winnebago Industries, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WHD",
+"name": "Cactus, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WINA",
+"name": "Winmark",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WKC",
+"name": "World Kinect Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WLY",
+"name": "John Wiley & Sons",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WOR",
+"name": "Worthington Enterprises",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WRBY",
+"name": "Warby Parker",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WRLD",
+"name": "World Acceptance Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WS",
+"name": "Worthington Steel",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WSBC",
+"name": "WesBanco",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WSC",
+"name": "WillScot Holdings Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WSFS",
+"name": "WSFS Financial Corporation",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WT",
+"name": "WisdomTree Investments, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WU",
+"name": "Western Union",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "WWW",
+"name": "Wolverine World Wide, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "XHR",
+"name": "Xenia Hotels & Resorts, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "XNCR",
+"name": "Xencor Inc",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "XPEL",
+"name": "XPEL, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "YELP",
+"name": "Yelp, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "YOU",
+"name": "Clear Secure, Inc.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ZD",
+"name": "Ziff Davis",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ZWS",
+"name": "Zurn Elkay Water Solutions Corp.",
+"category": "Actions",
+"market": "US",
+"country": "États-Unis",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"sp600"
+]
+},
+{
+"ticker": "ABB.ST",
+"name": "ABB Ltd",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "ADDT-B.ST",
+"name": "Addtech B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "ALFA.ST",
+"name": "Alfa Laval",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "ASSA-B.ST",
+"name": "Assa Abloy B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "AZN.ST",
+"name": "AstraZeneca",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Health Care",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "ATCO-A.ST",
+"name": "Atlas Copco A",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "BOL.ST",
+"name": "Boliden",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "EPI-A.ST",
+"name": "Epiroc A",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "EQT.ST",
+"name": "EQT",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "ERIC-B.ST",
+"name": "Ericsson B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "ESSITY-B.ST",
+"name": "Essity B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "EVO.ST",
+"name": "Evolution",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "SHB-A.ST",
+"name": "Handelsbanken A",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "HM-B.ST",
+"name": "Hennes & Mauritz B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Consumer Discretionary",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "HEXA-B.ST",
+"name": "Hexagon B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "INDU-C.ST",
+"name": "Industrivärden C",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "INVE-B.ST",
+"name": "Investor B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "LIFCO-B.ST",
+"name": "Lifco B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "NIBE-B.ST",
+"name": "Nibe Industrier B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "NDA-SE.ST",
+"name": "Nordea Bank Abp",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "SAAB-B.ST",
+"name": "Saab B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "SAND.ST",
+"name": "Sandvik",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "SCA-B.ST",
+"name": "SCA B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Materials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "SEB-A.ST",
+"name": "SEB A",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "SKA-B.ST",
+"name": "Skanska B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "SKF-B.ST",
+"name": "SKF B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "SWED-A.ST",
+"name": "Swedbank A",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Financials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "TEL2-B.ST",
+"name": "Tele2 B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "TELIA.ST",
+"name": "Telia Company",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "VOLV-B.ST",
+"name": "Volvo B",
+"category": "Actions",
+"market": "Europe",
+"country": "Suède",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"omxs30"
+]
+},
+{
+"ticker": "ALTR.LS",
+"name": "Altri",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Basic Resources",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "BCP.LS",
+"name": "Banco Comercial Português",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Banks",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "COR.LS",
+"name": "Corticeira Amorim",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Industrial Goods & Services",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "CTT.LS",
+"name": "CTT Correios de Portugal",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Industrial Goods & Services",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "EDPR.LS",
+"name": "EDP Renováveis",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "EDP.LS",
+"name": "Energias de Portugal",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "GALP.LS",
+"name": "Galp Energia",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "IBS.LS",
+"name": "Ibersol",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Travel & Leisure",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "JMT.LS",
+"name": "Jerónimo Martins",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Personal Care, Drug & Grocery Stores",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "EGL.LS",
+"name": "Mota-Engil",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Construction & Materials",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "NOS.LS",
+"name": "NOS",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Telecommunications",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "NBA.LS",
+"name": "Novabase",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Technology",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "PHR.LS",
+"name": "Pharol",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Telecommunications",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "RENE.LS",
+"name": "Redes Energéticas Nacionais",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "SEM.LS",
+"name": "Semapa",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Basic Resources",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "SON.LS",
+"name": "Sonae",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Personal Care, Drug & Grocery Stores",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "SONC.LS",
+"name": "Sonae Capital",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "NVG.LS",
+"name": "The Navigator Company",
+"category": "Actions",
+"market": "Europe",
+"country": "Portugal",
+"sector": "Basic Resources",
+"aliases": [],
+"indices": [
+"psi"
+]
+},
+{
+"ticker": "AEM.TO",
+"name": "Agnico Eagle Mines Limited",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Basic Materials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "ATD.TO",
+"name": "Alimentation Couche-Tard Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Consumer Cyclical",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "BMO.TO",
+"name": "Bank of Montreal",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "BNS.TO",
+"name": "Bank of Nova Scotia",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "ABX.TO",
+"name": "Barrick Mining Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Basic Materials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "BCE.TO",
+"name": "BCE Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "BAM.TO",
+"name": "Brookfield Asset Management Ltd.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "BN.TO",
+"name": "Brookfield Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "BIP-UN.TO",
+"name": "Brookfield Infrastructure Partners L.P.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "CAE.TO",
+"name": "CAE Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "CCO.TO",
+"name": "Cameco Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "CM.TO",
+"name": "Canadian Imperial Bank of Commerce",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "CNR.TO",
+"name": "Canadian National Railway Company",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "CNQ.TO",
+"name": "Canadian Natural Resources Limited",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "CP.TO",
+"name": "Canadian Pacific Kansas City Limited",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "CTC-A.TO",
+"name": "Canadian Tire Corporation Limited",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Consumer Cyclical",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "CCL-B.TO",
+"name": "CCL Industries Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Consumer Cyclical",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "CLS.TO",
+"name": "Celestica Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "CVE.TO",
+"name": "Cenovus Energy Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "GIB-A.TO",
+"name": "CGI Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "CSU.TO",
+"name": "Constellation Software Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "DOL.TO",
+"name": "Dollarama Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "EMA.TO",
+"name": "Emera Incorporated",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "ENB.TO",
+"name": "Enbridge Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "FFH.TO",
+"name": "Fairfax Financial Holdings Limited",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "FM.TO",
+"name": "First Quantum Minerals Ltd.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Basic Materials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "FSV.TO",
+"name": "FirstService Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Real Estate",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "FTS.TO",
+"name": "Fortis Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "FNV.TO",
+"name": "Franco-Nevada Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Basic Materials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "WN.TO",
+"name": "George Weston Limited",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "GIL.TO",
+"name": "Gildan Activewear Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Consumer Cyclical",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "H.TO",
+"name": "Hydro One Limited",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Utilities",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "IMO.TO",
+"name": "Imperial Oil Limited",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "IFC.TO",
+"name": "Intact Financial Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "K.TO",
+"name": "Kinross Gold Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Basic Materials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "L.TO",
+"name": "Loblaw Companies Limited",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "MG.TO",
+"name": "Magna International Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Consumer Cyclical",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "MFC.TO",
+"name": "Manulife Financial Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "MRU.TO",
+"name": "Metro Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "NTR.TO",
+"name": "Nutrien Ltd.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Basic Materials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "OTEX.TO",
+"name": "Open Text Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "PPL.TO",
+"name": "Pembina Pipeline Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "POW.TO",
+"name": "Power Corporation of Canada",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "QSR.TO",
+"name": "Restaurant Brands International Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Consumer Cyclical",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "RCI-B.TO",
+"name": "Rogers Communications Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "RY.TO",
+"name": "Royal Bank of Canada",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "SAP.TO",
+"name": "Saputo Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Consumer Staples",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "SHOP.TO",
+"name": "Shopify Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "SLF.TO",
+"name": "Sun Life Financial Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "SU.TO",
+"name": "Suncor Energy Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "TRP.TO",
+"name": "TC Energy Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "TECK-B.TO",
+"name": "Teck Resources Limited",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Basic Materials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "T.TO",
+"name": "Telus Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Communication Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "TRI.TO",
+"name": "Thomson Reuters Corporation",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "TD.TO",
+"name": "Toronto-Dominion Bank",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "TOU.TO",
+"name": "Tourmaline Oil Corp.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Energy",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "WCN.TO",
+"name": "Waste Connections Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "WPM.TO",
+"name": "Wheaton Precious Metals Corp.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Basic Materials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "WSP.TO",
+"name": "WSP Global Inc.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Canada",
+"sector": "Industrials",
+"aliases": [],
+"indices": [
+"tsx60"
+]
+},
+{
+"ticker": "ALPA4.SA",
+"name": "Alpargatas",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "clothing",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "ABEV3.SA",
+"name": "Ambev",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "beverages",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "AMER3.SA",
+"name": "Americanas",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "retail",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "AZUL4.SA",
+"name": "Azul",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "airlines",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "B3SA3.SA",
+"name": "B3",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "stock exchange",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BBAS3.SA",
+"name": "Banco do Brasil",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "banking",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BBSE3.SA",
+"name": "BB Seguridade [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "insurance",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BBDC3.SA",
+"name": "Bradesco",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "banking",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BBDC4.SA",
+"name": "Bradesco",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "banking",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BIDI11.SA",
+"name": "Banco Inter [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "banking",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BPAN4.SA",
+"name": "Banco Pan",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "banking",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BRAP4.SA",
+"name": "Bradespar",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "holding",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BRML3.SA",
+"name": "BRMalls",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "real estate",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BRKM5.SA",
+"name": "Braskem",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "petrochemicals",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BRFS3.SA",
+"name": "BRF",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "foods",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BPAC11.SA",
+"name": "BTG Pactual",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "banking",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "CRFB3.SA",
+"name": "Carrefour Brasil",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "retail",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "CCRO3.SA",
+"name": "CCR",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "transportation",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "CVCB3.SA",
+"name": "CVC Brasil",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "travel and tourism",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "CMIG4.SA",
+"name": "CEMIG",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "electric utility",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "CIEL3.SA",
+"name": "Cielo",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "payment system",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "COGN3.SA",
+"name": "Cogna",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "higher education",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "CPLE6.SA",
+"name": "Copel",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "electric utility",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "CSAN3.SA",
+"name": "Cosan",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "conglomerate",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "CPFE3.SA",
+"name": "CPFL Energia",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "electric utility",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "CSNA3.SA",
+"name": "CSN",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "siderurgy and metallurgy",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "CYRE3.SA",
+"name": "Cyrela Brazil Realty",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "real estate",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "DXCO3.SA",
+"name": "Dexco",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "wood",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "ECOR3.SA",
+"name": "EcoRodovias",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "transportation",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "ENBR3.SA",
+"name": "EDP - Energias do Brasil",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "electric utility",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "AXIA3.SA",
+"name": "Eletrobras",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "electric utility",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "AXIA7.SA",
+"name": "Eletrobras",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "electric utility",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "EMBJ3.SA",
+"name": "Embraer",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "aerospace/defense",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "ENGI11.SA",
+"name": "Energisa [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "electric utility",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "ENEV3.SA",
+"name": "Eneva",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "electric utility",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "EGIE3.SA",
+"name": "ENGIE Brasil",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "electric utility",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "EQTL3.SA",
+"name": "Equatorial Energia [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "electric utility",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "EZTC3.SA",
+"name": "Eztec [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "real estate",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "GGBR4.SA",
+"name": "Gerdau",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "siderurgy and metallurgy",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "GOLL4.SA",
+"name": "Gol",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "airlines",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "PCAR3.SA",
+"name": "GPA",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "retail",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "SOMA3.SA",
+"name": "Grupo Soma",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "clothing",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "FLRY3.SA",
+"name": "Grupo Fleury [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "healthcare",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "HAPV3.SA",
+"name": "Grupo Hapvida [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "healthcare",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "HYPE3.SA",
+"name": "Hypera Pharma",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "pharmaceutical",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "IGTI11.SA",
+"name": "Iguatemi",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "shopping malls",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "IRBR3.SA",
+"name": "IRB Brasil RE",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "insurance",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "ITUB4.SA",
+"name": "Itaú Unibanco",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "banking",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "ITSA4.SA",
+"name": "Itaúsa",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "holding",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "JBSS3.SA",
+"name": "JBS",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "food and beverages",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "JHSF3.SA",
+"name": "JHSF Participações",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "real estate",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "KLBN11.SA",
+"name": "Klabin",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "pulp and paper",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "RENT3.SA",
+"name": "Localiza",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "rental car",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "LWSA3.SA",
+"name": "LocaWeb [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "internet services",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "LREN3.SA",
+"name": "Lojas Renner",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "department store",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "MGLU3.SA",
+"name": "Magazine Luiza",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "department store",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "MRFG3.SA",
+"name": "Marfrig",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "foods",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "CASH3.SA",
+"name": "Méliuz [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "cashback",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "GOAU4.SA",
+"name": "Metalúrgica Gerdau",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "holding",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "BEEF3.SA",
+"name": "Minerva Foods",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "foods",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "MRVE3.SA",
+"name": "MRV",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "real estate",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "MULT3.SA",
+"name": "Multiplan",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "shopping malls",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "NTCO3.SA",
+"name": "Natura & Co",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "cosmetics",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "PETR3.SA",
+"name": "Petrobras",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "oil and gas",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "PETR4.SA",
+"name": "Petrobras",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "oil and gas",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "VBBR3.SA",
+"name": "Petrobras Distribuidora",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "oil and gas",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "PRIO3.SA",
+"name": "PetroRio [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "oil and gas",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "PETZ3.SA",
+"name": "Petz [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "retail",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "QUAL3.SA",
+"name": "Qualicorp",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "insurance",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "RADL3.SA",
+"name": "RaiaDrogasil",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "drugstore",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "RDOR3.SA",
+"name": "Rede D'Or São Luiz [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "healthcare",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "RAIL3.SA",
+"name": "Rumo",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "logistics",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "SBSP3.SA",
+"name": "Sabesp",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "waste management",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "SANB11.SA",
+"name": "Santander Brasil",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "banking",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "ASAI3.SA",
+"name": "Sendas Distribuidora",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "retail",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "SULA11.SA",
+"name": "SulAmérica Seguros",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "insurance",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "SUZB3.SA",
+"name": "Suzano Papel e Celulose",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "pulp and paper",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "TAEE11.SA",
+"name": "Taesa S.A.",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "electric utility",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "VIVT3.SA",
+"name": "Telefônica Brasil",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "telecommunications",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "TIMS3.SA",
+"name": "TIM Brasil",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "telecommunications",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "TOTS3.SA",
+"name": "TOTVS",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "software",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "UGPA3.SA",
+"name": "Ultrapar",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "conglomerate",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "LCAM3.SA",
+"name": "Unidas [pt]",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "rental car",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "USIM5.SA",
+"name": "Usiminas",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "siderurgy and metallurgy",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "VALE3.SA",
+"name": "Vale",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "mining",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "VIIA3.SA",
+"name": "Via",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "retail",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "YDUQ3.SA",
+"name": "YDUQS",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "higher education",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "WEGE3.SA",
+"name": "WEG",
+"category": "Actions",
+"market": "Amériques",
+"country": "Brésil",
+"sector": "industrial engineering",
+"aliases": [],
+"indices": [
+"ibov"
+]
+},
+{
+"ticker": "ADANIENT.NS",
+"name": "Adani Enterprises",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Metals & Mining",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "ADANIPORTS.NS",
+"name": "Adani Ports & SEZ",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "APOLLOHOSP.NS",
+"name": "Apollo Hospitals",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Healthcare",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "ASIANPAINT.NS",
+"name": "Asian Paints",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Consumer Durables",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "AXISBANK.NS",
+"name": "Axis Bank",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "BAJAJ-AUTO.NS",
+"name": "Bajaj Auto",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Automobile and Auto Components",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "BAJFINANCE.NS",
+"name": "Bajaj Finance",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "BAJAJFINSV.NS",
+"name": "Bajaj Finserv",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "BEL.NS",
+"name": "Bharat Electronics",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Capital Goods",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "BHARTIARTL.NS",
+"name": "Bharti Airtel",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Telecommunication",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "CIPLA.NS",
+"name": "Cipla",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Healthcare",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "COALINDIA.NS",
+"name": "Coal India",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Oil, Gas & Consumable Fuels",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "DRREDDY.NS",
+"name": "Dr. Reddy's Laboratories",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Healthcare",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "EICHERMOT.NS",
+"name": "Eicher Motors",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Automobile and Auto Components",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "ETERNAL.NS",
+"name": "Eternal",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Consumer Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "GRASIM.NS",
+"name": "Grasim Industries",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Construction Materials",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "HCLTECH.NS",
+"name": "HCLTech",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "HDFCBANK.NS",
+"name": "HDFC Bank",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "HDFCLIFE.NS",
+"name": "HDFC Life",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "HINDALCO.NS",
+"name": "Hindalco Industries",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Metals & Mining",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "HINDUNILVR.NS",
+"name": "Hindustan Unilever",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Fast Moving Consumer Goods",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "ICICIBANK.NS",
+"name": "ICICI Bank",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "INDIGO.NS",
+"name": "IndiGo",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "INFY.NS",
+"name": "Infosys",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "ITC.NS",
+"name": "ITC",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Fast Moving Consumer Goods",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "JIOFIN.NS",
+"name": "Jio Financial Services",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "JSWSTEEL.NS",
+"name": "JSW Steel",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Metals & Mining",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "KOTAKBANK.NS",
+"name": "Kotak Mahindra Bank",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "LT.NS",
+"name": "Larsen & Toubro",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Construction",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "M&M.NS",
+"name": "Mahindra & Mahindra",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Automobile and Auto Components",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "MARUTI.NS",
+"name": "Maruti Suzuki",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Automobile and Auto Components",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "MAXHEALTH.NS",
+"name": "Max Healthcare",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Healthcare",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "NESTLEIND.NS",
+"name": "Nestlé India",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Fast Moving Consumer Goods",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "NTPC.NS",
+"name": "NTPC",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Power",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "ONGC.NS",
+"name": "Oil and Natural Gas Corporation",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Oil, Gas & Consumable Fuels",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "POWERGRID.NS",
+"name": "Power Grid",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Power",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "RELIANCE.NS",
+"name": "Reliance Industries",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Oil, Gas & Consumable Fuels",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "SBILIFE.NS",
+"name": "SBI Life Insurance Company",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "SHRIRAMFIN.NS",
+"name": "Shriram Finance",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "SBIN.NS",
+"name": "State Bank of India",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Financial Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "SUNPHARMA.NS",
+"name": "Sun Pharma",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Healthcare",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "TCS.NS",
+"name": "Tata Consultancy Services",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "TATACONSUM.NS",
+"name": "Tata Consumer Products",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Fast Moving Consumer Goods",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "TMPV.NS",
+"name": "Tata Motors Passenger Vehicles",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Automobile and Auto Components",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "TATASTEEL.NS",
+"name": "Tata Steel",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Metals & Mining",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "TECHM.NS",
+"name": "Tech Mahindra",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "TITAN.NS",
+"name": "Titan Company",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Consumer Durables",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "TRENT.NS",
+"name": "Trent",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Consumer Services",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "ULTRACEMCO.NS",
+"name": "UltraTech Cement",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Construction Materials",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
+"ticker": "WIPRO.NS",
+"name": "Wipro",
+"category": "Actions",
+"market": "Asie",
+"country": "Inde",
+"sector": "Information Technology",
+"aliases": [],
+"indices": [
+"nifty50"
+]
+},
+{
 "ticker": "ASML",
 "name": "ASML (ADR)",
 "category": "Actions",
@@ -18417,16 +28571,6 @@
 {
 "ticker": "UPST",
 "name": "Upstart",
-"category": "Actions",
-"market": "US",
-"country": "États-Unis",
-"sector": null,
-"aliases": [],
-"indices": []
-},
-{
-"ticker": "MARA",
-"name": "MARA Holdings",
 "category": "Actions",
 "market": "US",
 "country": "États-Unis",
@@ -19075,56 +29219,6 @@
 "indices": []
 },
 {
-"ticker": "VOLV-B.ST",
-"name": "Volvo",
-"category": "Actions",
-"market": "Europe",
-"country": "Suède",
-"sector": null,
-"aliases": [],
-"indices": []
-},
-{
-"ticker": "ERIC-B.ST",
-"name": "Ericsson",
-"category": "Actions",
-"market": "Europe",
-"country": "Suède",
-"sector": null,
-"aliases": [],
-"indices": []
-},
-{
-"ticker": "ATCO-A.ST",
-"name": "Atlas Copco",
-"category": "Actions",
-"market": "Europe",
-"country": "Suède",
-"sector": null,
-"aliases": [],
-"indices": []
-},
-{
-"ticker": "INVE-B.ST",
-"name": "Investor AB",
-"category": "Actions",
-"market": "Europe",
-"country": "Suède",
-"sector": null,
-"aliases": [],
-"indices": []
-},
-{
-"ticker": "HM-B.ST",
-"name": "H&M",
-"category": "Actions",
-"market": "Europe",
-"country": "Suède",
-"sector": null,
-"aliases": [],
-"indices": []
-},
-{
 "ticker": "EQNR.OL",
 "name": "Equinor",
 "category": "Actions",
@@ -19190,26 +29284,6 @@
 "category": "Actions",
 "market": "Europe",
 "country": "Belgique",
-"sector": null,
-"aliases": [],
-"indices": []
-},
-{
-"ticker": "EDP.LS",
-"name": "EDP",
-"category": "Actions",
-"market": "Europe",
-"country": "Portugal",
-"sector": null,
-"aliases": [],
-"indices": []
-},
-{
-"ticker": "GALP.LS",
-"name": "Galp Energia",
-"category": "Actions",
-"market": "Europe",
-"country": "Portugal",
 "sector": null,
 "aliases": [],
 "indices": []

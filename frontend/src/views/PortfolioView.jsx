@@ -1,7 +1,9 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
-import { Layers, Plus, Trash2, Activity, ShieldAlert, Maximize2, Equal, Scale, Play, PieChart, Settings2, Lock, LockOpen } from 'lucide-react';
+import { Layers, Plus, Trash2, Activity, ShieldAlert, Maximize2, Equal, Scale, Play, PieChart, Settings2, Lock, LockOpen, Loader2 } from 'lucide-react';
 import PortfolioLibrary from '../components/PortfolioLibrary';
+import ExportButton from '../components/ExportButton';
+import { exportPortfolio } from '../export/builders';
 import AssetSearchInput from '../components/AssetSearchInput';
 import PeriodPicker from '../components/PeriodPicker';
 import StatsDashboard from '../components/StatsDashboard';
@@ -40,13 +42,13 @@ const round2 = (x) => Math.round(x * 100) / 100;
 const nameOf = (tk) => trName(getAsset(tk)?.name) || tk;
 
 /** Champ numérique avec unité intégrée à droite. */
-function UnitInput({ value, onChange, unit, onEnter, width = '100%' }) {
+function UnitInput({ value, onChange, unit, onEnter, width = '100%', label }) {
   return (
     <div style={{ position: 'relative', width }}>
-      <input type="text" inputMode="decimal" value={value} onChange={(e) => onChange(e.target.value)}
+      <input type="text" inputMode="decimal" value={value} onChange={(e) => onChange(e.target.value)} aria-label={label}
         onKeyDown={(e) => e.key === 'Enter' && onEnter?.()}
         style={{ width: '100%', paddingRight: 26, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }} />
-      <span style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)', fontSize: 12, pointerEvents: 'none' }}>{unit}</span>
+      <span aria-hidden="true" style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)', fontSize: 12, pointerEvents: 'none' }}>{unit}</span>
     </div>
   );
 }
@@ -57,7 +59,7 @@ function AllocationBar({ rows, weights, sum }) {
   const ok = Math.abs(sum - 100) <= 0.5;
   return (
     <div style={{ marginTop: 14 }}>
-      <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: '#0b0f17', border: '1px solid var(--border-2)' }}>
+      <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: 'var(--panel-2)', border: '1px solid var(--border-2)' }}>
         {rows.map((r, i) => weights[i] > 0 && (
           <div key={r.id} title={`${nameOf(r.ticker) || t('Actif')} : ${fmt(weights[i], 1)} %`}
             style={{ width: `${Math.min(weights[i], 100) / Math.max(sum, 100) * 100}%`, background: COLORS[i % COLORS.length] }} />
@@ -80,8 +82,8 @@ function CorrelationMatrix({ corr }) {
   if (!corr || corr.tickers.length < 2) return null;
   const cell = (v) => {
     const a = Math.abs(v);
-    const bg = v >= 0 ? `rgba(229,72,77,${0.12 + a * 0.6})` : `rgba(43,179,163,${0.12 + a * 0.6})`;
-    return { background: bg, color: a > 0.5 ? '#fff' : 'var(--text-2)' };
+    const bg = v >= 0 ? `rgba(196,43,28,${0.12 + a * 0.6})` : `rgba(46,117,182,${0.12 + a * 0.6})`;
+    return { background: bg, color: a > 0.5 ? 'var(--text)' : 'var(--text-2)' };
   };
   // Paires extrêmes (lecture rapide de la matrice, simple affichage)
   const pairs = [];
@@ -288,8 +290,9 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
             <h3 className="section-title"><Layers size={16} /> {t('Composition du portefeuille')}</h3>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{ fontSize: 12, color: 'var(--muted)' }}>{t('Je saisis')}</span>
-              <Segmented value={inputMode} onChange={switchMode} options={[{ value: 'weight', label: 'des %' }, { value: 'amount', label: 'des montants' }]} />
-              <select value="" onChange={(e) => applyPreset(e.target.value)} style={{ fontSize: 12, padding: '5px 8px' }}>
+              <Segmented label="Je saisis" value={inputMode} onChange={switchMode} options={[{ value: 'weight', label: 'des %' }, { value: 'amount', label: 'des montants' }]} />
+              <select value="" onChange={(e) => applyPreset(e.target.value)} style={{ fontSize: 12, padding: '5px 8px' }}
+                aria-label={t('Partir d’un modèle de portefeuille')} title={t('Partir d’un modèle de portefeuille')}>
                 <option value="">{t('Modèles…')}</option>
                 {PRESETS.map(p => <option key={p.label} value={p.label}>{t(p.label)}</option>)}
               </select>
@@ -311,12 +314,12 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
               <AssetSearchInput value={r.ticker} onChange={(tk) => update(r.id, 'ticker', tk)}
                 onEnter={() => simulate()} placeholder="Rechercher un actif…" />
               {inputMode === 'weight'
-                ? <UnitInput value={r.weight} onChange={(v) => update(r.id, 'weight', v)} unit="%" onEnter={() => simulate()} />
+                ? <UnitInput value={r.weight} onChange={(v) => update(r.id, 'weight', v)} unit="%" onEnter={() => simulate()} label={`${t('Poids')} ${nameOf(r.ticker) || ''} (%)`} />
                 : <span className="alloc-derived">{weights[i] ? `${fmt(weights[i], 1)} %` : '—'}</span>}
               {inputMode === 'amount'
-                ? <UnitInput value={r.amount} onChange={(v) => update(r.id, 'amount', v)} unit={currency} onEnter={() => simulate()} />
+                ? <UnitInput value={r.amount} onChange={(v) => update(r.id, 'amount', v)} unit={currency} onEnter={() => simulate()} label={`${t('Montant')} ${nameOf(r.ticker) || ''} (${currency})`} />
                 : <span className="alloc-derived">{amounts[i] ? `${fmt(amounts[i], 0)} ${currency}` : '—'}</span>}
-              <button type="button" className="icon-btn" title={t('Supprimer la ligne')} onClick={() => removeRow(r.id)} style={{ color: '#9ca3af' }}>
+              <button type="button" className="icon-btn" title={t('Supprimer la ligne')} aria-label={t('Supprimer la ligne')} onClick={() => removeRow(r.id)} style={{ color: 'var(--muted)' }}>
                 <Trash2 size={15} />
               </button>
               {inputMode === 'weight' && (
@@ -346,10 +349,10 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
             {inputMode === 'weight' ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ fontSize: 12, color: 'var(--muted)' }}>{t('Capital total (optionnel)')}</span>
-                <UnitInput value={totalCapital} onChange={setTotalCapital} unit={currency} onEnter={() => simulate()} width={130} />
+                <UnitInput value={totalCapital} onChange={setTotalCapital} unit={currency} onEnter={() => simulate()} width={130} label={t('Capital total (optionnel)')} />
               </div>
             ) : (
-              <span style={{ fontSize: 13, color: 'var(--muted-2)' }}>{t('Capital total :')} <strong style={{ color: '#fff' }}>{fmt(capital, 0)} {currency}</strong></span>
+              <span style={{ fontSize: 13, color: 'var(--muted-2)' }}>{t('Capital total :')} <strong style={{ color: 'var(--text)' }}>{fmt(capital, 0)} {currency}</strong></span>
             )}
           </div>
 
@@ -365,20 +368,20 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
           <PeriodPicker mode={timeMode} onModeChange={setTimeMode} period={period} onPeriodChange={(p) => { setPeriod(p); if (data) simulate({ period: p }); }}
             start={start} end={end} onStartChange={setStart} onEndChange={setEnd} today={today} />
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <Field label="Benchmark" style={{ flex: 1, minWidth: 150 }}>
-              <select value={benchmark} onChange={(e) => setBenchmark(e.target.value)} style={{ width: '100%' }}>
+            <Field label="Comparer à" style={{ flex: 1, minWidth: 150 }}>
+              <select aria-label={t('Comparer à')} title={t("Indice de référence (benchmark) utilisé pour le bêta, l'alpha et la comparaison")} value={benchmark} onChange={(e) => setBenchmark(e.target.value)} style={{ width: '100%' }}>
                 {BENCHMARKS.map(b => <option key={b.value} value={b.value}>{b.label}</option>)}
               </select>
             </Field>
             <Field label="Devise" style={{ width: 80 }}>
-              <select value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%' }}><option value="€">€</option><option value="$">$</option></select>
+              <select aria-label={t('Devise')} value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%' }}><option value="€">€</option><option value="$">$</option></select>
             </Field>
           </div>
           <Field label="Rééquilibrage">
-            <select value={rebalance} onChange={(e) => { setRebalance(e.target.value); if (data) simulate({ rebalance: e.target.value }); }} style={{ width: '100%' }}>
+            <select aria-label={t('Rééquilibrage')} value={rebalance} onChange={(e) => { setRebalance(e.target.value); if (data) simulate({ rebalance: e.target.value }); }} style={{ width: '100%' }}>
               {REBALANCE.map(r => <option key={r.value} value={r.value}>{t(r.label)}</option>)}
             </select>
-            <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 5, lineHeight: 1.4 }}>
+            <div className="hint" style={{ marginTop: 5 }}>
               {t(rebalance === 'none' ? 'Les poids dérivent avec les cours : ce qui monte pèse de plus en plus lourd.'
                 : rebalance === 'monthly' ? 'Chaque début de mois, on revend ce qui a monté pour racheter ce qui a baissé.'
                   : 'Poids remis à la cible chaque jour (modèle théorique).')}
@@ -398,12 +401,17 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
           ...(timeMode === 'preset' ? { period } : { start_date: start, end_date: end }),
         }} />
 
-      {error && <div className="error-box">{error}</div>}
+      {error && <div className="error-box" role="alert">{error}</div>}
       {!data && !loading && (
-        <EmptyState icon={PieChart} title="Aucune simulation pour l'instant">
-          Ajoutez des actifs avec leur poids (ou partez d'un « Modèle… »), puis cliquez sur « Simuler le portefeuille » pour obtenir l'historique, le risque et la projection.
+        <EmptyState icon={PieChart} title="Aucune simulation pour l'instant"
+          actions={<>
+            <span className="label">{t('Ou partez d’un modèle tout prêt :')}</span>
+            {PRESETS.map(p => <button key={p.label} type="button" className="btn btn-sm" onClick={() => { applyPreset(p.label); window.scrollTo({ top: 0 }); }}>{t(p.label)}</button>)}
+          </>}>
+          {"Choisissez vos actifs et leur poids en % (total = 100 %), puis cliquez sur « Simuler le portefeuille ». Vous verrez comment ce mélange se serait comporté, son niveau de risque et une projection."}
         </EmptyState>
       )}
+      {!data && loading && <EmptyState icon={Loader2} busy title="Simulation en cours…">{'Téléchargement des cours et calcul des indicateurs.'}</EmptyState>}
 
       {data && (
         <div style={{ opacity: loading ? 0.55 : 1, transition: 'opacity .15s' }}>
@@ -413,8 +421,9 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
               <span className="tag">{t(data.tickers.length > 1 ? '{n} actifs' : '{n} actif', { n: data.tickers.length })}</span>
               <span className="tag">{t('Rééquilibrage :')} {t(REBALANCE.find(r => r.value === data.rebalance)?.label || '').split(' (')[0]}</span>
             </div>
-            <div className="result-meta">
-              {t('Du {a} au {b}', { a: fmtDate(data.period_start), b: fmtDate(data.period_end) })} {t('(historique commun à tous les actifs)')} · {t('Référence :')} <strong>{data.benchmark_label}</strong>
+            <div className="result-meta" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <span>{t('Du {a} au {b}', { a: fmtDate(data.period_start), b: fmtDate(data.period_end) })} {t('(historique commun à tous les actifs)')} · {t('Référence :')} <strong>{data.benchmark_label}</strong></span>
+              <ExportButton onExport={() => exportPortfolio(data, currency)} small />
             </div>
           </div>
 
@@ -435,22 +444,22 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
           <div className="grid-2" style={{ marginBottom: 16 }}>
             <div className="panel" style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, gap: 10, flexWrap: 'wrap' }}>
-                <Segmented value={chartType} onChange={setChartType} options={[
+                <Segmented label="Type de graphique" value={chartType} onChange={setChartType} options={[
                   { value: 'line', label: 'Valeur vs benchmark', icon: <Activity size={13} /> },
-                  { value: 'drawdown', label: 'Drawdown', icon: <ShieldAlert size={13} />, accent: '#e5484d' },
+                  { value: 'drawdown', label: 'Drawdown', icon: <ShieldAlert size={13} />, accent: 'var(--red)' },
                 ]} />
-                <button type="button" className="icon-btn" title={t('Plein écran')}
-                  onClick={() => onFullscreen({ kind: 'chart', title: 'Portefeuille', props: { data: data.chart_data, type: chartType, lineColor: '#e0a43a', isMoney, currency, compareKey: 'benchmark', compareLabel: data.benchmark_label, mainLabel: 'Portefeuille' } })}>
+                <button type="button" className="icon-btn" title={t('Plein écran')} aria-label={t('Plein écran')}
+                  onClick={() => onFullscreen({ kind: 'chart', title: 'Portefeuille', props: { data: data.chart_data, type: chartType, lineColor: '#1e7145', isMoney, currency, compareKey: 'benchmark', compareLabel: data.benchmark_label, mainLabel: 'Portefeuille' } })}>
                   <Maximize2 size={15} />
                 </button>
               </div>
               <div style={{ flex: 1, minHeight: 360 }}>
                 <ChartErrorBoundary resetKey={data}>
-                  <TradingViewChart data={data.chart_data} type={chartType} lineColor="#e0a43a" isMoney={isMoney} currency={currency}
+                  <TradingViewChart data={data.chart_data} type={chartType} lineColor="#1e7145" isMoney={isMoney} currency={currency}
                     compareKey="benchmark" compareLabel={data.benchmark_label} mainLabel="Portefeuille" />
                 </ChartErrorBoundary>
               </div>
-              {chartType === 'line' && <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6 }}>{t('Trait ambre : portefeuille · pointillés gris :')} {data.benchmark_label} {isMoney ? t('avec le même capital') : t('(base 100)')}</div>}
+              {chartType === 'line' && <div className="hint" style={{ marginTop: 6 }}>{t('Trait vert : portefeuille · pointillés gris :')} {data.benchmark_label} {isMoney ? t('avec le même capital') : t('(base 100)')}</div>}
             </div>
             <MonteCarloCard mc={data.monte_carlo} forecastDays={pendingDays ?? data._days} computedDays={data._days} currency={currency}
               onHorizonChange={(d) => { setForecastDays(d); simulate({ forecastDays: d }); }}
@@ -462,9 +471,9 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
               <h3 className="section-title">{t('Détail par actif')}</h3>
               <div style={{ display: 'flex', gap: 18, fontSize: 12, color: 'var(--muted-2)', flexWrap: 'wrap' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('Corrélation moyenne :')} <strong style={{ color: '#fff' }}>{fmt(data.breakdown.average_correlation, 2)}</strong>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('Corrélation moyenne :')} <strong style={{ color: 'var(--text)' }}>{fmt(data.breakdown.average_correlation, 2)}</strong>
                   <HelpButtons definition={DEFINITIONS.average_correlation} size={13} /></span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('Ratio de diversification :')} <strong style={{ color: '#fff' }}>{fmt(data.breakdown.diversification_ratio, 2)}</strong>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('Ratio de diversification :')} <strong style={{ color: 'var(--text)' }}>{fmt(data.breakdown.diversification_ratio, 2)}</strong>
                   <HelpButtons definition={DEFINITIONS.diversification_ratio} size={13} /></span>
               </div>
             </div>
@@ -479,7 +488,7 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.breakdown.assets.map((a, i) => (
+                  {data.breakdown.assets.map((a) => (
                     <tr key={a.ticker}>
                       <td><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: COLORS[data.tickers.indexOf(a.ticker) % COLORS.length], marginRight: 8 }} />
                         <strong>{nameOf(a.ticker)}</strong> <span style={{ color: 'var(--muted)' }}>{a.ticker}</span></td>
@@ -492,8 +501,8 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
                       <td className="num" style={{ color: signColor(a.return_contribution_pct) }}>{fmt(a.return_contribution_pct, 1, true)} {t('pts')}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <div style={{ flex: 1, height: 6, background: '#0b0f17', borderRadius: 3, overflow: 'hidden' }}>
-                            <div style={{ width: `${Math.max(0, Math.min(100, a.risk_contribution_pct))}%`, height: '100%', background: a.risk_contribution_pct > a.weight_pct * 1.5 ? 'var(--amber)' : COLORS[i % COLORS.length] }} />
+                          <div style={{ flex: 1, height: 6, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
+                            <div style={{ width: `${Math.max(0, Math.min(100, a.risk_contribution_pct))}%`, height: '100%', background: a.risk_contribution_pct > a.weight_pct * 1.5 ? 'var(--amber)' : COLORS[data.tickers.indexOf(a.ticker) % COLORS.length] }} />
                           </div>
                           <span style={{ fontVariantNumeric: 'tabular-nums', width: 46, textAlign: 'right' }}>{fmt(a.risk_contribution_pct, 1)} %</span>
                         </div>
@@ -503,7 +512,7 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
                 </tbody>
               </table>
             </div>
-            <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 8 }}>{t('Barre orange : la ligne pèse beaucoup plus dans le risque que dans le capital.')}</div>
+            <div className="hint" style={{ marginTop: 8 }}>{t('Barre orange : la ligne pèse beaucoup plus dans le risque que dans le capital.')}</div>
           </div>
 
           {data.breakdown.correlation.tickers.length > 1 && (

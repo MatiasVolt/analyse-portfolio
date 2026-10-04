@@ -5,6 +5,8 @@ import { Bookmark, Save, FolderOpen, Trash2, GitCompare, Loader2 } from 'lucide-
 import { API, COLORS, fmt, fmtDate } from '../format';
 import { useLang, trName } from '../i18n';
 import { getAsset } from '../tickerDatabase';
+import ExportButton from './ExportButton';
+import { exportComparisonReport } from '../export/builders';
 
 const STORAGE_KEY = 'portfolios.v1';
 const MAX_COMPARE = 5;
@@ -103,6 +105,10 @@ export default function PortfolioLibrary({ currentItems, rebalance, onLoad, comp
       <div className="panel-head">
         <h3 className="section-title"><Bookmark size={15} /> {t('Mes portefeuilles')}</h3>
         <div className="lib-save">
+          {saved.length > 0 && (
+            <ExportButton label={selected.length ? 'Rapport de comparaison ({n})' : 'Rapport de comparaison (tous)'} labelVars={{ n: selected.length }}
+              onExport={() => exportComparisonReport(selected.length ? saved.filter(p => selected.includes(p.id)) : saved, compareParams)} />
+          )}
           <input id="portfolio-name" type="text" value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && save()}
             aria-label={t('Nom du portefeuille')} placeholder={t('Nom du portefeuille')} maxLength={60} />
           <button type="button" className="btn" onClick={save} disabled={!canSave}
@@ -182,12 +188,12 @@ export default function PortfolioLibrary({ currentItems, rebalance, onLoad, comp
             <div style={{ height: 300 }}>
               <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10}>
                 <LineChart data={chart} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#222226" />
-                  <XAxis dataKey="date" stroke="#88888f" fontSize={11} minTickGap={60} tickFormatter={(d) => fmtDate(d)} />
-                  <YAxis stroke="#88888f" fontSize={11} width={48} domain={['auto', 'auto']} tickFormatter={(v) => fmt(v, 0)} />
-                  <Tooltip contentStyle={{ backgroundColor: '#1b1b1e', borderColor: '#323237', color: '#fff', fontSize: 12 }}
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e6e8e6" />
+                  <XAxis dataKey="date" stroke="#69716c" fontSize={11} minTickGap={60} tickFormatter={(d) => fmtDate(d)} />
+                  <YAxis stroke="#69716c" fontSize={11} width={48} domain={['auto', 'auto']} tickFormatter={(v) => fmt(v, 0)} />
+                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#c6c9c6', color: 'var(--text)', fontSize: 12 }}
                     labelFormatter={(d) => fmtDate(d)} formatter={(v, n) => [fmt(v, 1), n]} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
                   {cmp.results.map(({ p }, i) => (
                     <Line key={p.id} dataKey={p.id} name={p.name} stroke={COLORS[i % COLORS.length]} dot={false} strokeWidth={2} connectNulls isAnimationActive={false} />
                   ))}
