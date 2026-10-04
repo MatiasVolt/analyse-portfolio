@@ -10,6 +10,8 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import backend
+import i18n
+from i18n import T
 import json
 import os
 import re
@@ -32,6 +34,28 @@ app.add_middleware(
 )
 # Les historiques longs (période MAX) et le screener pèsent lourd : compression automatique
 app.add_middleware(GZipMiddleware, minimum_size=2000)
+
+
+@app.middleware("http")
+async def language_middleware(request: Request, call_next):
+    """?lang=en sur n'importe quelle route : les textes générés (interprétations, explications, erreurs) passent en anglais."""
+    i18n.set_lang(request.query_params.get("lang", "fr"))
+    # ?rf=fixed -> ancien taux fixe de 2 % ; sinon taux du marché (bon du Trésor US à 3 mois)
+    backend.set_risk_free(backend.RISK_FREE_RATE if request.query_params.get("rf") == "fixed" else market_risk_free())
+    return await call_next(request)
+
+
+def market_risk_free() -> float:
+    """Taux du bon du Trésor US à 3 mois (données FRED en cache), 2 % si indisponible."""
+    try:
+        import fixed_income
+        data = fixed_income._mem.get("data")
+        if not data and os.path.exists(fixed_income.BONDS_CACHE):
+            data = json.load(open(fixed_income.BONDS_CACHE, encoding="utf-8"))
+        rate = data and data.get("risk_free_3m")
+        return float(rate) / 100 if rate else backend.RISK_FREE_RATE
+    except Exception:
+        return backend.RISK_FREE_RATE
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -96,7 +120,9 @@ def fetch_many(tickers: List[str], period: Optional[str] = "5y", start: Optional
                 missing.append(t)
 
     if missing:
-        kwargs = {"start": start, "end": end} if (start and end) else {"period": period or "5y"}
+        # yfinance exclut la date de fin : +1 jour pour que la date choisie soit incluse
+        kwargs = ({"start": start, "end": (pd.Timestamp(end) + pd.Timedelta(days=1)).strftime("%Y-%m-%d")}
+                  if (start and end) else {"period": period or "5y"})
         raw = yf.download(missing, progress=False, auto_adjust=True, group_by="ticker", threads=True, **kwargs)
         for t in missing:
             try:
@@ -109,7 +135,7 @@ def fetch_many(tickers: List[str], period: Optional[str] = "5y", start: Optional
             except Exception:
                 df = pd.DataFrame()
             if df.empty:
-                raise ValueError(f"Aucune donnée disponible pour « {t} ». Vérifiez le symbole (format Yahoo Finance).")
+                raise ValueError(T(f"Aucune donnée disponible pour « {t} ». Vérifiez le symbole (format Yahoo Finance).", f"No data available for “{t}”. Check the symbol (Yahoo Finance format)."))
             if backend.detecter_classe_actif(t) != "CRYPTO":
                 df = backend.fix_unit_glitches(df)
             df.attrs["ticker"] = t
@@ -180,7 +206,7 @@ def get_asset_analysis(
         data = fetch_many([ticker, benchmark], period=period, start=start_date, end=end_date)
         df_asset, df_bench = data[ticker], data[benchmark]
         if len(df_asset) < 5:
-            raise ValueError("Historique trop court pour une analyse (moins de 5 séances).")
+            raise ValueError(T("Historique trop court pour une analyse (moins de 5 séances).", "History too short for an analysis (fewer than 5 sessions)."))
 
         conf = parse_conf(var_confidence)
         prices = df_asset["Close"]
@@ -233,18 +259,18 @@ def analyze_portfolio(req: PortfolioRequest):
     try:
         weights_in = {k.strip().upper(): float(v) for k, v in req.weights.items() if float(v) > 0}
         if not weights_in:
-            raise ValueError("Aucune pondération positive.")
+            raise ValueError(T("Aucune pondération positive.", "No positive weight."))
         tickers = list(weights_in.keys())
         total_w = sum(weights_in.values())
         if abs(total_w - 100) > 0.5:
-            raise ValueError(f"La somme des pondérations doit faire 100 % (actuellement {total_w:.1f} %).")
+            raise ValueError(T(f"La somme des pondérations doit faire 100 % (actuellement {total_w:.1f} %).", f"Weights must add up to 100% (currently {total_w:.1f}%)."))
 
         bench_ticker = (req.benchmark or "^GSPC").upper()
         data = fetch_many(tickers + [bench_ticker], period=req.period, start=req.start_date, end=req.end_date)
 
         prices_df = pd.concat({t: data[t]["Close"] for t in tickers}, axis=1, join="inner").dropna()
         if len(prices_df) < 5:
-            raise ValueError("Historique commun insuffisant : les actifs choisis n'ont pas assez de dates de cotation en commun.")
+            raise ValueError(T("Historique commun insuffisant : les actifs choisis n'ont pas assez de dates de cotation en commun.", "Not enough shared history: the chosen assets do not have enough trading dates in common."))
 
         classes = {t: backend.detecter_classe_actif(t) for t in tickers}
         ppy = 365 if all(c == "CRYPTO" for c in classes.values()) else 252
@@ -312,7 +338,7 @@ _screener_mem = {"mtime": None, "payload": None}
 def load_screener_payload() -> dict:
     """Charge le cache une seule fois (rechargé seulement si le fichier change) et calcule les plages."""
     if not os.path.exists(SCREENER_FILE):
-        raise HTTPException(status_code=503, detail="Cache du screener absent. Lancez une actualisation.")
+        raise HTTPException(status_code=503, detail=T("Cache du screener absent. Lancez une actualisation.", "Screener cache missing. Run a refresh."))
     mtime = os.path.getmtime(SCREENER_FILE)
     if _screener_mem["mtime"] != mtime:
         with open(SCREENER_FILE, "r", encoding="utf-8") as f:
@@ -430,11 +456,148 @@ def get_screener_status():
 @app.post("/api/screener/refresh")
 def trigger_screener_refresh(background_tasks: BackgroundTasks):
     if screener_sync_state["is_running"]:
-        raise HTTPException(status_code=409, detail="Actualisation déjà en cours.")
+        raise HTTPException(status_code=409, detail=T("Actualisation déjà en cours.", "Refresh already running."))
     elapsed = time.time() - screener_sync_state["last_updated_ts"]
     if screener_sync_state["last_updated_ts"] > 0 and elapsed < COOLDOWN_SECONDS:
         rem_h = round((COOLDOWN_SECONDS - elapsed) / 3600, 1)
-        raise HTTPException(status_code=429, detail=f"Attendez {rem_h} h avant la prochaine actualisation.")
+        raise HTTPException(status_code=429, detail=T(f"Attendez {rem_h} h avant la prochaine actualisation.", f"Wait {rem_h} h before the next refresh."))
     screener_sync_state.update(is_running=True, progress_pct=0, progress_text="Lancement...")
     background_tasks.add_task(task_update_screener_cache)
     return {"message": "Actualisation lancée en tâche de fond."}
+
+
+# -------------------------------------------------------------
+# 4. CALENDRIER ÉCONOMIQUE
+# -------------------------------------------------------------
+import econ_calendar
+
+
+def _event_reactions(events: list) -> None:
+    """Pour chaque annonce passée : variation de ses actifs de référence le jour concerné, comparée à un jour normal."""
+    past = [e for e in events if e["timestamp"] < time.time() and e["impact"] in ("High", "Medium")]
+    refs = sorted({a["ticker"] for e in past for a in e["assets"][:2]})
+    if not refs:
+        return
+    try:
+        data = fetch_many(refs, period="6mo")
+    except Exception:
+        data = {}
+        for t in refs:  # un ticker en échec ne doit pas tout bloquer
+            try:
+                data.update(fetch_many([t], period="6mo"))
+            except Exception:
+                pass
+    stats = {}
+    for t, df in data.items():
+        r = df["Close"].pct_change().dropna()
+        stats[t] = (r, float(r.tail(60).abs().median()) if len(r) > 10 else None)
+
+    for e in past:
+        day = pd.Timestamp(econ_calendar.reaction_day(e["datetime"]))
+        reactions = []
+        for a in e["assets"][:2]:
+            if a["ticker"] not in stats:
+                continue
+            r, typical = stats[a["ticker"]]
+            after = r[r.index >= day]
+            if after.empty or (after.index[0] - day).days > 3:
+                continue
+            chg = float(after.iloc[0])
+            reactions.append({
+                "ticker": a["ticker"], "name": a["name"], "date": after.index[0].strftime("%Y-%m-%d"),
+                "change_pct": round(chg * 100, 2),
+                "vs_normal": round(abs(chg) / typical, 1) if typical else None,
+            })
+        e["reaction"] = reactions
+
+
+@app.get("/api/calendar")
+def get_calendar(tickers: Optional[str] = None, weights: Optional[str] = None):
+    """
+    Annonces de la semaine. Avec `tickers` (et éventuellement `weights`), renvoie aussi l'exposition
+    par devise et ne garde que les annonces qui concernent ces actifs.
+    """
+    try:
+        feed = econ_calendar.get_events()
+        events = [econ_calendar.localize_event(e) for e in feed["events"]]
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    _event_reactions(events)
+
+    exposure = None
+    if tickers:
+        tl = [t.strip().upper() for t in tickers.split(",") if t.strip()]
+        try:
+            wl = [float(w) for w in weights.split(",")] if weights else [1.0] * len(tl)
+        except ValueError:
+            wl = [1.0] * len(tl)
+        if len(wl) != len(tl):
+            wl = [1.0] * len(tl)
+        expo = {}
+        for t, w in zip(tl, wl):
+            ccys = econ_calendar.asset_currencies(t)
+            for c in ccys:
+                expo[c] = expo.get(c, 0.0) + w / len(ccys)
+        total = sum(expo.values()) or 1.0
+        exposure = sorted(({"currency": c, "country": econ_calendar.currencies_names().get(c, c), "pct": round(v / total * 100, 1)}
+                           for c, v in expo.items()), key=lambda x: -x["pct"])
+        wanted = set(expo)
+        events = [e for e in events if e["currency"] in wanted]
+
+    now = time.time()
+    upcoming_high = [e for e in events if e["impact"] == "High" and e["timestamp"] >= now]
+    return {
+        "source": feed["source"],
+        "updated": datetime.fromtimestamp(econ_calendar._mem["ts"] or now).strftime("%Y-%m-%d %H:%M"),
+        "currencies": econ_calendar.currencies_names(),
+        "exposure": exposure,
+        "next_high": upcoming_high[0] if upcoming_high else None,
+        "events": events,
+    }
+
+
+# -------------------------------------------------------------
+# 5. OBLIGATIONS & DÉRIVÉS
+# -------------------------------------------------------------
+import fixed_income
+
+
+@app.get("/api/bonds")
+def get_bonds():
+    try:
+        rows = load_screener_payload()["results"]
+        by_ticker = {r["ticker"]: r for r in rows}
+    except Exception:
+        by_ticker = {}
+    try:
+        return fixed_income.localize_bonds(fixed_income.get_bonds(by_ticker), i18n.lang())
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=T(f"Données obligataires indisponibles : {e}", f"Bond data unavailable: {e}"))
+
+
+@app.get("/api/options/{ticker}")
+def get_options(ticker: str, expiry: Optional[str] = None):
+    """Cours, volatilités historiques, taux sans risque et chaîne d'options (si Yahoo en fournit pour ce sous-jacent)."""
+    try:
+        t = ticker.strip().upper()
+        df = fetch_many([t], period="1y")[t]
+        close = df["Close"]
+        classe = backend.detecter_classe_actif(t)
+        ppy = backend.periods_per_year(classe)
+        spot = float(close.iloc[-1])
+        chain = fixed_income.get_option_chain(t, expiry, spot)
+        rf = None
+        try:
+            rf = fixed_income._mem["data"]["risk_free_3m"] if fixed_income._mem["data"] else None
+        except Exception:
+            rf = None
+        return {
+            "ticker": t, "spot": round(spot, 4 if spot < 10 else 2), "asset_class": classe,
+            "hv_30": fixed_income.historical_vol(close, 30, ppy), "hv_1y": fixed_income.historical_vol(close, 252, ppy),
+            "risk_free_pct": rf if rf is not None else 4.0,
+            **chain,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

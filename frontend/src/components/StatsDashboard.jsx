@@ -2,6 +2,7 @@ import { useState, memo } from 'react';
 import { StatCell } from './ui';
 import { DEFINITIONS, METRICS, METRIC_TABS, ASSET_CLASS_LABELS } from '../definitions';
 import { parseNum, fmtMillions } from '../format';
+import { useLang, getRfMode, setRfMode } from '../i18n';
 
 function toneFor(meta, v) {
   if (v === null || v === undefined) return undefined;
@@ -10,14 +11,15 @@ function toneFor(meta, v) {
 }
 
 function MetricGrid({ keys, metrics, interpretations, confLabel }) {
+  const { t } = useLang();
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(175px, 1fr))', gap: '16px 24px' }}>
+    <div className="stat-grid">
       {keys.map(k => {
         const meta = METRICS[k];
         const v = metrics[meta.field];
         return (
           <StatCell key={k}
-            label={meta.varLabel ? `${meta.label} (${confLabel} %)` : meta.label}
+            label={meta.varLabel ? `${t(meta.label)} (${confLabel} %)` : meta.label}
             value={v} unit={meta.unit} nd={meta.nd ?? 2} signed={meta.signed}
             tone={toneFor(meta, v)}
             interpretation={meta.interp ? interpretations?.[meta.interp] : undefined}
@@ -32,41 +34,43 @@ function MetricGrid({ keys, metrics, interpretations, confLabel }) {
  * Tableau de bord des indicateurs, par onglets.
  * classMetrics : liste {id,label,value,unit,definition,interpretation,tone} propre au type d'actif.
  */
-function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, varInput, onVarChange, onVarSubmit, footer }) {
+function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, varInput, onVarChange, onVarSubmit, confUsed, footer }) {
+  const { t, lang } = useLang();
   const [tab, setTab] = useState('overview');
   const tabs = [
     ...METRIC_TABS,
-    ...(classMetrics?.length ? [{ id: 'specific', label: `Spécifique ${ASSET_CLASS_LABELS[assetClass] || ''}`.trim() }] : []),
+    ...(classMetrics?.length ? [{ id: 'specific', label: `${t('Spécifique')} ${t(ASSET_CLASS_LABELS[assetClass] || '')}`.trim() }] : []),
     { id: 'all', label: 'Tout' },
   ];
-  const active = tabs.find(t => t.id === tab) ? tab : 'overview';
-  const conf = parseNum(varInput);
-  const confLabel = Number.isFinite(conf) ? String(conf).replace('.', ',') : '95';
+  const active = tabs.find(x => x.id === tab) ? tab : 'overview';
+  // Libellé = niveau ayant servi au calcul (et non la saisie en cours, ni une valeur hors bornes ignorée par l'API)
+  const conf = confUsed !== undefined ? Math.round(confUsed * 1000) / 10 : parseNum(varInput);
+  const confLabel = Number.isFinite(conf) ? (lang === 'fr' ? String(conf).replace('.', ',') : String(conf)) : '95';
 
   return (
     <div className="panel" style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
-        <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
-          {tabs.map(t => (
-            <button key={t.id} type="button" onClick={() => setTab(t.id)} style={{
-              background: 'none', border: 'none', fontSize: 13, padding: '0 0 9px', marginBottom: -1,
-              fontWeight: active === t.id ? 600 : 400, color: active === t.id ? '#5b8cff' : 'var(--muted)',
-              borderBottom: `2px solid ${active === t.id ? 'var(--accent)' : 'transparent'}`,
-            }}>{t.label}</button>
+      <div className="dash-head">
+        <div className="underline-tabs" role="tablist">
+          {tabs.map(x => (
+            <button key={x.id} type="button" role="tab" aria-selected={active === x.id} className={active === x.id ? 'on' : ''} onClick={() => setTab(x.id)}>{t(x.label)}</button>
           ))}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 8 }}>
-          <span style={{ fontSize: 12, color: 'var(--muted-2)' }}>Confiance VaR</span>
+        <div className="dash-var">
+          <button type="button" className="btn btn-sm" onClick={() => { setRfMode(getRfMode() === 'fixed' ? 'market' : 'fixed'); onVarSubmit(); }}
+            title={t("Taux utilisé pour le Sharpe, le Sortino et l'alpha. Cliquez pour basculer entre le taux du marché et l'ancien taux fixe de 2 %.")}>
+            {t('Taux sans risque :')} {getRfMode() === 'fixed' ? t('2 % fixe') : t('marché {v} %', { v: String(metrics.risk_free_pct ?? '…').replace('.', lang === 'fr' ? ',' : '.') })}
+          </button>
+          <span style={{ fontSize: 12, color: 'var(--muted-2)' }}>{t('Confiance VaR')}</span>
           <input type="text" inputMode="decimal" value={varInput} onChange={(e) => onVarChange(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onVarSubmit()}
-            title="Entre 50 et 99,9 — appuyez sur Entrée pour recalculer"
+            title={t('Entre 50 et 99,9 — appuyez sur Entrée pour recalculer')}
             style={{ width: 54, padding: '3px 6px', textAlign: 'center', fontWeight: 700, fontSize: 12 }} />
           <span style={{ fontSize: 12, color: 'var(--muted-2)' }}>%</span>
         </div>
       </div>
 
       {active === 'specific' ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px 24px' }}>
+        <div className="stat-grid">
           {classMetrics.map(m => (
             <StatCell key={m.id} label={m.label} tone={m.tone}
               value={m.unit === 'M' && m.value != null ? fmtMillions(m.value) : m.value} unit={m.unit === 'M' ? '' : m.unit}
@@ -78,9 +82,9 @@ function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, va
       ) : active === 'all' ? (
         <MetricGrid keys={Object.keys(METRICS)} metrics={metrics} interpretations={interpretations} confLabel={confLabel} />
       ) : (
-        <MetricGrid keys={tabs.find(t => t.id === active).keys} metrics={metrics} interpretations={interpretations} confLabel={confLabel} />
+        <MetricGrid keys={tabs.find(x => x.id === active).keys} metrics={metrics} interpretations={interpretations} confLabel={confLabel} />
       )}
-      {footer && <div style={{ marginTop: 14, fontSize: 11, color: 'var(--muted)' }}>{footer}</div>}
+      {footer && <div className="hint" style={{ marginTop: 16, paddingTop: 10, borderTop: '1px solid var(--border)' }}>{footer}</div>}
     </div>
   );
 }

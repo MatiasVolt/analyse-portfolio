@@ -1,20 +1,22 @@
 import { PERIODS } from '../format';
+import { useLang } from '../i18n';
 
 /** Sélecteur de période : boutons rapides ou dates précises. */
 export default function PeriodPicker({ mode, onModeChange, period, onPeriodChange, start, end, onStartChange, onEndChange, today }) {
+  const { t } = useLang();
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 5 }}>
-        <span className="label" style={{ margin: 0 }}>Période</span>
+        <span className="label" style={{ margin: 0 }}>{t('Période')}</span>
         <button type="button" onClick={() => onModeChange(mode === 'preset' ? 'custom' : 'preset')}
-          style={{ background: 'none', border: 'none', color: '#5b8cff', fontSize: 11, padding: 0 }}>
-          {mode === 'preset' ? 'Dates précises' : 'Boutons rapides'}
+          style={{ background: 'none', border: 'none', color: 'var(--accent-text)', fontSize: 11, padding: 0 }}>
+          {mode === 'preset' ? t('Dates précises') : t('Boutons rapides')}
         </button>
       </div>
       {mode === 'preset' ? (
         <div className="segmented">
           {PERIODS.map(p => (
-            <button key={p.value} type="button" className={period === p.value ? 'on' : ''} onClick={() => onPeriodChange(p.value)}>{p.label}</button>
+            <button key={p.value} type="button" className={period === p.value ? 'on' : ''} onClick={() => onPeriodChange(p.value)}>{t(p.label)}</button>
           ))}
         </div>
       ) : (

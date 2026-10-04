@@ -159,3 +159,27 @@ export const SCREENER_GROUPS = [
 export const SCREENER_METRICS = Object.fromEntries(SCREENER_GROUPS.flatMap(g => g.metrics.map(m => [m.key, m])));
 
 export const SCREENER_DEFAULT_COLUMNS = ['perf_1y_pct', 'annualized_volatility_pct', 'sharpe', 'sortino', 'max_drawdown_pct', 'beta', 'rsi_14'];
+
+// Déplacé depuis views/BondsView.jsx (référencé par le dictionnaire anglais)
+export const BOND_DEFS = {
+  curve: "Courbe des taux : rendement des emprunts d'État américains selon leur durée. Normalement croissante (prêter longtemps est plus risqué). Inversée (taux courts > taux longs), elle a précédé la plupart des récessions américaines.",
+  s10_2: "Écart entre le taux à 10 ans et le taux à 2 ans. Négatif = courbe inversée : le marché anticipe des baisses de taux, souvent à cause d'un ralentissement attendu.",
+  credit: "Prime de risque (OAS) demandée aux entreprises par rapport aux emprunts d'État. Elle s'écarte quand les investisseurs craignent des faillites, et se resserre quand ils sont confiants.",
+  price: "Prix de l'obligation, en % du nominal. Au-dessus de 100 : le coupon est supérieur aux taux du marché ; en dessous : il est inférieur.",
+  ytm: "Rendement actuariel (YTM) : rendement annuel obtenu si l'on achète à ce prix, encaisse tous les coupons (réinvestis au même taux) et garde l'obligation jusqu'à l'échéance.",
+  current: "Rendement courant : coupon annuel ÷ prix. Ignore le gain ou la perte à l'échéance (remboursement à 100).",
+  macaulay: "Duration de Macaulay : durée de vie moyenne des flux, pondérée par leur valeur actuelle (en années).",
+  modified: "Duration modifiée : variation approximative du prix (en %) pour une variation de 1 point des taux. 7 = le prix baisse d'environ 7 % si les taux montent de 1 %.",
+  convexity: "Convexité : courbure de la relation prix/taux. Elle rend la baisse de prix (taux en hausse) un peu moins forte que la hausse de prix (taux en baisse).",
+  dv01: "DV01 : variation du prix (pour le nominal saisi) quand les taux bougent de 0,01 % (1 point de base).",
+};
+
+// Déplacé depuis views/DerivativesView.jsx (référencé par le dictionnaire anglais)
+export const GREEKS = {
+  delta: "Delta : variation du prix de l'option quand le sous-jacent monte de 1. Un delta de 0,5 = l'option gagne 0,50 si l'action gagne 1. C'est aussi, grossièrement, la probabilité de finir dans la monnaie.",
+  gamma: 'Gamma : vitesse à laquelle le delta change quand le sous-jacent bouge. Élevé près du strike et de l\'échéance.',
+  vega: "Vega : variation du prix de l'option si la volatilité augmente de 1 point. Les options prennent de la valeur quand le marché s'agite.",
+  theta: "Theta : perte de valeur par jour qui passe, toutes choses égales par ailleurs (« érosion du temps »). Un acheteur d'option la subit, un vendeur l'encaisse.",
+  rho: "Rho : variation du prix de l'option si les taux d'intérêt augmentent de 1 point.",
+  prob: "Probabilité, selon le modèle (monde « neutre au risque »), que l'option finisse dans la monnaie à l'échéance.",
+};

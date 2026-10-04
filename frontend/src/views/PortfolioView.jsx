@@ -1,18 +1,24 @@
-import { memo, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
-import { Layers, Plus, Trash2, Activity, ShieldAlert, Maximize2, Equal, Scale, Play } from 'lucide-react';
+import { Layers, Plus, Trash2, Activity, ShieldAlert, Maximize2, Equal, Scale, Play, PieChart, Settings2, Lock, LockOpen } from 'lucide-react';
+import PortfolioLibrary from '../components/PortfolioLibrary';
 import AssetSearchInput from '../components/AssetSearchInput';
 import PeriodPicker from '../components/PeriodPicker';
 import StatsDashboard from '../components/StatsDashboard';
 import MonteCarloCard from '../components/MonteCarloCard';
+import { EventsPanel } from '../components/Calendar';
 import TradingViewChart, { ChartErrorBoundary } from '../components/TradingViewChart';
 import { Field, Segmented, HelpButtons, EmptyState } from '../components/ui';
 import { getAsset } from '../tickerDatabase';
-import { API, BENCHMARKS, COLORS, fmt, parseNum, signColor } from '../format';
+import { API, BENCHMARKS, COLORS, fmt, fmtDate, parseNum, signColor } from '../format';
 import { DEFINITIONS } from '../definitions';
+import { useLang, trName } from '../i18n';
 
-let nextId = 1;
-const newRow = (ticker = '', weight = '', amount = '') => ({ id: nextId++, ticker, weight, amount });
+// Identifiant unique de ligne. Pas de simple compteur de module : il repart à 1 à chaque rechargement à chaud (HMR)
+// alors que les lignes déjà affichées sont conservées -> deux lignes avec le même id (saisie dupliquée, lignes en double).
+let seq = 0;
+const uid = () => `${Date.now().toString(36)}-${(seq++).toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+const newRow = (ticker = '', weight = '', amount = '') => ({ id: uid(), ticker, weight, amount });
 
 const PRESETS = [
   { label: '60/40 classique', items: [['SPY', 60], ['AGG', 40]] },
@@ -31,7 +37,7 @@ const REBALANCE = [
 ];
 
 const round2 = (x) => Math.round(x * 100) / 100;
-const nameOf = (t) => getAsset(t)?.name || t;
+const nameOf = (tk) => trName(getAsset(tk)?.name) || tk;
 
 /** Champ numérique avec unité intégrée à droite. */
 function UnitInput({ value, onChange, unit, onEnter, width = '100%' }) {
@@ -46,22 +52,23 @@ function UnitInput({ value, onChange, unit, onEnter, width = '100%' }) {
 }
 
 function AllocationBar({ rows, weights, sum }) {
+  const { t } = useLang();
   const over = sum > 100.5;
   const ok = Math.abs(sum - 100) <= 0.5;
   return (
     <div style={{ marginTop: 14 }}>
       <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: '#0b0f17', border: '1px solid var(--border-2)' }}>
         {rows.map((r, i) => weights[i] > 0 && (
-          <div key={r.id} title={`${nameOf(r.ticker) || 'Actif'} : ${fmt(weights[i], 1)} %`}
+          <div key={r.id} title={`${nameOf(r.ticker) || t('Actif')} : ${fmt(weights[i], 1)} %`}
             style={{ width: `${Math.min(weights[i], 100) / Math.max(sum, 100) * 100}%`, background: COLORS[i % COLORS.length] }} />
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 12 }}>
         <span style={{ color: ok ? 'var(--green)' : over ? 'var(--red)' : 'var(--amber)', fontWeight: 600 }}>
-          Total alloué : {fmt(sum, 1)} %
+          {t('Total alloué : {v} %', { v: fmt(sum, 1) })}
         </span>
         <span style={{ color: 'var(--muted)' }}>
-          {ok ? 'Prêt à simuler' : over ? `Dépasse de ${fmt(sum - 100, 1)} %` : `Reste ${fmt(100 - sum, 1)} % à répartir`}
+          {ok ? t('Prêt à simuler') : over ? t('Dépasse de {v} %', { v: fmt(sum - 100, 1) }) : t('Reste {v} % à répartir', { v: fmt(100 - sum, 1) })}
         </span>
       </div>
     </div>
@@ -69,36 +76,63 @@ function AllocationBar({ rows, weights, sum }) {
 }
 
 function CorrelationMatrix({ corr }) {
+  const { t } = useLang();
   if (!corr || corr.tickers.length < 2) return null;
   const cell = (v) => {
     const a = Math.abs(v);
-    const bg = v >= 0 ? `rgba(242,54,69,${0.12 + a * 0.6})` : `rgba(41,98,255,${0.12 + a * 0.6})`;
+    const bg = v >= 0 ? `rgba(229,72,77,${0.12 + a * 0.6})` : `rgba(43,179,163,${0.12 + a * 0.6})`;
     return { background: bg, color: a > 0.5 ? '#fff' : 'var(--text-2)' };
   };
+  // Paires extrêmes (lecture rapide de la matrice, simple affichage)
+  const pairs = [];
+  corr.matrix.forEach((row, i) => row.forEach((v, j) => { if (j > i && v !== null && v !== undefined) pairs.push({ a: corr.tickers[i], b: corr.tickers[j], v }); }));
+  pairs.sort((x, y) => y.v - x.v);
+  const hi = pairs[0], lo = pairs[pairs.length - 1];
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ borderCollapse: 'separate', borderSpacing: 3, fontSize: 12 }}>
-        <thead>
-          <tr><th />{corr.tickers.map(t => <th key={t} style={{ padding: '4px 6px', color: 'var(--muted)', fontWeight: 600 }}>{t}</th>)}</tr>
-        </thead>
-        <tbody>
-          {corr.matrix.map((row, i) => (
-            <tr key={corr.tickers[i]}>
-              <td style={{ padding: '4px 8px', color: 'var(--muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{corr.tickers[i]}</td>
-              {row.map((v, j) => (
-                <td key={j} style={{ padding: '6px 8px', textAlign: 'center', borderRadius: 4, minWidth: 52, ...(i === j ? { color: 'var(--muted)' } : cell(v)) }}>{fmt(v, 2)}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6 }}>Rouge = les actifs montent et baissent ensemble · Bleu = ils évoluent en sens inverse (diversification).</div>
+    <div className="corr-layout">
+      <div style={{ overflowX: 'auto', minWidth: 0 }}>
+        <table style={{ borderCollapse: 'separate', borderSpacing: 3, fontSize: 12 }}>
+          <thead>
+            <tr><th />{corr.tickers.map(tk => <th key={tk} style={{ padding: '4px 6px', color: 'var(--muted)', fontWeight: 600 }}>{tk}</th>)}</tr>
+          </thead>
+          <tbody>
+            {corr.matrix.map((row, i) => (
+              <tr key={corr.tickers[i]}>
+                <td style={{ padding: '4px 8px', color: 'var(--muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{corr.tickers[i]}</td>
+                {row.map((v, j) => (
+                  <td key={j} style={{ padding: '7px 8px', textAlign: 'center', borderRadius: 4, minWidth: 56, fontVariantNumeric: 'tabular-nums', ...(i === j ? { color: 'var(--muted)', background: 'var(--panel-2)' } : cell(v)) }}>{fmt(v, 2)}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="corr-side">
+        <div className="corr-scale">
+          <span>−1</span><div className="corr-gradient" /><span>+1</span>
+        </div>
+        <div className="hint" style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}><span>{t('Sens inverse')}</span><span>{t('Ensemble')}</span></div>
+        {hi && (
+          <div className="corr-fact">
+            <span className="label">{t('Paire la plus liée')}</span>
+            <strong>{nameOf(hi.a)} / {nameOf(hi.b)}</strong> <span className="corr-val" style={cell(hi.v)}>{fmt(hi.v, 2)}</span>
+          </div>
+        )}
+        {lo && lo !== hi && (
+          <div className="corr-fact">
+            <span className="label">{t('Meilleure diversification')}</span>
+            <strong>{nameOf(lo.a)} / {nameOf(lo.b)}</strong> <span className="corr-val" style={cell(lo.v)}>{fmt(lo.v, 2)}</span>
+          </div>
+        )}
+        <div className="hint">{t('Rouge : les actifs montent et baissent ensemble. Bleu : ils évoluent en sens inverse, ce qui amortit les baisses du portefeuille.')}</div>
+      </div>
     </div>
   );
 }
 
-function PortfolioView({ shared, onFullscreen }) {
+function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
   const { today, varInput, setVarInput, confLevel, forecastDays, setForecastDays, currency, setCurrency } = shared;
+  const { t, lang } = useLang();
 
   const [rows, setRows] = useState(() => [newRow(), newRow()]);
   const [inputMode, setInputMode] = useState('weight'); // 'weight' : on saisit des %, 'amount' : on saisit des montants
@@ -113,6 +147,7 @@ function PortfolioView({ shared, onFullscreen }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [pendingDays, setPendingDays] = useState(null);
   const abortRef = useRef(null);
 
   // --- Valeurs dérivées : en mode %, les montants se calculent ; en mode montants, les % se calculent
@@ -130,27 +165,57 @@ function PortfolioView({ shared, onFullscreen }) {
   const update = (id, field, value) => setRows(rs => rs.map(r => (r.id === id ? { ...r, [field]: value } : r)));
   const removeRow = (id) => setRows(rs => (rs.length > 1 ? rs.filter(r => r.id !== id) : [newRow()]));
 
+  /**
+   * Barre coulissante : fixe le poids de la ligne, puis répartit le reste (100 % − lignes verrouillées − cette ligne)
+   * entre les autres lignes non verrouillées, proportionnellement à leurs poids actuels (à parts égales s'ils sont nuls).
+   */
+  const slideWeight = (id, raw) => setRows(rs => {
+    const num = (r) => Math.max(parseNum(r.weight) || 0, 0);
+    const lockedSum = rs.filter(r => r.locked && r.id !== id).reduce((a, r) => a + num(r), 0);
+    const w = Math.max(0, Math.min(parseFloat(raw) || 0, 100 - lockedSum));
+    const others = rs.filter(r => r.id !== id && !r.locked && r.ticker.trim());
+    if (!others.length) return rs.map(r => (r.id === id ? { ...r, weight: String(round2(w)) } : r));
+    const othersSum = others.reduce((a, r) => a + num(r), 0);
+    const remaining = Math.max(0, 100 - lockedSum - w);
+    const next = new Map(others.map(r => [r.id, round2(othersSum > 0 ? (remaining * num(r)) / othersSum : remaining / others.length)]));
+    // Corrige l'arrondi sur la dernière ligne ajustée pour retomber exactement sur 100 %
+    const drift = round2(remaining - [...next.values()].reduce((a, b) => a + b, 0));
+    const lastId = others[others.length - 1].id;
+    next.set(lastId, round2(Math.max(0, next.get(lastId) + drift)));
+    return rs.map(r => (r.id === id ? { ...r, weight: String(round2(w)) } : next.has(r.id) ? { ...r, weight: String(next.get(r.id)) } : r));
+  });
+  const toggleLock = (id) => setRows(rs => rs.map(r => (r.id === id ? { ...r, locked: !r.locked } : r)));
+
+  const loadSaved = (p) => {
+    setInputMode('weight');
+    setRows(p.items.map(([tk, w]) => newRow(tk, String(w))));
+    setRebalance(p.rebalance || 'none');
+  };
+
   const switchMode = (mode) => {
     if (mode === inputMode) return;
     if (mode === 'amount') {
       setRows(rs => rs.map((r, i) => ({ ...r, amount: amounts[i] ? String(Math.round(amounts[i])) : '' })));
-    } else {
+    } else if (capital > 0) {
       setRows(rs => rs.map((r, i) => ({ ...r, weight: weights[i] ? String(round2(weights[i])) : '' })));
-      if (capital > 0) setTotalCapital(String(Math.round(capital)));
-    }
+      setTotalCapital(String(Math.round(capital)));
+    } // aucun montant saisi : on garde les % d'avant au lieu de tout effacer
     setInputMode(mode);
   };
 
   const equalWeights = () => {
-    const filled = rows.filter(r => r.ticker.trim());
-    if (!filled.length) return;
-    const each = round2(100 / filled.length);
-    let given = 0;
-    setRows(rs => rs.map(r => {
-      if (!r.ticker.trim()) return { ...r, weight: '' };
-      given += 1;
-      return { ...r, weight: String(given === filled.length ? round2(100 - each * (filled.length - 1)) : each) };
-    }));
+    // Compteur local à l'updater : React (StrictMode) peut l'appeler deux fois
+    setRows(rs => {
+      const n = rs.filter(r => r.ticker.trim()).length;
+      if (!n) return rs;
+      const each = round2(100 / n);
+      let given = 0;
+      return rs.map(r => {
+        if (!r.ticker.trim()) return { ...r, weight: '' };
+        given += 1;
+        return { ...r, weight: String(given === n ? round2(100 - each * (n - 1)) : each) };
+      });
+    });
   };
 
   const normalize = () => {
@@ -172,18 +237,19 @@ function PortfolioView({ shared, onFullscreen }) {
   const simulate = async (o = {}) => {
     const fd = o.forecastDays ?? forecastDays;
     const valid = rows.map((r, i) => ({ t: r.ticker.trim().toUpperCase(), w: weights[i] })).filter(x => x.t && x.w > 0);
-    if (!valid.length) { setError('Ajoutez au moins un actif avec une pondération ou un montant.'); return; }
+    if (!valid.length) { setError(t('Ajoutez au moins un actif avec une pondération ou un montant.')); return; }
     const dup = valid.find((x, i) => valid.findIndex(y => y.t === x.t) !== i);
-    if (dup) { setError(`« ${nameOf(dup.t)} » apparaît deux fois : fusionnez les deux lignes.`); return; }
+    if (dup) { setError(t('« {n} » apparaît deux fois : fusionnez les deux lignes.', { n: nameOf(dup.t) })); return; }
     const total = valid.reduce((a, x) => a + x.w, 0);
-    if (Math.abs(total - 100) > 0.5) { setError(`La somme des pondérations doit faire 100 % (actuellement ${fmt(total, 1)} %). Utilisez « Ajuster à 100 % ».`); return; }
-    if (timeMode === 'custom' && start >= end) { setError('La date de début doit précéder la date de fin.'); return; }
+    if (Math.abs(total - 100) > 0.5) { setError(t('La somme des pondérations doit faire 100 % (actuellement {v} %). Utilisez « Ajuster à 100 % ».', { v: fmt(total, 1) })); return; }
+    if (timeMode === 'custom' && start >= end) { setError(t('La date de début doit précéder la date de fin.')); return; }
 
     abortRef.current?.abort();
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     setError(null);
     setLoading(true);
+    setPendingDays(String(fd));
     try {
       const payload = {
         weights: Object.fromEntries(valid.map(x => [x.t, x.w])),
@@ -194,14 +260,20 @@ function PortfolioView({ shared, onFullscreen }) {
         ...(capital > 0 ? { initial_capital: capital } : {}),
       };
       const res = await axios.post(`${API}/api/portfolio/analyze`, payload, { signal: ctrl.signal });
-      setData(res.data);
+      setData({ ...res.data, _days: String(fd), _conf: payload.var_confidence });
     } catch (err) {
       if (axios.isCancel(err)) return;
-      setError(err.response?.data?.detail || "Impossible de joindre l'API (le serveur Python est-il lancé ?).");
+      setError(err.response?.data?.detail || t("Impossible de joindre l'API (le serveur Python est-il lancé ?)."));
     } finally {
-      if (abortRef.current === ctrl) setLoading(false);
+      if (abortRef.current === ctrl) { setLoading(false); setPendingDays(null); }
     }
   };
+
+  // Changement de langue : on relance la simulation pour récupérer les textes traduits
+  useEffect(() => {
+    if (data) simulate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   const m = data?.metrics;
   const isMoney = Boolean(data?.money_summary);
@@ -212,60 +284,72 @@ function PortfolioView({ shared, onFullscreen }) {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginBottom: 16, alignItems: 'stretch' }}>
         {/* ---------------- COMPOSITION ---------------- */}
         <div className="panel" style={{ flex: '2 1 600px', minWidth: 0 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
-            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Layers size={16} /> Composition du portefeuille
-            </h3>
+          <div className="panel-head">
+            <h3 className="section-title"><Layers size={16} /> {t('Composition du portefeuille')}</h3>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 12, color: 'var(--muted)' }}>Je saisis</span>
+              <span style={{ fontSize: 12, color: 'var(--muted)' }}>{t('Je saisis')}</span>
               <Segmented value={inputMode} onChange={switchMode} options={[{ value: 'weight', label: 'des %' }, { value: 'amount', label: 'des montants' }]} />
               <select value="" onChange={(e) => applyPreset(e.target.value)} style={{ fontSize: 12, padding: '5px 8px' }}>
-                <option value="">Modèles…</option>
-                {PRESETS.map(p => <option key={p.label} value={p.label}>{p.label}</option>)}
+                <option value="">{t('Modèles…')}</option>
+                {PRESETS.map(p => <option key={p.label} value={p.label}>{t(p.label)}</option>)}
               </select>
             </div>
           </div>
 
           {/* En-têtes de colonnes (une seule fois, plus de « % » répétés sur chaque ligne) */}
-          <div style={{ display: 'grid', gridTemplateColumns: '10px minmax(0,1fr) 110px 130px 30px', gap: 8, padding: '0 0 6px', borderBottom: '1px solid var(--border)', marginBottom: 8 }}>
+          <div className="alloc-row alloc-head">
             <span />
-            <span className="label" style={{ margin: 0 }}>Actif</span>
-            <span className="label" style={{ margin: 0, textAlign: 'right' }}>Poids</span>
-            <span className="label" style={{ margin: 0, textAlign: 'right' }}>Montant ({currency})</span>
+            <span className="label" style={{ margin: 0 }}>{t('Actif')}</span>
+            <span className="label" style={{ margin: 0, textAlign: 'right' }}>{t('Poids')}</span>
+            <span className="label" style={{ margin: 0, textAlign: 'right' }}>{t('Montant')} ({currency})</span>
             <span />
           </div>
 
           {rows.map((r, i) => (
-            <div key={r.id} style={{ display: 'grid', gridTemplateColumns: '10px minmax(0,1fr) 110px 130px 30px', gap: 8, alignItems: 'center', marginBottom: 6 }}>
-              <span style={{ width: 10, height: 10, borderRadius: 3, background: COLORS[i % COLORS.length], opacity: r.ticker ? 1 : 0.25 }} />
-              <AssetSearchInput value={r.ticker} onChange={(t) => update(r.id, 'ticker', t)} onSelect={(t) => update(r.id, 'ticker', t)}
+            <div key={r.id} className="alloc-row">
+              <span className="alloc-dot" style={{ background: COLORS[i % COLORS.length], opacity: r.ticker ? 1 : 0.25 }} />
+              <AssetSearchInput value={r.ticker} onChange={(tk) => update(r.id, 'ticker', tk)}
                 onEnter={() => simulate()} placeholder="Rechercher un actif…" />
               {inputMode === 'weight'
                 ? <UnitInput value={r.weight} onChange={(v) => update(r.id, 'weight', v)} unit="%" onEnter={() => simulate()} />
-                : <span style={{ textAlign: 'right', color: 'var(--muted-2)', fontVariantNumeric: 'tabular-nums', paddingRight: 8 }}>{weights[i] ? `${fmt(weights[i], 1)} %` : '—'}</span>}
+                : <span className="alloc-derived">{weights[i] ? `${fmt(weights[i], 1)} %` : '—'}</span>}
               {inputMode === 'amount'
                 ? <UnitInput value={r.amount} onChange={(v) => update(r.id, 'amount', v)} unit={currency} onEnter={() => simulate()} />
-                : <span style={{ textAlign: 'right', color: 'var(--muted-2)', fontVariantNumeric: 'tabular-nums', paddingRight: 8 }}>{amounts[i] ? fmt(amounts[i], 0) : '—'}</span>}
-              <button type="button" className="icon-btn" title="Supprimer la ligne" onClick={() => removeRow(r.id)} style={{ color: '#9ca3af' }}>
+                : <span className="alloc-derived">{amounts[i] ? `${fmt(amounts[i], 0)} ${currency}` : '—'}</span>}
+              <button type="button" className="icon-btn" title={t('Supprimer la ligne')} onClick={() => removeRow(r.id)} style={{ color: '#9ca3af' }}>
                 <Trash2 size={15} />
               </button>
+              {inputMode === 'weight' && (
+                <div className="alloc-slider-row">
+                  {/* Barre coulissante : les autres lignes non verrouillées s'ajustent pour rester à 100 % */}
+                  <input type="range" className="alloc-slider" min="0" max="100" step="0.5" disabled={r.locked}
+                    value={Math.min(100, Math.max(0, weights[i] || 0))}
+                    onChange={(e) => slideWeight(r.id, e.target.value)}
+                    style={{ '--fill': COLORS[i % COLORS.length], '--pct': `${Math.min(100, weights[i] || 0)}%` }}
+                    aria-label={`${t('Poids')} ${nameOf(r.ticker) || ''}`} />
+                  <button type="button" className={`icon-btn lock-btn${r.locked ? ' active' : ''}`} onClick={() => toggleLock(r.id)} aria-pressed={Boolean(r.locked)}
+                    title={r.locked ? t('Déverrouiller : ce poids pourra de nouveau être ajusté automatiquement') : t('Verrouiller ce poids : il ne bougera plus quand vous déplacez les autres barres')}>
+                    {r.locked ? <Lock size={13} /> : <LockOpen size={13} />}
+                  </button>
+                </div>
+              )}
             </div>
           ))}
 
           <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-            <button type="button" className="btn" onClick={() => setRows(rs => [...rs, newRow()])}><Plus size={14} /> Ajouter un actif</button>
+            <button type="button" className="btn" onClick={() => setRows(rs => [...rs, newRow()])}><Plus size={14} /> {t('Ajouter un actif')}</button>
             {inputMode === 'weight' && <>
-              <button type="button" className="btn" onClick={equalWeights} disabled={!filledCount} title="Même poids pour chaque actif renseigné"><Equal size={14} /> Répartir équitablement</button>
-              <button type="button" className="btn" onClick={normalize} disabled={sum <= 0 || Math.abs(sum - 100) < 0.01} title="Garde les proportions mais ramène le total à 100 %"><Scale size={14} /> Ajuster à 100 %</button>
+              <button type="button" className="btn" onClick={equalWeights} disabled={!filledCount} title={t('Même poids pour chaque actif renseigné')}><Equal size={14} /> {t('Répartir équitablement')}</button>
+              <button type="button" className="btn" onClick={normalize} disabled={sum <= 0 || Math.abs(sum - 100) < 0.01} title={t('Garde les proportions mais ramène le total à 100 %')}><Scale size={14} /> {t('Ajuster à 100 %')}</button>
             </>}
             <div style={{ flex: 1 }} />
             {inputMode === 'weight' ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 12, color: 'var(--muted)' }}>Capital total (optionnel)</span>
+                <span style={{ fontSize: 12, color: 'var(--muted)' }}>{t('Capital total (optionnel)')}</span>
                 <UnitInput value={totalCapital} onChange={setTotalCapital} unit={currency} onEnter={() => simulate()} width={130} />
               </div>
             ) : (
-              <span style={{ fontSize: 13, color: 'var(--muted-2)' }}>Capital total : <strong style={{ color: '#fff' }}>{fmt(capital, 0)} {currency}</strong></span>
+              <span style={{ fontSize: 13, color: 'var(--muted-2)' }}>{t('Capital total :')} <strong style={{ color: '#fff' }}>{fmt(capital, 0)} {currency}</strong></span>
             )}
           </div>
 
@@ -275,7 +359,9 @@ function PortfolioView({ shared, onFullscreen }) {
 
         {/* ---------------- PARAMÈTRES ---------------- */}
         <div className="panel" style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700 }}>Paramètres de simulation</h3>
+          <div className="panel-head" style={{ marginBottom: 0 }}>
+            <h3 className="section-title"><Settings2 size={16} /> {t('Paramètres de simulation')}</h3>
+          </div>
           <PeriodPicker mode={timeMode} onModeChange={setTimeMode} period={period} onPeriodChange={(p) => { setPeriod(p); if (data) simulate({ period: p }); }}
             start={start} end={end} onStartChange={setStart} onEndChange={setEnd} today={today} />
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -290,74 +376,95 @@ function PortfolioView({ shared, onFullscreen }) {
           </div>
           <Field label="Rééquilibrage">
             <select value={rebalance} onChange={(e) => { setRebalance(e.target.value); if (data) simulate({ rebalance: e.target.value }); }} style={{ width: '100%' }}>
-              {REBALANCE.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+              {REBALANCE.map(r => <option key={r.value} value={r.value}>{t(r.label)}</option>)}
             </select>
             <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 5, lineHeight: 1.4 }}>
-              {rebalance === 'none' ? 'Les poids dérivent avec les cours : ce qui monte pèse de plus en plus lourd.'
+              {t(rebalance === 'none' ? 'Les poids dérivent avec les cours : ce qui monte pèse de plus en plus lourd.'
                 : rebalance === 'monthly' ? 'Chaque début de mois, on revend ce qui a monté pour racheter ce qui a baissé.'
-                  : 'Poids remis à la cible chaque jour (modèle théorique).'}
+                  : 'Poids remis à la cible chaque jour (modèle théorique).')}
             </div>
           </Field>
           <button type="button" className="btn btn-primary" onClick={() => simulate()} disabled={loading} style={{ padding: '10px 14px', fontSize: 13, marginTop: 'auto' }}>
-            <Play size={14} /> {loading ? 'Calcul…' : 'Simuler le portefeuille'}
+            <Play size={14} /> {loading ? t('Calcul…') : t('Simuler le portefeuille')}
           </button>
         </div>
       </div>
 
+      <PortfolioLibrary
+        currentItems={rows.map((r, i) => [r.ticker.trim().toUpperCase(), round2(weights[i])]).filter(([tk, w]) => tk && w > 0)}
+        rebalance={rebalance} onLoad={loadSaved}
+        compareParams={{
+          benchmark, var_confidence: confLevel(),
+          ...(timeMode === 'preset' ? { period } : { start_date: start, end_date: end }),
+        }} />
+
       {error && <div className="error-box">{error}</div>}
-      {!data && !loading && <EmptyState>Composez votre portefeuille (ou choisissez un modèle) puis lancez la simulation.</EmptyState>}
+      {!data && !loading && (
+        <EmptyState icon={PieChart} title="Aucune simulation pour l'instant">
+          Ajoutez des actifs avec leur poids (ou partez d'un « Modèle… »), puis cliquez sur « Simuler le portefeuille » pour obtenir l'historique, le risque et la projection.
+        </EmptyState>
+      )}
 
       {data && (
         <div style={{ opacity: loading ? 0.55 : 1, transition: 'opacity .15s' }}>
-          <div style={{ color: 'var(--muted)', fontSize: 12, marginBottom: 10 }}>
-            Simulation du {data.period_start} au {data.period_end} · {REBALANCE.find(r => r.value === data.rebalance)?.label} · référence <strong style={{ color: 'var(--text-2)' }}>{data.benchmark_label}</strong>
-            {' '}· historique commun à tous les actifs uniquement
+          <div className="result-head">
+            <div className="result-title">
+              <h1>{t('Résultats de la simulation')}</h1>
+              <span className="tag">{t(data.tickers.length > 1 ? '{n} actifs' : '{n} actif', { n: data.tickers.length })}</span>
+              <span className="tag">{t('Rééquilibrage :')} {t(REBALANCE.find(r => r.value === data.rebalance)?.label || '').split(' (')[0]}</span>
+            </div>
+            <div className="result-meta">
+              {t('Du {a} au {b}', { a: fmtDate(data.period_start), b: fmtDate(data.period_end) })} {t('(historique commun à tous les actifs)')} · {t('Référence :')} <strong>{data.benchmark_label}</strong>
+            </div>
           </div>
 
-          <div className="panel" style={{ marginBottom: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16, padding: '12px 20px' }}>
-            <div><span className="label">Capital initial</span><strong style={{ fontSize: 19 }}>{isMoney ? `${fmt(data.money_summary.initial_capital, 0)} ${currency}` : '—'}</strong></div>
-            <div><span className="label">Valeur finale</span><strong style={{ fontSize: 19 }}>{isMoney ? `${fmt(data.money_summary.final_value, 0)} ${currency}` : '—'}</strong></div>
-            <div><span className="label">Gain / perte</span><strong style={{ fontSize: 19, color: isMoney ? signColor(data.money_summary.profit_loss) : undefined }}>{isMoney ? `${fmt(data.money_summary.profit_loss, 0, true)} ${currency}` : '—'}</strong></div>
-            <div><span className="label">Rendement</span><strong style={{ fontSize: 19, color: signColor(m.total_change_pct) }}>{fmt(m.total_change_pct, 2, true)} %</strong>
-              <span style={{ fontSize: 12, color: 'var(--muted)', marginLeft: 6 }}>soit {fmt(m.cagr_pct, 2, true)} %/an</span></div>
+          <div className="panel kpi-strip">
+            <div><span className="label">{t('Capital initial')}</span>{isMoney ? <strong className="kpi-value">{fmt(data.money_summary.initial_capital, 0)} {currency}</strong>
+              : <><strong className="kpi-value dim">—</strong><span className="kpi-sub">{t('Renseignez un capital total')}</span></>}</div>
+            <div><span className="label">{t('Valeur finale')}</span>{isMoney ? <strong className="kpi-value">{fmt(data.money_summary.final_value, 0)} {currency}</strong>
+              : <strong className="kpi-value dim">—</strong>}</div>
+            <div><span className="label">{t('Gain / perte')}</span>{isMoney ? <strong className="kpi-value" style={{ color: signColor(data.money_summary.profit_loss) }}>{fmt(data.money_summary.profit_loss, 0, true)} {currency}</strong>
+              : <strong className="kpi-value dim">—</strong>}</div>
+            <div><span className="label">{t('Rendement')}</span><strong className="kpi-value" style={{ color: signColor(m.total_change_pct) }}>{fmt(m.total_change_pct, 2, true)} %</strong>
+              <span className="kpi-sub">{t('soit {v} % par an', { v: fmt(m.cagr_pct, 2, true) })}</span></div>
           </div>
 
-          <StatsDashboard metrics={m} interpretations={data.interpretations} varInput={varInput} onVarChange={setVarInput} onVarSubmit={() => simulate()}
-            footer={`Calculé sur ${m.observations} séances communes · taux sans risque 2 %`} />
+          <StatsDashboard metrics={m} interpretations={data.interpretations} varInput={varInput} onVarChange={setVarInput} onVarSubmit={() => simulate()} confUsed={data._conf}
+            footer={t('Calculé sur {n} séances communes · taux sans risque {r} %', { n: m.observations, r: fmt(m.risk_free_pct, 2) })} />
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(440px, 1fr))', gap: 16, marginBottom: 16 }}>
+          <div className="grid-2" style={{ marginBottom: 16 }}>
             <div className="panel" style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, gap: 10, flexWrap: 'wrap' }}>
                 <Segmented value={chartType} onChange={setChartType} options={[
                   { value: 'line', label: 'Valeur vs benchmark', icon: <Activity size={13} /> },
-                  { value: 'drawdown', label: 'Drawdown', icon: <ShieldAlert size={13} />, accent: '#f23645' },
+                  { value: 'drawdown', label: 'Drawdown', icon: <ShieldAlert size={13} />, accent: '#e5484d' },
                 ]} />
-                <button type="button" className="icon-btn" title="Plein écran"
-                  onClick={() => onFullscreen({ kind: 'chart', title: 'Portefeuille', props: { data: data.chart_data, type: chartType, lineColor: '#089981', isMoney, currency, compareKey: 'benchmark', compareLabel: data.benchmark_label, mainLabel: 'Portefeuille' } })}>
+                <button type="button" className="icon-btn" title={t('Plein écran')}
+                  onClick={() => onFullscreen({ kind: 'chart', title: 'Portefeuille', props: { data: data.chart_data, type: chartType, lineColor: '#e0a43a', isMoney, currency, compareKey: 'benchmark', compareLabel: data.benchmark_label, mainLabel: 'Portefeuille' } })}>
                   <Maximize2 size={15} />
                 </button>
               </div>
               <div style={{ flex: 1, minHeight: 360 }}>
-                <ChartErrorBoundary>
-                  <TradingViewChart data={data.chart_data} type={chartType} lineColor="#089981" isMoney={isMoney} currency={currency}
+                <ChartErrorBoundary resetKey={data}>
+                  <TradingViewChart data={data.chart_data} type={chartType} lineColor="#e0a43a" isMoney={isMoney} currency={currency}
                     compareKey="benchmark" compareLabel={data.benchmark_label} mainLabel="Portefeuille" />
                 </ChartErrorBoundary>
               </div>
-              {chartType === 'line' && <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6 }}>Trait vert : portefeuille · pointillés gris : {data.benchmark_label} {isMoney ? 'avec le même capital' : '(base 100)'}</div>}
+              {chartType === 'line' && <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6 }}>{t('Trait ambre : portefeuille · pointillés gris :')} {data.benchmark_label} {isMoney ? t('avec le même capital') : t('(base 100)')}</div>}
             </div>
-            <MonteCarloCard mc={data.monte_carlo} forecastDays={forecastDays} currency={currency}
+            <MonteCarloCard mc={data.monte_carlo} forecastDays={pendingDays ?? data._days} computedDays={data._days} currency={currency}
               onHorizonChange={(d) => { setForecastDays(d); simulate({ forecastDays: d }); }}
-              onFullscreen={() => onFullscreen({ kind: 'mc', forecastDays, props: { data: data.monte_carlo.chart_data } })} />
+              onFullscreen={() => onFullscreen({ kind: 'mc', forecastDays: data._days, props: { data: data.monte_carlo.chart_data } })} />
           </div>
 
           {/* Détail par ligne */}
           <div className="panel" style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
-              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Détail par actif</h3>
+              <h3 className="section-title">{t('Détail par actif')}</h3>
               <div style={{ display: 'flex', gap: 18, fontSize: 12, color: 'var(--muted-2)', flexWrap: 'wrap' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>Corrélation moyenne : <strong style={{ color: '#fff' }}>{fmt(data.breakdown.average_correlation, 2)}</strong>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('Corrélation moyenne :')} <strong style={{ color: '#fff' }}>{fmt(data.breakdown.average_correlation, 2)}</strong>
                   <HelpButtons definition={DEFINITIONS.average_correlation} size={13} /></span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>Ratio de diversification : <strong style={{ color: '#fff' }}>{fmt(data.breakdown.diversification_ratio, 2)}</strong>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{t('Ratio de diversification :')} <strong style={{ color: '#fff' }}>{fmt(data.breakdown.diversification_ratio, 2)}</strong>
                   <HelpButtons definition={DEFINITIONS.diversification_ratio} size={13} /></span>
               </div>
             </div>
@@ -365,10 +472,10 @@ function PortfolioView({ shared, onFullscreen }) {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Actif</th><th className="num">Poids</th><th className="num">Perf. totale</th><th className="num">CAGR</th>
-                    <th className="num">Volatilité</th><th className="num">Max DD</th><th className="num">Sharpe</th>
-                    <th className="num"><span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>Contrib. perf.<HelpButtons definition={DEFINITIONS.return_contribution} size={12} /></span></th>
-                    <th style={{ minWidth: 160 }}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>Part du risque<HelpButtons definition={DEFINITIONS.risk_contribution} size={12} /></span></th>
+                    <th>{t('Actif')}</th><th className="num">{t('Poids')}</th><th className="num">{t('Perf. totale')}</th><th className="num">CAGR</th>
+                    <th className="num">{t('Volatilité')}</th><th className="num">Max DD</th><th className="num">Sharpe</th>
+                    <th className="num"><span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>{t('Contrib. perf.')}<HelpButtons definition={DEFINITIONS.return_contribution} size={12} /></span></th>
+                    <th style={{ minWidth: 160 }}><span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>{t('Part du risque')}<HelpButtons definition={DEFINITIONS.risk_contribution} size={12} /></span></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -382,7 +489,7 @@ function PortfolioView({ shared, onFullscreen }) {
                       <td className="num">{fmt(a.volatility_pct, 1)} %</td>
                       <td className="num" style={{ color: 'var(--red)' }}>{fmt(a.max_drawdown_pct, 1)} %</td>
                       <td className="num">{fmt(a.sharpe_ratio, 2)}</td>
-                      <td className="num" style={{ color: signColor(a.return_contribution_pct) }}>{fmt(a.return_contribution_pct, 1, true)} pts</td>
+                      <td className="num" style={{ color: signColor(a.return_contribution_pct) }}>{fmt(a.return_contribution_pct, 1, true)} {t('pts')}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <div style={{ flex: 1, height: 6, background: '#0b0f17', borderRadius: 3, overflow: 'hidden' }}>
@@ -396,15 +503,18 @@ function PortfolioView({ shared, onFullscreen }) {
                 </tbody>
               </table>
             </div>
-            <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 8 }}>Barre orange : la ligne pèse beaucoup plus dans le risque que dans le capital.</div>
+            <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 8 }}>{t('Barre orange : la ligne pèse beaucoup plus dans le risque que dans le capital.')}</div>
           </div>
 
           {data.breakdown.correlation.tickers.length > 1 && (
             <div className="panel" style={{ marginBottom: 24 }}>
-              <h3 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700 }}>Matrice de corrélation</h3>
+              <h3 className="section-title" style={{ marginBottom: 12 }}>{t('Matrice de corrélation')}</h3>
               <CorrelationMatrix corr={data.breakdown.correlation} />
             </div>
           )}
+
+          <EventsPanel tickers={data.tickers} weights={data.tickers.map(tk => data.weights[tk])}
+            title="Annonces économiques qui concernent ce portefeuille" onOpenCalendar={onOpenCalendar} />
         </div>
       )}
     </div>
