@@ -4,6 +4,7 @@ import { Search, Activity, BarChart2, ShieldAlert, Maximize2, ChartLine, Loader2
 import AssetSearchInput from '../components/AssetSearchInput';
 import PeriodPicker from '../components/PeriodPicker';
 import StatsDashboard from '../components/StatsDashboard';
+import { annualNote, periodFooter } from '../periodText';
 import MonteCarloCard from '../components/MonteCarloCard';
 import { EventsPanel } from '../components/Calendar';
 import TradingViewChart, { ChartErrorBoundary } from '../components/TradingViewChart';
@@ -66,7 +67,7 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
       setData({ ...res.data, _days: String(p.forecastDays), _conf: p.conf });
     } catch (err) {
       if (axios.isCancel(err)) return;
-      setError(err.response?.data?.detail || t("Impossible de joindre l'API (le serveur Python est-il lancé ?)."));
+      setError(err.response?.data?.detail || t("Le service de données ne répond pas pour le moment. Réessayez dans un instant."));
     } finally {
       if (abortRef.current === ctrl) { setLoading(false); setPendingDays(null); }
     }
@@ -102,7 +103,7 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
           </Field>
           <Field label="Comparer à">
             <select aria-label={t('Comparer à')} title={t("Indice de référence (benchmark) utilisé pour le bêta, l'alpha et la comparaison")} value={benchmark} onChange={(e) => { setBenchmark(e.target.value); if (data) run({ benchmark: e.target.value }); }}>
-              <option value="">{t('Automatique')}</option>
+              <option value="">{t('Automatique (indice du pays)')}</option>
               {BENCHMARKS.map(b => <option key={b.value} value={b.value}>{b.label}</option>)}
             </select>
           </Field>
@@ -164,12 +165,12 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
               {hasCap ? <strong className="kpi-value" style={{ color: signColor(m.total_change_pct) }}>{fmt(cap * m.total_change_pct / 100, 0, true)} {currency}</strong>
                 : <><strong className="kpi-value dim">—</strong><span className="kpi-sub">{t('Saisissez un capital')}</span></>}</div>
             <div><span className="label">{t('Rendement')}</span><strong className="kpi-value" style={{ color: signColor(m.total_change_pct) }}>{fmt(m.total_change_pct, 2, true)} %</strong>
-              <span className="kpi-sub">{t('soit {v} % par an', { v: fmt(m.cagr_pct, 2, true) })}</span></div>
+              <span className="kpi-sub">{annualNote(t, m)}</span></div>
           </div>
 
           <StatsDashboard metrics={m} interpretations={data.interpretations} classMetrics={data.class_specific_metrics} assetClass={data.asset_class}
             varInput={varInput} onVarChange={setVarInput} onVarSubmit={() => run()} confUsed={data._conf}
-            footer={t('Calculé sur {n} séances · taux sans risque {r} % · annualisation {p} séances/an', { n: m.observations, r: fmt(m.risk_free_pct, 2), p: m.periods_per_year })} />
+            footer={periodFooter(t, m)} />
 
           <div className="grid-2" style={{ marginBottom: 24 }}>
             <div className="panel" style={{ display: 'flex', flexDirection: 'column' }}>

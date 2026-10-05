@@ -1,12 +1,14 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
-import { Layers, Plus, Trash2, Activity, ShieldAlert, Maximize2, Equal, Scale, Play, PieChart, Settings2, Lock, LockOpen, Loader2 } from 'lucide-react';
+import { Layers, Plus, Trash2, Activity, ShieldAlert, Maximize2, Equal, Scale, Play, PieChart, Settings2, Lock, LockOpen, Loader2, Spline } from 'lucide-react';
 import PortfolioLibrary from '../components/PortfolioLibrary';
 import ExportButton from '../components/ExportButton';
 import { exportPortfolio } from '../export/builders';
 import AssetSearchInput from '../components/AssetSearchInput';
 import PeriodPicker from '../components/PeriodPicker';
 import StatsDashboard from '../components/StatsDashboard';
+import FrontierPanel from '../components/FrontierPanel';
+import { annualNote, periodFooter } from '../periodText';
 import MonteCarloCard from '../components/MonteCarloCard';
 import { EventsPanel } from '../components/Calendar';
 import TradingViewChart, { ChartErrorBoundary } from '../components/TradingViewChart';
@@ -132,7 +134,7 @@ function CorrelationMatrix({ corr }) {
   );
 }
 
-function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
+function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
   const { today, varInput, setVarInput, confLevel, forecastDays, setForecastDays, currency, setCurrency } = shared;
   const { t, lang } = useLang();
 
@@ -192,6 +194,32 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
     setInputMode('weight');
     setRows(p.items.map(([tk, w]) => newRow(tk, String(w))));
     setRebalance(p.rebalance || 'none');
+  };
+
+  // Exemple envoyé par l'onglet « Bien démarrer » : on remplit les lignes, puis on simule dès que l'état est à jour
+  const [runPending, setRunPending] = useState(null); // options de la simulation à lancer au prochain rendu
+  const [showFrontier, setShowFrontier] = useState(false);
+  useEffect(() => {
+    if (!externalRequest) return;
+    loadSaved(externalRequest);
+    setTimeMode('preset');
+    setPeriod(externalRequest.period || '5y');
+    setRunPending({ period: externalRequest.period, rebalance: externalRequest.rebalance });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [externalRequest]);
+  useEffect(() => {
+    if (!runPending) return;
+    const o = runPending;
+    setRunPending(null);
+    simulate(o);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runPending, rows]);
+  // Dosage proposé par la frontière efficiente : mêmes actifs, nouveaux poids, puis nouvelle simulation
+  const applyFrontier = (w) => {
+    setInputMode('weight');
+    setRows(Object.entries(w).map(([tk, x]) => newRow(tk, String(x))));
+    setRunPending({});
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const switchMode = (mode) => {
@@ -262,10 +290,10 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
         ...(capital > 0 ? { initial_capital: capital } : {}),
       };
       const res = await axios.post(`${API}/api/portfolio/analyze`, payload, { signal: ctrl.signal });
-      setData({ ...res.data, _days: String(fd), _conf: payload.var_confidence });
+      setData({ ...res.data, _days: String(fd), _conf: payload.var_confidence, _payload: payload });
     } catch (err) {
       if (axios.isCancel(err)) return;
-      setError(err.response?.data?.detail || t("Impossible de joindre l'API (le serveur Python est-il lancé ?)."));
+      setError(err.response?.data?.detail || t("Le service de données ne répond pas pour le moment. Réessayez dans un instant."));
     } finally {
       if (abortRef.current === ctrl) { setLoading(false); setPendingDays(null); }
     }
@@ -423,9 +451,16 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
             </div>
             <div className="result-meta" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
               <span>{t('Du {a} au {b}', { a: fmtDate(data.period_start), b: fmtDate(data.period_end) })} {t('(historique commun à tous les actifs)')} · {t('Référence :')} <strong>{data.benchmark_label}</strong></span>
+              {data.tickers.length > 1 && (
+                <button type="button" className={`btn btn-sm${showFrontier ? ' is-on' : ''}`} onClick={() => setShowFrontier(v => !v)} aria-expanded={showFrontier}
+                  title={t('Chercher, avec les mêmes actifs, un dosage moins risqué pour le même rendement')}>
+                  <Spline size={13} /> {t('Frontière efficiente')}
+                </button>
+              )}
               <ExportButton onExport={() => exportPortfolio(data, currency)} small />
             </div>
           </div>
+          {showFrontier && data._payload && <FrontierPanel payload={data._payload} onApply={applyFrontier} onClose={() => setShowFrontier(false)} />}
 
           <div className="panel kpi-strip">
             <div><span className="label">{t('Capital initial')}</span>{isMoney ? <strong className="kpi-value">{fmt(data.money_summary.initial_capital, 0)} {currency}</strong>
@@ -435,11 +470,11 @@ function PortfolioView({ shared, onFullscreen, onOpenCalendar }) {
             <div><span className="label">{t('Gain / perte')}</span>{isMoney ? <strong className="kpi-value" style={{ color: signColor(data.money_summary.profit_loss) }}>{fmt(data.money_summary.profit_loss, 0, true)} {currency}</strong>
               : <strong className="kpi-value dim">—</strong>}</div>
             <div><span className="label">{t('Rendement')}</span><strong className="kpi-value" style={{ color: signColor(m.total_change_pct) }}>{fmt(m.total_change_pct, 2, true)} %</strong>
-              <span className="kpi-sub">{t('soit {v} % par an', { v: fmt(m.cagr_pct, 2, true) })}</span></div>
+              <span className="kpi-sub">{annualNote(t, m)}</span></div>
           </div>
 
           <StatsDashboard metrics={m} interpretations={data.interpretations} varInput={varInput} onVarChange={setVarInput} onVarSubmit={() => simulate()} confUsed={data._conf}
-            footer={t('Calculé sur {n} séances communes · taux sans risque {r} %', { n: m.observations, r: fmt(m.risk_free_pct, 2) })} />
+            footer={periodFooter(t, m)} />
 
           <div className="grid-2" style={{ marginBottom: 16 }}>
             <div className="panel" style={{ display: 'flex', flexDirection: 'column' }}>

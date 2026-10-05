@@ -19,8 +19,8 @@ from i18n import T, lang, num
 
 import contextvars
 
-RISK_FREE_RATE = 0.02  # ancien taux fixe (option « 2 % fixe »)
-# Taux sans risque de la requête en cours (décimal) : fixé par l'API (taux du marché par défaut)
+RISK_FREE_RATE = 0.02  # dernier recours si aucun taux de marché n'est disponible
+# Taux sans risque de la requête en cours (décimal) : fixé par l'API selon la devise de l'actif (risk_free.py)
 _rf = contextvars.ContextVar("risk_free", default=RISK_FREE_RATE)
 
 
@@ -51,6 +51,50 @@ def _r(x, nd=2):
 def fr(x, nd=2, signed=False):
     """Nombre pour les phrases, au format de la langue de la requête (virgule en français, point en anglais)."""
     return num(x, nd, signed)
+
+
+_MONTHS_FR = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."]
+
+
+def fdate(d):
+    """'2026-02-12' -> « 12 févr. 2026 » (français) ou « Feb 12, 2026 » (anglais)."""
+    if not d:
+        return ""
+    ts = pd.Timestamp(d)
+    return T(f"{ts.day} {_MONTHS_FR[ts.month - 1]} {ts.year}", ts.strftime("%b %d, %Y").replace(" 0", " "))
+
+
+def sessions_word(ppy, n=2):
+    """« séances » pour une place boursière, « jours » pour la crypto qui cote 7 j/7."""
+    if ppy >= 365:
+        return T("jour" if n < 2 else "jours", "day" if n < 2 else "days")
+    return T("séance" if n < 2 else "séances", "session" if n < 2 else "sessions")
+
+
+def one_session(ppy):
+    """« une séance » ou « un jour » (crypto), avec le bon accord."""
+    return T("un jour", "one day") if ppy >= 365 else T("une séance", "one session")
+
+
+def fconf(x):
+    """95.0 -> « 95 » ; 97.5 -> « 97,5 »."""
+    return fr(x, 0) if x is not None and float(x).is_integer() else fr(x, 1)
+
+
+def fdur(n, ppy=252):
+    """Nombre de séances -> durée parlante : « environ 3 semaines », « environ 4 mois », « environ 1,5 an »."""
+    if n is None:
+        return ""
+    per_week = 7 if ppy >= 365 else 5
+    weeks = n / per_week
+    if weeks < 1.5:
+        return T(f"{round(n)} {sessions_word(ppy, round(n))}", f"{round(n)} {sessions_word(ppy, round(n))}")
+    if weeks < 8:
+        return T(f"environ {round(weeks)} semaines", f"about {round(weeks)} weeks")
+    months = n / (ppy / 12)
+    if months < 18:
+        return T(f"environ {round(months)} mois", f"about {round(months)} months")
+    return T(f"environ {fr(months / 12, 1)} ans", f"about {fr(months / 12, 1)} years")
 
 
 # =====================================================================
@@ -248,6 +292,35 @@ def drawdown_episodes(prices: pd.Series) -> list:
     episode_id = np.cumsum(~under)[under]
     _, counts = np.unique(episode_id, return_counts=True)
     return counts.tolist()
+
+
+def drawdown_details(prices: pd.Series) -> dict:
+    """Dates de la pire baisse (sommet, creux, retour au sommet) et de la plus longue période sous un ancien record."""
+    p = prices.dropna()
+    if len(p) < 2:
+        return {}
+    peak = p.cummax()
+    dd = p / peak - 1
+    out = {"days_below_peak_pct": _r((dd < 0).mean() * 100, 1), "high_date": p.idxmax().strftime("%Y-%m-%d"), "high_scope": "period"}
+    trough = dd.idxmin()
+    if dd.loc[trough] < 0:
+        peak_date = p.loc[:trough].idxmax()
+        after = p.loc[trough:]
+        rec = after[after >= p.loc[peak_date]]
+        out.update({"mdd_peak_date": peak_date.strftime("%Y-%m-%d"), "mdd_trough_date": trough.strftime("%Y-%m-%d"),
+                    "mdd_recovery_date": rec.index[0].strftime("%Y-%m-%d") if not rec.empty else None})
+    under = (dd < 0).to_numpy()
+    if under.any():
+        ep_id = np.cumsum(~under)
+        ep_id = np.where(under, ep_id, -1)
+        ids, counts = np.unique(ep_id[ep_id >= 0], return_counts=True)
+        longest = ids[counts.argmax()]
+        idx = np.where(ep_id == longest)[0]
+        start = idx[0] - 1 if idx[0] > 0 else idx[0]  # le dernier record avant la baisse
+        out.update({"longest_dd_start": p.index[start].strftime("%Y-%m-%d"), "longest_dd_end": p.index[idx[-1]].strftime("%Y-%m-%d"),
+                    "longest_dd_ongoing": bool(idx[-1] == len(p) - 1), "drawdown_count": int(len(ids)),
+                    "drawdown_count_5pct": int(sum(dd.to_numpy()[ep_id == i].min() <= -0.05 for i in ids))})
+    return out
 
 
 def mean_time_to_recovery(prices: pd.Series) -> float:
@@ -465,10 +538,15 @@ def compute_core_metrics(prices: pd.Series, bench_prices: pd.Series, conf: float
         "cvar_pct": conditional_var(returns, conf),
         "observations": int(len(returns)),
         "periods_per_year": ppy,
+        "period_years": _r((prices.index[-1] - prices.index[0]).days / 365.25, 3) if len(prices) > 1 else 0,
         "risk_free_pct": _r(risk_free() * 100),
     })
     m.update(rel)
     m.update(monthly_stats(prices))
+    m.update(drawdown_details(prices))
+    if not returns.empty:
+        m["best_day_date"] = returns.idxmax().strftime("%Y-%m-%d")
+        m["worst_day_date"] = returns.idxmin().strftime("%Y-%m-%d")
     return m
 
 
@@ -746,27 +824,40 @@ def asset_class_metrics(asset_class: str, df: pd.DataFrame, ppy: int, dividends=
 # 10. INTERPRÉTATIONS (PHRASES CHIFFRÉES)
 # =====================================================================
 
-def interpret_metrics(m: dict, benchmark_label: str = None) -> dict:
+def interpret_metrics(m: dict, benchmark_label: str = None, portfolio: bool = False) -> dict:
     c = {}
     g = m.get
     bl = benchmark_label or T("l'indice de référence", "the benchmark")
+    ppy = g("periods_per_year") or 252
+    years = g("period_years") or 0
+    rf_txt = T(f"{fr(risk_free() * 100)} %", f"{fr(risk_free() * 100)}%") + (f", {g('risk_free_source')}" if g("risk_free_source") else "")
+    vol = g("annualized_volatility_pct")
+    daily_move = vol / math.sqrt(ppy) if vol else None  # amplitude d'une séance « normale »
 
     v = g("total_change_pct")
     if v is not None:
-        c["total_change"] = T(f"Sur la période, 100 investis sont devenus {fr(100 + v)}. ", f"Over the period, 100 invested became {fr(100 + v)}. ") + (
+        c["total_change"] = T(f"Sur la période, le cours a varié de {fr(v, 2, True)} % : 100 placés au départ valent {fr(100 + v)} à la fin. ",
+                              f"Over the period, the price changed by {fr(v, 2, True)}%: 100 invested at the start is worth {fr(100 + v)} at the end. ") + (
             T("Performance positive.", "Positive performance.") if v >= 0 else T("Performance négative : l'actif a perdu de la valeur.", "Negative performance: the asset lost value."))
 
     v = g("cagr_pct")
     if v is not None:
-        c["cagr"] = T(f"En moyenne, l'actif a rapporté {fr(v)} % par an (intérêts composés). ", f"On average, the asset returned {fr(v)}% per year (compounded). ") + (
-            T("C'est supérieur à la moyenne historique des actions mondiales (environ 7 à 8 % par an).", "That is above the long-run average of global equities (about 7–8% a year).") if v > 8 else
-            T("C'est dans la moyenne historique des actions (environ 5 à 8 % par an).", "That is in line with the long-run average of equities (about 5–8% a year).") if v >= 5 else
-            T("C'est un rendement modeste.", "That is a modest return.") if v >= 0 else T("Le rendement annuel est négatif.", "The annual return is negative."))
+        if 0 < years < 0.95:
+            c["cagr"] = T(f"La période dure moins d'un an ({fdur(g('observations'), ppy)}) : ces {fr(v, 2, True)} % par an supposent que le rythme observé continue toute une année. Chiffre extrapolé, à prendre avec prudence.",
+                          f"The period is shorter than a year ({fdur(g('observations'), ppy)}): this {fr(v, 2, True)}% a year assumes the observed pace lasts a full year. An extrapolated figure, to be taken with caution.")
+        elif 0.95 <= years <= 1.05:
+            c["cagr"] = T(f"Sur une période d'un an, le rendement annuel ({fr(v, 2, True)} %) est logiquement presque identique à la variation totale. Cet indicateur devient utile pour comparer des périodes de durées différentes.",
+                          f"Over a one-year period, the annual return ({fr(v, 2, True)}%) is naturally almost the same as the total change. This indicator becomes useful to compare periods of different lengths.")
+        else:
+            c["cagr"] = T(f"En moyenne, l'actif a rapporté {fr(v)} % par an (intérêts composés). ", f"On average, the asset returned {fr(v)}% per year (compounded). ") + (
+                T("C'est supérieur à la moyenne historique des actions mondiales (environ 7 à 8 % par an).", "That is above the long-run average of global equities (about 7–8% a year).") if v > 8 else
+                T("C'est dans la moyenne historique des actions (environ 5 à 8 % par an).", "That is in line with the long-run average of equities (about 5–8% a year).") if v >= 5 else
+                T("C'est un rendement modeste.", "That is a modest return.") if v >= 0 else T("Le rendement annuel est négatif.", "The annual return is negative."))
 
     v = g("sharpe_ratio")
     if v is not None:
         c["sharpe"] = T(f"Sharpe de {fr(v)} : ", f"Sharpe of {fr(v)}: ") + (
-            T(f"le rendement est inférieur au taux sans risque ({fr(risk_free() * 100)} %) ; un placement sans risque aurait fait mieux.", f"the return is below the risk-free rate ({fr(risk_free() * 100)}%); a risk-free investment would have done better.") if v < 0 else
+            T(f"le rendement est inférieur au taux sans risque ({rf_txt}) ; un placement sans risque aurait fait mieux.", f"the return is below the risk-free rate ({rf_txt}); a risk-free investment would have done better.") if v < 0 else
             T("le rendement compense faiblement le risque pris. Chaque unité de volatilité est peu rémunérée.", "the return barely compensates the risk taken. Each unit of volatility is poorly rewarded.") if v < 0.5 else
             T("rendement correct au regard du risque, typique d'un indice actions sur le long terme.", "a decent return for the risk, typical of an equity index over the long run.") if v < 1 else
             T("très bon rapport rendement/risque.", "a very good risk/return trade-off.") if v < 2 else
@@ -793,27 +884,36 @@ def interpret_metrics(m: dict, benchmark_label: str = None) -> dict:
 
     v = g("omega_ratio")
     if v is not None:
-        c["omega"] = T(f"Omega de {fr(v)} : la somme des hausses vaut {fr(v)} fois la somme des baisses. ", f"Omega of {fr(v)}: total gains are {fr(v)} times total losses. ") + (
-            T("Au-dessus de 1, le bilan des journées est gagnant.", "Above 1, the days add up to a gain.") if v > 1 else T("En dessous de 1, les baisses l'emportent.", "Below 1, the losses win."))
+        c["omega"] = T(f"Omega de {fr(v)} : si l'on additionne toutes les hausses d'un côté et toutes les baisses de l'autre, les hausses valent {fr(v)} fois les baisses. ",
+                       f"Omega of {fr(v)}: adding up all the rises on one side and all the falls on the other, the rises are worth {fr(v)} times the falls. ") + (
+            T("Les pertes l'emportent sur les gains.", "Losses outweigh gains.") if v < 1 else
+            T("Léger avantage aux gains, typique d'un actif qui monte lentement sur le long terme.", "A slight edge to gains, typical of an asset rising slowly over the long run.") if v < 1.1 else
+            T("Avantage net aux gains.", "A clear edge to gains.") if v < 1.3 else T("Très net avantage aux gains.", "A very clear edge to gains."))
 
     v = g("win_rate_pct")
     if v is not None:
-        c["win_rate"] = T(f"{fr(v, 1)} % des séances ont fini en hausse. Un taux proche de 50 % est normal pour un actif coté : la rentabilité dépend surtout de la taille des gains par rapport aux pertes (voir Profit Factor).",
-                          f"{fr(v, 1)}% of sessions closed higher. A rate near 50% is normal for a listed asset: profitability depends mostly on the size of gains versus losses (see Profit Factor).")
-
-    v = g("profit_factor")
-    if v is not None:
-        c["profit_factor"] = T(f"Les hausses cumulées valent {fr(v)} fois les baisses cumulées. ", f"Cumulative gains are {fr(v)} times cumulative losses. ") + (
-            T("Les pertes l'emportent.", "Losses dominate.") if v < 1 else
-            T("Léger avantage aux gains, typique d'un actif haussier sur le long terme.", "A slight edge to gains, typical of an asset rising over the long run.") if v < 1.2 else
-            T("Avantage net aux gains.", "A clear edge to gains.") if v < 1.5 else T("Très net avantage aux gains.", "A very clear edge to gains."))
+        c["win_rate"] = T(f"{fr(v, 1)} % des {sessions_word(ppy)} ont fini en hausse. Un taux proche de 50 % est normal pour un actif coté : la rentabilité dépend surtout de la taille des gains par rapport aux pertes (voir le ratio Omega).",
+                          f"{fr(v, 1)}% of {sessions_word(ppy)} closed higher. A rate near 50% is normal for a listed asset: profitability depends mostly on the size of gains versus losses (see the Omega ratio).")
 
     v = g("max_drawdown_pct")
     if v is not None:
         a = abs(v)
         need = (100 / (100 - a) - 1) * 100 if a < 100 else None
-        c["mdd"] = T(f"La pire baisse depuis un sommet a été de {fr(a)} %", f"The worst fall from a peak was {fr(a)}%") + (
-            T(f", ce qui exigeait ensuite une hausse de {fr(need)} % pour revenir au sommet. ", f", which then required a {fr(need)}% rise to get back to the peak. ") if need else ". ") + (
+        txt = T(f"Au pire moment, l'actif a perdu {fr(a)} %", f"At the worst point, the asset lost {fr(a)}%")
+        if g("mdd_peak_date"):
+            txt += T(f", entre son sommet du {fdate(g('mdd_peak_date'))} et son point bas du {fdate(g('mdd_trough_date'))}",
+                     f", between its peak on {fdate(g('mdd_peak_date'))} and its low on {fdate(g('mdd_trough_date'))}")
+        txt += ". "
+        if g("mdd_peak_date"):
+            txt += (T(f"Il a retrouvé ce sommet le {fdate(g('mdd_recovery_date'))}. ", f"It got back to that peak on {fdate(g('mdd_recovery_date'))}. ") if g("mdd_recovery_date")
+                    else T("Il n'a pas encore retrouvé ce sommet. ", "It has not yet got back to that peak. "))
+        if need and a >= 1:
+            done = bool(g("mdd_recovery_date")) or not g("mdd_peak_date")
+            txt += (T(f"Pour revenir au sommet, il a fallu +{fr(need)} %", f"To get back to the peak, it took +{fr(need)}%") if done else
+                    T(f"Depuis ce point bas, il faudrait +{fr(need)} % pour revenir au sommet", f"From that low, it would take +{fr(need)}% to get back to the peak")) + T(
+                f" : 100 tombés à {fr(100 - a)} doivent regagner {fr(a)}, et {fr(a)} représente {fr(need)} % de {fr(100 - a)}. Une chute se rattrape toujours avec une hausse plus grande (−50 % exige +100 %). ",
+                f": 100 that fell to {fr(100 - a)} must regain {fr(a)}, and {fr(a)} is {fr(need)}% of {fr(100 - a)}. A fall always takes a bigger rise to recover (−50% requires +100%). ")
+        c["mdd"] = txt + (
             T("Baisse limitée : profil défensif.", "Limited fall: defensive profile.") if a < 10 else
             T("Correction modérée, courante pour un actif actions.", "Moderate correction, common for an equity asset.") if a < 25 else
             T("Baisse sévère, typique d'un marché baissier.", "Severe fall, typical of a bear market.") if a < 50 else
@@ -821,56 +921,95 @@ def interpret_metrics(m: dict, benchmark_label: str = None) -> dict:
 
     v = g("mean_drawdown_pct")
     if v is not None:
-        c["mean_dd"] = T(f"Lorsqu'il est sous son dernier sommet, l'actif se trouve en moyenne {fr(abs(v))} % plus bas. C'est la « douleur » typique que l'on ressent en le détenant, plus représentative que le seul pire cas.",
-                         f"When below its last peak, the asset sits on average {fr(abs(v))}% lower. That is the typical “pain” of holding it, more representative than the worst case alone.")
+        below = g("days_below_peak_pct")
+        mdd = abs(g("max_drawdown_pct") or 0)
+        txt = (T(f"L'actif a passé {fr(below, 0)} % des {sessions_word(ppy)} sous un ancien record, en moyenne {fr(abs(v))} % en dessous. ",
+                 f"The asset spent {fr(below, 0)}% of {sessions_word(ppy)} below a previous record, on average {fr(abs(v))}% below it. ") if below is not None else
+               T(f"Sous un ancien record, l'actif se trouvait en moyenne {fr(abs(v))} % plus bas. ", f"Below a previous record, the asset sat on average {fr(abs(v))}% lower. "))
+        if v and mdd > abs(v) * 1.5:
+            txt += T(f"C'est le recul « habituel » ressenti en le détenant ; la pire chute ({fr(mdd)} %) a été {fr(mdd / abs(v), 1)} fois plus profonde.",
+                     f"That is the “usual” dip felt while holding it; the worst fall ({fr(mdd)}%) was {fr(mdd / abs(v), 1)} times deeper.")
+        else:
+            txt += T("C'est le recul « habituel » ressenti en le détenant.", "That is the “usual” dip felt while holding it.")
+        c["mean_dd"] = txt
 
     v = g("current_drawdown_pct")
     if v is not None:
-        c["current_dd"] = (T("L'actif est actuellement sur un plus haut.", "The asset is currently at a high.") if v == 0 else
-                           T(f"L'actif est actuellement {fr(abs(v))} % sous son plus haut de la période.", f"The asset is currently {fr(abs(v))}% below its period high."))
+        scope_all = g("high_scope") == "all"
+        ref = T("son record historique", "its all-time high") if scope_all else T("son plus haut de la période", "its high for the period")
+        when = T(f" (atteint le {fdate(g('high_date'))})", f" (reached on {fdate(g('high_date'))})") if g("high_date") else ""
+        if v == 0:
+            c["current_dd"] = T(f"L'actif est actuellement sur {ref}.", f"The asset is currently at {ref}.")
+        else:
+            back = (100 / (100 + v) - 1) * 100 if v > -100 else None
+            c["current_dd"] = T(f"L'actif est aujourd'hui {fr(abs(v))} % sous {ref}{when}.", f"The asset is currently {fr(abs(v))}% below {ref}{when}.") + (
+                T(f" Il lui faudrait gagner {fr(back)} % pour y revenir.", f" It would need to gain {fr(back)}% to get back there.") if back else "")
 
     v = g("mean_time_to_recovery_days")
-    if v is not None:
+    if v is not None and g("drawdown_count"):
         lng = g("longest_drawdown_days")
-        c["recovery"] = T(f"Une phase de baisse dure en moyenne {fr(v, 0)} séances avant le retour à un nouveau sommet", f"A falling phase lasts on average {fr(v, 0)} sessions before a new high") + (
-            T(f" ; la plus longue a duré {lng} séances", f"; the longest lasted {lng} sessions") if lng else "") + T(
-            ". Une période encore en cours est comptée jusqu'à aujourd'hui.", ". A period still in progress is counted up to today.")
+        n, n5 = g("drawdown_count"), g("drawdown_count_5pct")
+        start = fdate(g("longest_dd_start"))
+        if n == 1 and g("longest_dd_ongoing"):
+            txt = T(f"L'actif est sous son record depuis le {start}, soit {lng} {sessions_word(ppy)} ({fdur(lng, ppy)}), et ne l'a pas encore retrouvé. ",
+                    f"The asset has been below its record since {start}, i.e. {lng} {sessions_word(ppy)} ({fdur(lng, ppy)}), and has not yet got back to it. ")
+        else:
+            txt = T(f"Chaque fois que l'actif est passé sous un record, il lui a fallu en moyenne {fr(v, 0)} {sessions_word(ppy)} ({fdur(v, ppy)}) pour en établir un nouveau. ",
+                    f"Each time the asset fell below a record, it took on average {fr(v, 0)} {sessions_word(ppy)} ({fdur(v, ppy)}) to set a new one. ")
+            txt += T(f"C'est arrivé {n} fois sur la période, dont {n5} avec une baisse de plus de 5 %. ", f"It happened {n} times over the period, {n5} of them with a fall of more than 5%. ")
+            if lng and g("longest_dd_start"):
+                span = (T(f"du {start} à aujourd'hui (toujours en cours)", f"from {start} to today (still ongoing)") if g("longest_dd_ongoing")
+                        else T(f"du {start} au {fdate(g('longest_dd_end'))}", f"from {start} to {fdate(g('longest_dd_end'))}"))
+                txt += T(f"La plus longue attente a duré {lng} {sessions_word(ppy)} ({fdur(lng, ppy)}), {span}. ",
+                         f"The longest wait lasted {lng} {sessions_word(ppy)} ({fdur(lng, ppy)}), {span}. ")
+        c["recovery"] = txt + (
+            T("Les replis sont vite effacés.", "Dips are quickly erased.") if v < 10 else
+            T("Délai de récupération modéré.", "A moderate recovery time.") if v < 60 else
+            T("Les replis mettent longtemps à être effacés : il faut de la patience.", "Dips take a long time to be erased: patience is needed."))
 
     v = g("ulcer_index")
     if v is not None:
-        c["ulcer"] = T(f"Ulcer Index de {fr(v)} : ", f"Ulcer Index of {fr(v)}: ") + (
-            T("baisses rares et peu profondes, détention très sereine.", "rare and shallow falls, a very calm holding.") if v < 5 else
-            T("baisses modérées, comparables à un indice actions large.", "moderate falls, comparable to a broad equity index.") if v < 15 else
-            T("baisses profondes et/ou longues : détention éprouvante psychologiquement.", "deep and/or long falls: a psychologically trying holding."))
+        c["ulcer"] = T(f"Ulcer Index de {fr(v)} : il résume en un chiffre le stress de détenir l'actif. Il vaut à peu près la baisse « typique » sous le record, en donnant plus de poids aux chutes profondes et longues. ",
+                       f"Ulcer Index of {fr(v)}: it sums up in one number how stressful the asset was to hold. It is roughly the “typical” distance below the record, giving more weight to deep and long falls. ") + (
+            T("Baisses rares et peu profondes : détention très sereine.", "Rare and shallow falls: a very calm holding.") if v < 5 else
+            T("Baisses modérées, comparables à un indice actions large.", "Moderate falls, comparable to a broad equity index.") if v < 15 else
+            T("Baisses profondes et/ou longues : détention éprouvante.", "Deep and/or long falls: a trying holding.")) + T(
+            " À rendement égal, l'actif à l'Ulcer Index le plus bas est le plus confortable à garder.", " For the same return, the asset with the lowest Ulcer Index is the most comfortable to hold.")
 
-    v = g("annualized_volatility_pct")
+    v = vol
     if v is not None:
-        c["vol"] = T(f"Volatilité de {fr(v)} % par an : dans environ 2 années sur 3, le rendement annuel devrait rester à ± {fr(v)} points autour de sa moyenne. ",
-                     f"Volatility of {fr(v)}% a year: in about 2 years out of 3, the annual return should stay within ± {fr(v)} points of its average. ") + (
-            T("Faible (niveau obligataire ou défensif).", "Low (bond-like or defensive).") if v < 10 else
-            T("Modérée (proche d'un grand indice actions, ~15-20 %).", "Moderate (close to a major equity index, ~15–20%).") if v < 22 else
-            T("Élevée (action individuelle ou secteur cyclique).", "High (single stock or cyclical sector).") if v < 40 else
-            T("Très élevée (crypto, small cap ou titre spéculatif).", "Very high (crypto, small cap or speculative stock)."))
+        mean = g("cagr_pct")
+        rng = (T(f" Avec le rendement moyen observé ({fr(mean, 1, True)} % par an), cela donne à peu près entre {fr(mean - v, 1, True)} % et {fr(mean + v, 1, True)} % sur une année.",
+                 f" With the observed average return ({fr(mean, 1, True)}% a year), that gives roughly between {fr(mean - v, 1, True)}% and {fr(mean + v, 1, True)}% over a year.")
+               if mean is not None and years >= 0.95 else "")
+        c["vol"] = T(f"Volatilité de {fr(v)} % par an. Un jour normal, le cours bouge d'environ ± {fr(daily_move)} %. Sur un an, environ 2 années sur 3, le rendement s'écarte de moins de {fr(v)} % de sa moyenne.",
+                     f"Volatility of {fr(v)}% a year. On a normal day, the price moves about ± {fr(daily_move)}%. Over a year, in about 2 years out of 3, the return stays within {fr(v)}% of its average.") + rng + " " + (
+            T("Niveau faible (obligataire ou défensif).", "Low level (bond-like or defensive).") if v < 10 else
+            T("Niveau modéré (proche d'un grand indice actions, ~15-20 %).", "Moderate level (close to a major equity index, ~15–20%).") if v < 22 else
+            T("Niveau élevé (action individuelle ou secteur cyclique).", "High level (single stock or cyclical sector).") if v < 40 else
+            T("Niveau très élevé (crypto, petite capitalisation ou titre spéculatif).", "Very high level (crypto, small cap or speculative stock)."))
 
     conf = g("var_confidence_selected") or 95
     v = g("var_historical_pct")
     if v is not None:
-        per_year = max(1, round((100 - conf) / 100 * 252))
-        c["var_h"] = T(f"Historiquement, dans {fr(conf, 1)} % des séances la baisse n'a pas dépassé {fr(abs(v))} %. Les {fr(100 - conf, 1)} % de séances restantes (environ {per_year} par an) ont été pires.",
-                       f"Historically, in {fr(conf, 1)}% of sessions the loss did not exceed {fr(abs(v))}%. The remaining {fr(100 - conf, 1)}% of sessions (about {per_year} a year) were worse.")
+        per_year = max(1, round((100 - conf) / 100 * ppy))
+        every = round(100 / (100 - conf)) if conf < 100 else None
+        c["var_h"] = T(f"Sur {fconf(conf)} % des {sessions_word(ppy)} de la période, la baisse n'a pas dépassé {fr(abs(v))} %. Les {fconf(100 - conf)} % restants, soit environ {per_year} {sessions_word(ppy, per_year)} par an, ont été pires. ",
+                       f"On {fconf(conf)}% of the {sessions_word(ppy)} in the period, the loss did not exceed {fr(abs(v))}%. The remaining {fconf(100 - conf)}%, about {per_year} {sessions_word(ppy, per_year)} a year, were worse. ") + (
+            T(f"En pratique : environ {one_session(ppy)} sur {every}, attendez-vous à perdre au moins {fr(abs(v))} %.", f"In practice: about {one_session(ppy)} in {every}, expect to lose at least {fr(abs(v))}%.") if every else "")
     v = g("var_parametric_pct")
     if v is not None:
         vh = g("var_historical_pct")
         gap = ""
         if vh is not None and abs(vh) > abs(v) * 1.1:
-            gap = T(" Elle est plus optimiste que la VaR historique : les vraies queues de distribution sont plus épaisses qu'une loi normale.",
-                    " It is more optimistic than the historical VaR: real distribution tails are fatter than a normal distribution.")
-        c["var_p"] = T(f"Selon une loi normale ajustée aux données, la perte journalière ne dépasserait {fr(abs(v))} % que {fr(100 - conf, 1)} % du temps.",
-                       f"Under a normal distribution fitted to the data, the daily loss would exceed {fr(abs(v))}% only {fr(100 - conf, 1)}% of the time.") + gap
+            gap = T(" Elle est plus optimiste que la VaR historique : dans la réalité, les très mauvais jours arrivent plus souvent que ne le prévoit la courbe en cloche.",
+                    " It is more optimistic than the historical VaR: in reality, very bad days happen more often than the bell curve predicts.")
+        c["var_p"] = T(f"Si les variations suivaient une courbe en cloche parfaite, la perte journalière ne dépasserait {fr(abs(v))} % que {fconf(100 - conf)} % du temps.",
+                       f"If daily moves followed a perfect bell curve, the daily loss would exceed {fr(abs(v))}% only {fconf(100 - conf)}% of the time.") + gap
     v = g("cvar_pct")
     if v is not None:
-        c["cvar"] = T(f"Lors des {fr(100 - conf, 1)} % pires séances, la perte moyenne a été de {fr(abs(v))} %. C'est la réponse à la question : « quand ça va mal, ça va mal de combien ? »",
-                      f"On the worst {fr(100 - conf, 1)}% of sessions, the average loss was {fr(abs(v))}%. It answers the question: “when things go wrong, how wrong?”")
+        c["cvar"] = T(f"Lors des {fconf(100 - conf)} % pires {sessions_word(ppy)}, la perte moyenne a été de {fr(abs(v))} %. C'est la réponse à la question : « quand ça va mal, ça va mal de combien ? »",
+                      f"On the worst {fconf(100 - conf)}% of {sessions_word(ppy)}, the average loss was {fr(abs(v))}%. It answers the question: “when things go wrong, how wrong?”")
 
     v = g("beta")
     if v is not None:
@@ -883,9 +1022,10 @@ def interpret_metrics(m: dict, benchmark_label: str = None) -> dict:
     v = g("alpha_annual_pct")
     if v is not None:
         c["alpha"] = T(f"Alpha de {fr(v, 2, True)} % par an : ", f"Alpha of {fr(v, 2, True)}% a year: ") + (
-            T(f"l'actif a fait mieux que ce que son exposition à {bl} laissait prévoir.", f"the asset did better than its exposure to {bl} would suggest.") if v > 1 else
-            T(f"l'actif a fait moins bien que ce que son exposition à {bl} laissait prévoir.", f"the asset did worse than its exposure to {bl} would suggest.") if v < -1 else
-            T("la performance s'explique presque entièrement par l'exposition au marché.", "the performance is almost entirely explained by market exposure."))
+            T(f"l'actif a fait mieux que ce que son lien avec {bl} laissait attendre.", f"the asset did better than its link with {bl} would suggest.") if v > 1 else
+            T(f"l'actif a fait moins bien que ce que son lien avec {bl} laissait attendre.", f"the asset did worse than its link with {bl} would suggest.") if v < -1 else
+            T(f"la performance s'explique presque entièrement par les mouvements de {bl}.", f"the performance is almost entirely explained by the moves of {bl}.")) + T(
+            f" Taux sans risque utilisé : {rf_txt}.", f" Risk-free rate used: {rf_txt}.")
 
     v = g("correlation")
     if v is not None:
@@ -897,15 +1037,23 @@ def interpret_metrics(m: dict, benchmark_label: str = None) -> dict:
 
     v = g("r_squared")
     if v is not None:
-        c["r_squared"] = T(f"{fr(v, 1)} % des variations quotidiennes s'expliquent par celles de {bl}. Le reste est propre à l'actif.",
-                           f"{fr(v, 1)}% of daily moves are explained by those of {bl}. The rest is specific to the asset.")
+        words = next((w for target, w in [(10, T("un dixième", "a tenth")), (20, T("un cinquième", "a fifth")), (25, T("un quart", "a quarter")),
+                                          (33, T("un tiers", "a third")), (50, T("la moitié", "half")), (67, T("deux tiers", "two thirds")),
+                                          (75, T("trois quarts", "three quarters")), (90, T("neuf dixièmes", "nine tenths"))] if abs(v - target) <= 4), None)
+        approx = T(f", soit environ {words}", f", roughly {words}") if words else ""
+        c["r_squared"] = T(f"{fr(v, 1)} % des variations quotidiennes de l'actif vont de pair avec celles de {bl}{approx} ; le reste lui est propre. ",
+                           f"{fr(v, 1)}% of the asset's daily moves go hand in hand with those of {bl}{approx}; the rest is specific to it. ") + (
+            T(f"Cela ne veut pas dire que {bl} fait bouger l'actif : les deux réagissent souvent aux mêmes nouvelles (taux d'intérêt, appétit pour le risque, liquidité).",
+              f"It does not mean that {bl} moves the asset: both often react to the same news (interest rates, risk appetite, liquidity).") if v < 70 else
+            T(f"L'actif se comporte presque comme {bl}.", f"The asset behaves almost like {bl}."))
 
     v = g("tracking_error_pct")
     if v is not None:
-        c["tracking_error"] = T(f"L'écart de performance avec {bl} fluctue de ± {fr(v)} % par an. ", f"The performance gap with {bl} fluctuates by ± {fr(v)}% a year. ") + (
-            T("Très proche du benchmark (typique d'un ETF qui le réplique).", "Very close to the benchmark (typical of an ETF that tracks it).") if v < 3 else
-            T("Gestion qui s'éloigne nettement du benchmark.", "Clearly deviates from the benchmark.") if v > 10 else
-            T("Écart modéré avec le benchmark.", "A moderate gap with the benchmark."))
+        c["tracking_error"] = T(f"Chaque jour, l'actif fait un peu mieux ou un peu moins bien que {bl}. Sur un an, ces écarts s'additionnent : avec {fr(v)} %, l'actif termine typiquement l'année entre {fr(v)} % au-dessus et {fr(v)} % en dessous de {bl} (environ 2 années sur 3). ",
+                                f"Each day, the asset does a little better or a little worse than {bl}. Over a year these gaps add up: at {fr(v)}%, the asset typically ends the year between {fr(v)}% above and {fr(v)}% below {bl} (about 2 years out of 3). ") + (
+            T("Très proche de l'indice (typique d'un ETF qui le réplique).", "Very close to the index (typical of an ETF that tracks it).") if v < 3 else
+            T("Comportement nettement différent de l'indice.", "Behaves clearly differently from the index.") if v > 10 else
+            T("Écart modéré avec l'indice.", "A moderate gap with the index."))
 
     v = g("information_ratio")
     if v is not None:
@@ -948,10 +1096,33 @@ def interpret_metrics(m: dict, benchmark_label: str = None) -> dict:
                                  f"{fr(v, 0)}% of months were positive. Best month: {fr(g('best_month_pct'), 2, True)}%, worst month: {fr(g('worst_month_pct'), 2, True)}%.")
 
     v = g("downside_volatility_pct")
-    if v is not None:
-        c["downside_vol"] = T(f"Volatilité calculée uniquement sur les journées de baisse : {fr(v)} % par an. C'est le dénominateur du ratio de Sortino.",
-                              f"Volatility computed on down days only: {fr(v)}% a year. It is the denominator of the Sortino ratio.")
+    if v is not None and vol:
+        ratio = v / (vol / math.sqrt(2))  # ~1 quand hausses et baisses ont la même ampleur
+        c["downside_vol"] = T(f"Volatilité baissière de {fr(v)} % par an, pour une volatilité totale de {fr(vol)} %. ", f"Downside volatility of {fr(v)}% a year, for a total volatility of {fr(vol)}%. ") + (
+            T("Les baisses sont plus brutales que les hausses : quand l'actif recule, il le fait plus fort qu'il ne monte.", "Falls are sharper than rises: when the asset drops, it does so harder than it climbs.") if ratio > 1.1 else
+            T("Les hausses sont plus amples que les baisses : une bonne partie de la volatilité vient de mouvements vers le haut, ce qui est plutôt bon signe.", "Rises are larger than falls: much of the volatility comes from upward moves, which is rather a good sign.") if ratio < 0.9 else
+            T("Hausses et baisses ont à peu près la même ampleur.", "Rises and falls are roughly the same size.")) + T(
+            " C'est cette mesure qu'utilise le ratio de Sortino.", " This is the measure used by the Sortino ratio.")
 
+    for key, field, date_key in (("best_day", "max_daily_return_pct", "best_day_date"), ("worst_day", "min_daily_return_pct", "worst_day_date")):
+        v = g(field)
+        if v is None or not daily_move:
+            continue
+        x = abs(v) / daily_move
+        when = T(f"Le {fdate(g(date_key))}, l'actif ", f"On {fdate(g(date_key))}, the asset ") if g(date_key) else T("L'actif ", "The asset ")
+        c[key] = when + (T(f"a gagné {fr(v, 2, True)} % en {one_session(ppy)}", f"gained {fr(v, 2, True)}% in {one_session(ppy)}") if v >= 0 else
+                         T(f"a perdu {fr(abs(v))} % en {one_session(ppy)}", f"lost {fr(abs(v))}% in {one_session(ppy)}")) + T(
+            f", soit environ {fr(x, 0)} fois un mouvement habituel (± {fr(daily_move)} %). ", f", about {fr(x, 0)} times a usual move (± {fr(daily_move)}%). ") + (
+            T("Mouvement exceptionnel, souvent lié à une annonce (résultats, décision de banque centrale, rachat…).", "An exceptional move, often tied to news (earnings, central bank decision, takeover…).") if x >= 4.5 else
+            T("Mouvement marqué mais pas extrême pour cet actif.", "A marked but not extreme move for this asset."))
+
+    if portfolio:  # même phrases, sujet adapté
+        swaps = [("de l'actif", "du portefeuille"), ("à l'actif", "au portefeuille"), ("L'actif", "Le portefeuille"), ("l'actif", "le portefeuille"),
+                 ("the asset's", "the portfolio's"), ("The asset", "The portfolio"), ("the asset", "the portfolio")]
+        for k, txt in c.items():
+            for x, y in swaps:
+                txt = txt.replace(x, y)
+            c[k] = txt
     return c
 
 

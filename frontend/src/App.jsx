@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Minimize2, Moon, Sun, Search, Layers, SlidersHorizontal, CalendarDays, Landmark, Sigma } from 'lucide-react';
+import { Minimize2, Moon, Sun, Compass, Search, Layers, SlidersHorizontal, CalendarDays, Landmark, Sigma } from 'lucide-react';
 import AssetView from './views/AssetView';
 import PortfolioView from './views/PortfolioView';
 import ScreenerView from './views/ScreenerView';
 import CalendarView from './views/CalendarView';
 import BondsView from './views/BondsView';
 import DerivativesView from './views/DerivativesView';
+import GuideView from './views/GuideView';
 import { fetchCalendar } from './calendar';
 import TradingViewChart from './components/TradingViewChart';
 import { MonteCarloChart } from './components/MonteCarloCard';
@@ -16,6 +17,8 @@ import Brand from './components/Brand';
 import { useTheme, setTheme } from './theme';
 
 const TABS = [
+  { id: 'guide', label: 'Bien démarrer', icon: Compass,
+    about: 'Par où commencer pour faire fructifier son argent : les leçons de l’histoire, chiffres réels à l’appui.' },
   { id: 'asset', label: 'Actif / ETF', icon: Search,
     about: 'Analysez une action, un ETF, un indice ou une crypto : performance, risque et projection.' },
   { id: 'portfolio', label: 'Portefeuille', icon: Layers,
@@ -30,7 +33,7 @@ const TABS = [
     about: "Comprenez le prix d'une option et testez une stratégie, sans engager d'argent." },
 ];
 
-// Raccourcis clavier : Alt + 1…6 change d'onglet (Ctrl + chiffre est réservé par le navigateur aux onglets du navigateur)
+// Raccourcis clavier : Alt + 1…7 change d'onglet (Ctrl + chiffre est réservé par le navigateur aux onglets du navigateur)
 const ALT_KEY = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌥' : 'Alt';
 const isTyping = (el) => el && (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) || el.isContentEditable);
 
@@ -62,7 +65,12 @@ export default function App() {
   const { t, lang, setLang } = useLang();
   const theme = useTheme();
   const today = useMemo(() => new Date().toLocaleDateString('sv-SE'), []);
-  const [activeTab, setActiveTab] = useState('asset');
+  // Première visite : on ouvre « Bien démarrer » ; ensuite, directement l'analyse d'actif
+  const [activeTab, setActiveTab] = useState(() => {
+    try { return localStorage.getItem('visited') ? 'asset' : 'guide'; } catch { return 'asset'; }
+  });
+  useEffect(() => { try { localStorage.setItem('visited', '1'); } catch { /* stockage indisponible */ } }, []);
+  const [portfolioRequest, setPortfolioRequest] = useState(null);
   const [varInput, setVarInput] = useState('95');
   const [forecastDays, setForecastDays] = useState('252');
   const [currency, setCurrency] = useState('€');
@@ -96,7 +104,7 @@ export default function App() {
   const [tip, setTip] = useState(null); // infobulle de l'onglet survolé : { index, left, bottom }
   useEffect(() => {
     const onKey = (e) => {
-      if (e.altKey && !e.ctrlKey && !e.metaKey && /^Digit[1-6]$/.test(e.code)) {
+      if (e.altKey && !e.ctrlKey && !e.metaKey && /^Digit[1-7]$/.test(e.code)) {
         e.preventDefault();
         goTo(TABS[Number(e.code.slice(5)) - 1].id);
       } else if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !isTyping(document.activeElement)) {
@@ -144,8 +152,10 @@ export default function App() {
       </header>
 
       {/* Les onglets restent montés : on retrouve son analyse en revenant sur un onglet */}
+      <div data-view="guide" hidden={activeTab !== 'guide'}><GuideView active={activeTab === 'guide'} onGoTo={goTo}
+        onSimulate={(p) => { setPortfolioRequest({ items: Object.entries(p.weights), rebalance: 'monthly', period: 'max', id: Date.now() }); goTo('portfolio'); }} /></div>
       <div data-view="asset" hidden={activeTab !== 'asset'}><AssetView shared={shared} externalRequest={assetRequest} onFullscreen={setFullscreen} onOpenCalendar={openCalendar} /></div>
-      <div data-view="portfolio" hidden={activeTab !== 'portfolio'}><PortfolioView shared={shared} onFullscreen={setFullscreen} onOpenCalendar={openCalendar} /></div>
+      <div data-view="portfolio" hidden={activeTab !== 'portfolio'}><PortfolioView shared={shared} externalRequest={portfolioRequest} onFullscreen={setFullscreen} onOpenCalendar={openCalendar} /></div>
       <div data-view="screener" hidden={activeTab !== 'screener'}><ScreenerView active={activeTab === 'screener'} onAnalyze={analyzeFromScreener} /></div>
       <div data-view="bonds" hidden={activeTab !== 'bonds'}><BondsView active={activeTab === 'bonds'} onAnalyze={analyzeFromScreener} /></div>
       <div data-view="derivatives" hidden={activeTab !== 'derivatives'}><DerivativesView onAnalyze={analyzeFromScreener} /></div>
@@ -167,7 +177,7 @@ export default function App() {
       {tip && (
         <div className="tab-tip" role="tooltip" style={{ left: tip.left, bottom: tip.bottom }}>
           <span>{t(TABS[tip.index].about)}</span>
-          <span className="tab-tip-keys"><kbd>{ALT_KEY}</kbd> + <kbd>{tip.index + 1}</kbd>{TABS[tip.index].id !== 'bonds' && <> · {t('recherche')} <kbd>/</kbd></>}</span>
+          <span className="tab-tip-keys"><kbd>{ALT_KEY}</kbd> + <kbd>{tip.index + 1}</kbd>{!['bonds', 'guide'].includes(TABS[tip.index].id) && <> · {t('recherche')} <kbd>/</kbd></>}</span>
         </div>
       )}
     </div>

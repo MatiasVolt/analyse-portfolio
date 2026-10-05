@@ -1,8 +1,8 @@
 import { useId, useState, memo } from 'react';
 import { StatCell } from './ui';
 import { DEFINITIONS, METRICS, METRIC_TABS, ASSET_CLASS_LABELS } from '../definitions';
-import { parseNum, fmtMillions } from '../format';
-import { useLang, getRfMode, setRfMode } from '../i18n';
+import { parseNum, fmt, fmtMillions } from '../format';
+import { useLang } from '../i18n';
 
 function toneFor(meta, v) {
   if (v === null || v === undefined) return undefined;
@@ -11,7 +11,8 @@ function toneFor(meta, v) {
 }
 
 function MetricGrid({ keys, metrics, interpretations, confLabel }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const crypto = metrics.periods_per_year >= 365;
   return (
     <div className="stat-grid">
       {keys.map(k => {
@@ -19,8 +20,8 @@ function MetricGrid({ keys, metrics, interpretations, confLabel }) {
         const v = metrics[meta.field];
         return (
           <StatCell key={k}
-            label={meta.varLabel ? `${t(meta.label)} (${confLabel} %)` : meta.label}
-            value={v} unit={meta.unit} nd={meta.nd ?? 2} signed={meta.signed}
+            label={meta.varLabel ? `${t(meta.label)} (${confLabel}${lang === 'fr' ? ' %' : '%'})` : meta.label}
+            value={v} unit={crypto && meta.unit === 'séances' ? 'jours' : meta.unit} nd={meta.nd ?? 2} signed={meta.signed}
             tone={toneFor(meta, v)}
             interpretation={meta.interp ? interpretations?.[meta.interp] : undefined}
             definition={DEFINITIONS[meta.def]} />
@@ -57,10 +58,11 @@ function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, va
           ))}
         </div>
         <div className="dash-var">
-          <button type="button" className="btn btn-sm" onClick={() => { setRfMode(getRfMode() === 'fixed' ? 'market' : 'fixed'); onVarSubmit(); }}
-            title={t("Taux utilisé pour le Sharpe, le Sortino et l'alpha. Cliquez pour basculer entre le taux du marché et l'ancien taux fixe de 2 %.")}>
-            {t('Taux sans risque :')} {getRfMode() === 'fixed' ? t('2 % fixe') : t('marché {v} %', { v: String(metrics.risk_free_pct ?? '…').replace('.', lang === 'fr' ? ',' : '.') })}
-          </button>
+          {metrics.risk_free_pct != null && (
+            <span className="rf-note" title={t("Taux d'un placement sans risque dans la devise de l'actif. Il sert au calcul du Sharpe, du Sortino et de l'alpha.")}>
+              {t('Taux sans risque')} <strong>{fmt(metrics.risk_free_pct, 2)} %</strong>{metrics.risk_free_source ? ` · ${metrics.risk_free_source}` : ''}
+            </span>
+          )}
           <label htmlFor={`${uid}-var`} style={{ fontSize: 12, color: 'var(--muted-2)' }}>{t('Confiance VaR')}</label>
           <input id={`${uid}-var`} type="text" inputMode="decimal" value={varInput} onChange={(e) => onVarChange(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onVarSubmit()}

@@ -74,7 +74,7 @@ export default function PortfolioLibrary({ currentItems, rebalance, onLoad, comp
     const results = [], errors = [];
     settled.forEach((r, i) => {
       if (r.status === 'fulfilled') results.push({ p: chosen[i], d: r.value.data });
-      else errors.push(`${chosen[i].name} : ${r.reason?.response?.data?.detail || t("Impossible de joindre l'API (le serveur Python est-il lancé ?).")}`);
+      else errors.push(`${chosen[i].name} : ${r.reason?.response?.data?.detail || t("Le service de données ne répond pas pour le moment. Réessayez dans un instant.")}`);
     });
     setCmp({ results, errors });
     setLoading(false);

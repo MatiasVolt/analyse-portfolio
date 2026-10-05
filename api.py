@@ -10,6 +10,7 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import backend
+import risk_free
 import i18n
 from i18n import T
 import json
@@ -63,29 +64,41 @@ app.router.default_response_class = SafeJSONResponse
 async def language_middleware(request: Request, call_next):
     """?lang=en sur n'importe quelle route : les textes générés (interprétations, explications, erreurs) passent en anglais."""
     i18n.set_lang(request.query_params.get("lang", "fr"))
-    # ?rf=fixed -> ancien taux fixe de 2 % ; sinon taux du marché (bon du Trésor US à 3 mois)
-    backend.set_risk_free(backend.RISK_FREE_RATE if request.query_params.get("rf") == "fixed" else market_risk_free())
+    # Taux sans risque par défaut (dollar) ; l'analyse d'un actif ou d'un portefeuille le remplace par celui de sa devise
+    backend.set_risk_free(risk_free.for_currency("USD")["rate"])
     return await call_next(request)
 
 
-def market_risk_free() -> float:
-    """Taux du bon du Trésor US à 3 mois (données FRED en cache), 2 % si indisponible."""
-    try:
-        import fixed_income
-        data = fixed_income._mem.get("data")
-        if not data and os.path.exists(fixed_income.BONDS_CACHE):
-            data = json.load(open(fixed_income.BONDS_CACHE, encoding="utf-8"))
-        rate = data and data.get("risk_free_3m")
-        return float(rate) / 100 if rate else backend.RISK_FREE_RATE
-    except Exception:
-        return backend.RISK_FREE_RATE
+def use_risk_free(rf: dict):
+    """Applique le taux sans risque choisi (devise de l'actif) pour les calculs de la requête."""
+    backend.set_risk_free(rf["rate"])
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 BENCHMARK_LABELS = {
     "^GSPC": "S&P 500", "^IXIC": "Nasdaq Composite", "^NDX": "Nasdaq 100", "^FCHI": "CAC 40",
     "^STOXX50E": "Euro Stoxx 50", "^GDAXI": "DAX 40", "URTH": "MSCI World", "BTC-USD": "Bitcoin",
+    "^AEX": "AEX", "^IBEX": "IBEX 35", "FTSEMIB.MI": "FTSE MIB", "^FTSE": "FTSE 100", "^SSMI": "SMI", "^N225": "Nikkei 225",
+    "^GSPTSE": "S&P/TSX", "^BVSP": "Bovespa", "^NSEI": "Nifty 50", "^OMX": "OMX Stockholm 30",
 }
+
+
+# Indice de comparaison automatique selon la place de cotation (une action française se compare au CAC 40, pas au S&P 500)
+SUFFIX_BENCHMARK = {"PA": "^FCHI", "DE": "^GDAXI", "F": "^GDAXI", "AS": "^AEX", "MC": "^IBEX", "MI": "FTSEMIB.MI", "L": "^FTSE",
+                    "SW": "^SSMI", "T": "^N225", "TO": "^GSPTSE", "SA": "^BVSP", "NS": "^NSEI", "ST": "^OMX"}
+
+
+def default_benchmark(ticker: str, classe: str) -> str:
+    if classe == "CRYPTO":
+        return "BTC-USD" if ticker != "BTC-USD" else "^GSPC"
+    t = ticker.upper()
+    if "." in t and not t.startswith("^"):
+        suffix = t.rsplit(".", 1)[1]
+        if suffix in SUFFIX_BENCHMARK:
+            return SUFFIX_BENCHMARK[suffix]
+        if risk_free.listing_currency(t) == "EUR":
+            return "^STOXX50E"
+    return "^GSPC"
 
 
 def benchmark_label(ticker: str) -> str:
@@ -224,7 +237,7 @@ def get_asset_analysis(
         classe = backend.detecter_classe_actif(ticker)
         ppy = backend.periods_per_year(classe)
         if not benchmark:
-            benchmark = "BTC-USD" if classe == "CRYPTO" else "^GSPC"
+            benchmark = default_benchmark(ticker, classe)
         benchmark = benchmark.upper()
 
         div_future = _executor.submit(fetch_dividends, ticker) if classe in ("ACTION", "ETF") else None
@@ -237,7 +250,19 @@ def get_asset_analysis(
         prices = df_asset["Close"]
         b_label = benchmark_label(benchmark)
 
+        rf = risk_free.for_ticker(ticker)
+        use_risk_free(rf)
         stats = backend.compute_core_metrics(prices, df_bench["Close"], conf, ppy)
+        stats["risk_free_source"] = rf["source"]
+        stats["currency"] = rf["currency"]
+        # Drawdown actuel : toujours mesuré depuis le record historique, quelle que soit la période affichée
+        try:
+            whole = prices if (period == "max" and not (start_date and end_date)) else fetch_many([ticker], period="max")[ticker]["Close"].dropna()
+            stats["current_drawdown_pct"] = round(float(whole.iloc[-1] / whole.max() - 1) * 100, 2)
+            stats["high_date"] = whole.idxmax().strftime("%Y-%m-%d")
+            stats["high_scope"] = "all"
+        except Exception:
+            pass
         interpretations = backend.interpret_metrics(stats, b_label)
         dividends = div_future.result(timeout=15) if div_future else None
         class_metrics = backend.asset_class_metrics(classe, df_asset, ppy, dividends)
@@ -305,8 +330,11 @@ def analyze_portfolio(req: PortfolioRequest):
         conf = parse_conf(req.var_confidence)
         b_label = benchmark_label(bench_ticker)
 
+        rf = risk_free.for_portfolio(weights_in)
+        use_risk_free(rf)
         stats = backend.compute_core_metrics(value, data[bench_ticker]["Close"], conf, ppy)
-        interpretations = backend.interpret_metrics(stats, b_label)
+        stats["risk_free_source"] = rf["source"]
+        interpretations = backend.interpret_metrics(stats, b_label, portfolio=True)
         breakdown = backend.portfolio_breakdown(prices_df, w, ppy)
 
         has_capital = bool(req.initial_capital and req.initial_capital > 0)
@@ -611,11 +639,7 @@ def get_options(ticker: str, expiry: Optional[str] = None):
         ppy = backend.periods_per_year(classe)
         spot = float(close.iloc[-1])
         chain = fixed_income.get_option_chain(t, expiry, spot)
-        rf = None
-        try:
-            rf = fixed_income._mem["data"]["risk_free_3m"] if fixed_income._mem["data"] else None
-        except Exception:
-            rf = None
+        rf = round(risk_free.for_ticker(t)["rate"] * 100, 2)
         return {
             "ticker": t, "spot": round(spot, 4 if spot < 10 else 2), "asset_class": classe,
             "hv_30": fixed_income.historical_vol(close, 30, ppy), "hv_1y": fixed_income.historical_vol(close, 252, ppy),
@@ -633,6 +657,45 @@ def get_options(ticker: str, expiry: Optional[str] = None):
 # 6. RAPPORT DE COMPARAISON (.xlsx avec graphiques)
 # -------------------------------------------------------------
 import report
+import guide
+import frontier
+
+
+@app.post("/api/portfolio/frontier")
+def portfolio_frontier(req: PortfolioRequest):
+    """Frontière efficiente des actifs du portefeuille : mêmes actifs, autres dosages."""
+    try:
+        weights_in = {k.strip().upper(): float(v) for k, v in req.weights.items() if float(v) > 0}
+        tickers = list(weights_in)
+        if len(tickers) < 2:
+            raise ValueError(T("Il faut au moins deux actifs pour chercher un meilleur dosage.", "At least two assets are needed to look for a better mix."))
+        data = fetch_many(tickers, period=req.period, start=req.start_date, end=req.end_date)
+        prices = pd.concat({t: data[t]["Close"] for t in tickers}, axis=1, join="inner").dropna()
+        if len(prices) < 60:
+            raise ValueError(T("Historique commun trop court (moins de 60 séances) pour une estimation fiable.", "Shared history too short (under 60 sessions) for a reliable estimate."))
+        classes = {t: backend.detecter_classe_actif(t) for t in tickers}
+        ppy = 365 if all(c == "CRYPTO" for c in classes.values()) else 252
+        total = sum(weights_in.values())
+        current = np.array([weights_in[t] / total for t in tickers])
+        rf = risk_free.for_portfolio(weights_in)
+        out = frontier.compute(prices, current, ppy, rf["rate"])
+        out["risk_free_source"] = rf["source"]
+        return out
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+
+@app.get("/api/guide")
+def get_guide():
+    """Repères historiques de l'onglet « Bien démarrer » (calculés une fois, gardés 12 h)."""
+    try:
+        return guide.localize(guide.get(fetch_many), i18n.lang())
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=T(f"Données historiques indisponibles pour le moment ({e}).", f"Historical data unavailable right now ({e})."))
+
 from fastapi.responses import Response
 
 

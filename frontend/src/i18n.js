@@ -24,19 +24,12 @@ const initial = (() => {
 
 let current = initial;
 
-// Taux sans risque : 'market' (bon du Trésor US 3 mois, par défaut) ou 'fixed' (ancien taux fixe de 2 %)
-let rfMode = (() => { try { return localStorage.getItem('rfMode') === 'fixed' ? 'fixed' : 'market'; } catch { return 'market'; } })();
-export const getRfMode = () => rfMode;
-export function setRfMode(m) {
-  rfMode = m;
-  try { localStorage.setItem('rfMode', m); } catch { /* stockage indisponible */ }
-}
 export const getLang = () => current;
 export const getLocale = () => (current === 'en' ? 'en-US' : 'fr-FR');
 
 // Chaque requête vers l'API précise la langue : interprétations et explications reviennent traduites
 axios.interceptors.request.use((cfg) => {
-  cfg.params = { ...(cfg.params || {}), lang: current, rf: rfMode };
+  cfg.params = { ...(cfg.params || {}), lang: current };
   return cfg;
 });
 

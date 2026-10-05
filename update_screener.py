@@ -11,6 +11,7 @@ import pandas as pd
 import yfinance as yf
 
 import backend
+import risk_free
 import universe
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -44,18 +45,9 @@ def extract(raw: pd.DataFrame, ticker: str) -> pd.DataFrame:
     return df.dropna(subset=["Close"])
 
 
-def market_risk_free() -> float:
-    """Taux du bon du Trésor US à 3 mois (copie FRED de l'onglet Obligations), 2 % à défaut."""
-    try:
-        data = json.load(open(os.path.join(ROOT, "bonds_cache.json"), encoding="utf-8"))
-        return float(data["risk_free_3m"]) / 100
-    except Exception:
-        return backend.RISK_FREE_RATE
-
-
 def build_screener_database():
-    backend.set_risk_free(market_risk_free())
-    print(f"Taux sans risque utilisé : {backend.risk_free() * 100:.2f} %")
+    # Chaque actif est comparé au taux sans risque de sa devise de cotation (BCE pour l'euro, Trésor US pour le dollar…)
+    print("Taux sans risque :", ", ".join(f"{c} {v['rate']} %" for c, v in risk_free.rates().items()))
     print("Construction de l'univers...")
     try:
         assets = universe.build_universe(verbose=False)
@@ -90,6 +82,7 @@ def build_screener_database():
                 mkt = market_label(a)
                 ppy = 365 if a["category"] == "Crypto" else 252
                 bench = bench_close.get("Crypto" if mkt == "Crypto" else ("Europe" if mkt == "Europe" else "US"))
+                backend.set_risk_free(risk_free.for_ticker(a["ticker"])["rate"])
                 metrics = backend.screener_metrics(df, bench, ppy)
                 if not metrics:
                     continue
