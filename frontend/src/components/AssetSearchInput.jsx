@@ -1,9 +1,11 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
-import { getAsset, searchAssets, DEFAULT_SUGGESTIONS, ASSET_DATABASE } from '../tickerDatabase';
+import { getAsset, searchAssets, DEFAULT_SUGGESTIONS, ASSET_DATABASE, categoryOf, assetsInCategory } from '../tickerDatabase';
 import { TAG_COLORS, fmtInt } from '../format';
 import { themed } from '../theme';
 import { useLang, trName } from '../i18n';
+
+const POPULAR = ASSET_DATABASE.filter(a => a.tier === 1);
 
 /** Ticker correspondant exactement au texte tapé (symbole ou nom complet), sinon le texte tel quel en majuscules. */
 function resolveTicker(val) {
@@ -21,8 +23,9 @@ function resolveTicker(val) {
  * onSelect(ticker) au choix explicite d'une suggestion (clic ou flèches + Entrée),
  * onEnter() sur Entrée sans suggestion surlignée : le symbole tapé est conservé tel quel.
  * Champ vide + focus : suggestions populaires sous un titre explicite. Champ rempli + focus : liste fermée.
+ * exclude : tickers à ne pas proposer (ex. actifs déjà présents dans le portefeuille).
  */
-export default function AssetSearchInput({ value, onChange, onSelect, onEnter, placeholder = 'Nom ou symbole…', autoFocus = false, label = 'Rechercher un actif (nom ou symbole)' }) {
+export default function AssetSearchInput({ value, onChange, onSelect, onEnter, placeholder = 'Nom ou symbole…', autoFocus = false, label = 'Rechercher un actif (nom ou symbole)', exclude }) {
   const { t } = useLang();
   const listId = useId();
   const [text, setText] = useState(() => getAsset(value)?.name ?? value ?? '');
@@ -53,7 +56,16 @@ export default function AssetSearchInput({ value, onChange, onSelect, onEnter, p
 
   // explicit=true (flèche bas) : on montre aussi les suggestions par défaut quand le champ est vide
   const refresh = (val, explicit = false) => {
-    const next = val.trim() ? searchAssets(val, 8) : DEFAULT_SUGGESTIONS;
+    const skip = new Set((exclude || []).map(x => String(x).toUpperCase()));
+    const keep = (list) => list.filter(a => !skip.has(a.ticker.toUpperCase()));
+    const cat = categoryOf(val);
+    // Suggestions populaires : on puise dans tous les actifs vedettes pour en garder 8 même si certains sont exclus
+    let next = keep(POPULAR).slice(0, DEFAULT_SUGGESTIONS.length);
+    if (cat) {
+      // « Actions », « crypto », « ETF »… : un symbole identique reste en tête, puis les actifs de la catégorie
+      const exact = getAsset(val.trim());
+      next = keep([...(exact ? [exact] : []), ...assetsInCategory(cat).filter(a => a !== exact)]);
+    } else if (val.trim()) next = keep(searchAssets(val, 8 + skip.size)).slice(0, 8);
     setResults(next);
     setActive(-1);
     setOpen(explicit || Boolean(val.trim()));
@@ -111,7 +123,8 @@ export default function AssetSearchInput({ value, onChange, onSelect, onEnter, p
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: 'max(100%, 320px)', maxWidth: '90vw',
           background: 'var(--panel)', border: '1px solid var(--border-2)', borderRadius: 6, boxShadow: '0 8px 24px rgba(0,0,0,.16)', zIndex: 1000,
         }}>
-          {!text.trim() && <div style={{ padding: '7px 12px 5px', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--muted)' }}>{t('Suggestions populaires')}</div>}
+          {(!text.trim() || categoryOf(text)) && <div style={{ padding: '7px 12px 5px', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+            {text.trim() ? t('Catégorie {c} · les plus suivis d’abord', { c: t(categoryOf(text)) }) : t('Suggestions populaires')}</div>}
           <div ref={listRef} id={listId} role="listbox" aria-label={t('Suggestions')} style={{ maxHeight: 300, overflowY: 'auto' }}>
             {results.length === 0 && (
               <div style={{ padding: '10px 12px', fontSize: 12, color: 'var(--muted-2)' }}>

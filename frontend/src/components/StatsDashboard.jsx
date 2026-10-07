@@ -1,4 +1,4 @@
-import { useId, useState, memo } from 'react';
+import { useId, useRef, useState, memo } from 'react';
 import { StatCell } from './ui';
 import { DEFINITIONS, METRICS, METRIC_TABS, ASSET_CLASS_LABELS } from '../definitions';
 import { parseNum, fmt, fmtMillions } from '../format';
@@ -32,10 +32,38 @@ function MetricGrid({ keys, metrics, interpretations, confLabel }) {
 }
 
 /**
+ * Taux sans risque modifiable : champ vide = taux de marché de la devise (affiché à côté) ;
+ * une valeur + Entrée relance le calcul avec ce taux.
+ */
+function RiskFreeField({ uid, metrics, value, onChange, onSubmit }) {
+  const { t } = useLang();
+  const manual = value.trim() !== '';
+  const v = parseNum(value);
+  const invalid = manual && !(Number.isFinite(v) && v >= -5 && v <= 30);
+  const sent = useRef(value); // dernière valeur envoyée : on ne relance pas le calcul si rien n'a changé
+  const submit = () => { if (invalid || value === sent.current) return; sent.current = value; onSubmit(manual ? v : null); };
+  return (
+    <span className="rf-edit" title={t("Taux d'un placement sans risque. Il sert au calcul du Sharpe, du Sortino et de l'alpha. Laissez vide pour utiliser le taux du marché de la devise de l'actif ; saisissez un taux puis Entrée pour le remplacer.")}>
+      <label htmlFor={`${uid}-rf`}>{t('Taux sans risque')}</label>
+      <input id={`${uid}-rf`} type="text" inputMode="decimal" value={value} onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && submit()} onBlur={submit}
+        aria-invalid={invalid} aria-describedby={`${uid}-rf-src`}
+        style={{ width: 54, padding: '3px 6px', textAlign: 'center', fontWeight: 700, fontSize: 12, borderColor: invalid ? 'var(--red)' : undefined }} />
+      <span>%</span>
+      <span id={`${uid}-rf-src`} className="rf-src">
+        {invalid ? t('entre −5 et 30 %') : manual ? (
+          <button type="button" className="link-btn" onClick={() => { onChange(''); sent.current = ''; onSubmit(null); }}>{t('revenir au taux du marché')}</button>
+        ) : <>{t('marché :')} <strong>{fmt(metrics.risk_free_pct, 2)} %</strong>{metrics.risk_free_source ? ` · ${metrics.risk_free_source}` : ''}</>}
+      </span>
+    </span>
+  );
+}
+
+/**
  * Tableau de bord des indicateurs, par onglets.
  * classMetrics : liste {id,label,value,unit,definition,interpretation,tone} propre au type d'actif.
  */
-function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, varInput, onVarChange, onVarSubmit, confUsed, footer }) {
+function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, varInput, onVarChange, onVarSubmit, confUsed, rfInput, onRfChange, onRfSubmit, footer }) {
   const { t, lang } = useLang();
   const [tab, setTab] = useState('overview');
   const uid = useId();
@@ -58,11 +86,13 @@ function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, va
           ))}
         </div>
         <div className="dash-var">
-          {metrics.risk_free_pct != null && (
+          {metrics.risk_free_pct != null && (onRfChange ? (
+            <RiskFreeField uid={uid} metrics={metrics} value={rfInput} onChange={onRfChange} onSubmit={onRfSubmit} />
+          ) : (
             <span className="rf-note" title={t("Taux d'un placement sans risque dans la devise de l'actif. Il sert au calcul du Sharpe, du Sortino et de l'alpha.")}>
               {t('Taux sans risque')} <strong>{fmt(metrics.risk_free_pct, 2)} %</strong>{metrics.risk_free_source ? ` · ${metrics.risk_free_source}` : ''}
             </span>
-          )}
+          ))}
           <label htmlFor={`${uid}-var`} style={{ fontSize: 12, color: 'var(--muted-2)' }}>{t('Confiance VaR')}</label>
           <input id={`${uid}-var`} type="text" inputMode="decimal" value={varInput} onChange={(e) => onVarChange(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onVarSubmit()}
@@ -77,8 +107,8 @@ function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, va
           {classMetrics.map(m => (
             <StatCell key={m.id} label={m.label} tone={m.tone}
               value={m.unit === 'M' && m.value != null ? fmtMillions(m.value) : m.value} unit={m.unit === 'M' ? '' : m.unit}
-              nd={m.unit === 'pips' ? 0 : m.unit === 'M' ? 1 : 2}
-              signed={m.unit === '%' && /perf|ytd|ma200|dist/.test(m.id)}
+              nd={m.nd ?? (m.unit === 'pips' ? 0 : m.unit === 'M' ? 1 : 2)}
+              signed={m.unit === '%' && /perf|ytd|ma\d+|dist/.test(m.id)}
               interpretation={m.interpretation} definition={m.definition} />
           ))}
         </div>

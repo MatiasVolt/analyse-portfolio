@@ -9,7 +9,7 @@ import ExportButton from '../components/ExportButton';
 import { exportScreener } from '../export/builders';
 
 const PAGE = 100;
-const MARKET_LABELS = { US: 'Actions US', Europe: 'Actions Europe', 'Amériques': 'Actions Amériques', Asie: 'Actions Asie' };
+const MARKET_LABELS = { US: 'Actions US', Europe: 'Actions Europe', 'Amériques': 'Actions Amériques (hors US)', Asie: 'Actions Asie' };
 const MARKET_COLORS = { US: TAG_COLORS.Actions, Europe: '#8a6d1f', ...TAG_COLORS };
 
 const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -299,7 +299,7 @@ function ScreenerView({ active, onAnalyze }) {
               ))}
             </div>
           )}
-          {showFilters && <div className="hint" style={{ marginTop: 10 }}>{t('Les valeurs grisées indiquent la plage observée dans la base (minimum → maximum). Laissez vide pour ne pas filtrer. Les décimales acceptent la virgule.')}</div>}
+          {showFilters && <div className="hint" style={{ marginTop: 10 }}>{t('Ouvrez une catégorie (Performance, Risque…) pour voir ses filtres. Dans les cases Min et Max, le nombre écrit en gris clair tant que la case est vide est la plus petite (Min) ou la plus grande (Max) valeur de cet indicateur parmi tous les actifs de la base : c’est un repère pour choisir votre seuil, pas un filtre. Une case vide ne filtre rien. Les décimales acceptent la virgule.')}</div>}
         </div>
 
         {/* Résultats */}

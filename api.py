@@ -73,6 +73,15 @@ def use_risk_free(rf: dict):
     """Applique le taux sans risque choisi (devise de l'actif) pour les calculs de la requête."""
     backend.set_risk_free(rf["rate"])
 
+
+def with_override(rf: dict, pct: Optional[float]) -> dict:
+    """Taux saisi par l'utilisateur (en %) à la place du taux de marché de la devise."""
+    if pct is None:
+        return rf
+    if not -5 <= pct <= 30:
+        raise ValueError(T("Le taux sans risque doit être compris entre −5 % et 30 %.", "The risk-free rate must be between −5% and 30%."))
+    return {**rf, "rate": pct / 100, "source": T("taux saisi manuellement", "manually entered rate"), "date": None}
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 BENCHMARK_LABELS = {
@@ -115,6 +124,7 @@ class PortfolioRequest(BaseModel):
     var_confidence: Optional[float] = 0.95
     initial_capital: Optional[float] = None
     rebalance: Optional[str] = "none"
+    risk_free_pct: Optional[float] = None  # None = taux de marché de la devise
 
 
 # -------------------------------------------------------------
@@ -230,7 +240,8 @@ def get_asset_analysis(
     benchmark: Optional[str] = None,
     forecast_days: Optional[int] = 252,
     var_confidence: Optional[float] = 0.95,
-    initial_capital: Optional[float] = None
+    initial_capital: Optional[float] = None,
+    risk_free_pct: Optional[float] = None
 ):
     try:
         ticker = ticker.strip().upper()
@@ -250,7 +261,7 @@ def get_asset_analysis(
         prices = df_asset["Close"]
         b_label = benchmark_label(benchmark)
 
-        rf = risk_free.for_ticker(ticker)
+        rf = with_override(risk_free.for_ticker(ticker), risk_free_pct)
         use_risk_free(rf)
         stats = backend.compute_core_metrics(prices, df_bench["Close"], conf, ppy)
         stats["risk_free_source"] = rf["source"]
@@ -330,10 +341,13 @@ def analyze_portfolio(req: PortfolioRequest):
         conf = parse_conf(req.var_confidence)
         b_label = benchmark_label(bench_ticker)
 
-        rf = risk_free.for_portfolio(weights_in)
+        rf = with_override(risk_free.for_portfolio(weights_in), req.risk_free_pct)
         use_risk_free(rf)
         stats = backend.compute_core_metrics(value, data[bench_ticker]["Close"], conf, ppy)
         stats["risk_free_source"] = rf["source"]
+        # Crypto (7 j/7) mêlée à des actifs de bourse : seules les dates communes (jours de bourse) sont gardées
+        n_crypto = sum(c == "CRYPTO" for c in classes.values())
+        stats["mixed_crypto"] = 0 < n_crypto < len(classes)
         interpretations = backend.interpret_metrics(stats, b_label, portfolio=True)
         breakdown = backend.portfolio_breakdown(prices_df, w, ppy)
 
@@ -560,6 +574,8 @@ def _event_reactions(events: list) -> None:
                 "ticker": a["ticker"], "name": a["name"], "date": after.index[0].strftime("%Y-%m-%d"),
                 "change_pct": round(chg * 100, 2),
                 "vs_normal": round(abs(chg) / typical, 1) if typical else None,
+                # Variation habituelle : médiane des variations absolues des 60 dernières séances
+                "normal_pct": round(typical * 100, 2) if typical else None,
             })
         e["reaction"] = reactions
 
@@ -677,7 +693,7 @@ def portfolio_frontier(req: PortfolioRequest):
         ppy = 365 if all(c == "CRYPTO" for c in classes.values()) else 252
         total = sum(weights_in.values())
         current = np.array([weights_in[t] / total for t in tickers])
-        rf = risk_free.for_portfolio(weights_in)
+        rf = with_override(risk_free.for_portfolio(weights_in), req.risk_free_pct)
         out = frontier.compute(prices, current, ppy, rf["rate"])
         out["risk_free_source"] = rf["source"]
         return out

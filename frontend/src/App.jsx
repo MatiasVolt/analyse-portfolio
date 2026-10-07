@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Minimize2, Moon, Sun, Compass, Search, Layers, SlidersHorizontal, CalendarDays, Landmark, Sigma } from 'lucide-react';
+import { Minimize2, Moon, Sun, Compass, Search, Layers, SlidersHorizontal, CalendarDays, Landmark, Sigma, Calculator } from 'lucide-react';
 import AssetView from './views/AssetView';
 import PortfolioView from './views/PortfolioView';
 import ScreenerView from './views/ScreenerView';
@@ -7,9 +7,10 @@ import CalendarView from './views/CalendarView';
 import BondsView from './views/BondsView';
 import DerivativesView from './views/DerivativesView';
 import GuideView from './views/GuideView';
+import CalculatorView from './views/CalculatorView';
 import { fetchCalendar } from './calendar';
 import TradingViewChart from './components/TradingViewChart';
-import { MonteCarloChart } from './components/MonteCarloCard';
+import MonteCarloDrawChart from './components/MonteCarloDrawChart';
 import { horizonLabel, parseNum } from './format';
 import { useLang } from './i18n';
 import { FlagFR, FlagUK } from './components/Flags';
@@ -31,9 +32,11 @@ const TABS = [
     about: "Les taux d'intérêt du moment et un calculateur de prix d'obligation." },
   { id: 'derivatives', label: 'Dérivés', icon: Sigma,
     about: "Comprenez le prix d'une option et testez une stratégie, sans engager d'argent." },
+  { id: 'calculator', label: 'Calculatrice', icon: Calculator,
+    about: 'Épargne, crédit, rendements, taille de position, taux, VAN : les calculs financiers courants, formules expliquées.' },
 ];
 
-// Raccourcis clavier : Alt + 1…7 change d'onglet (Ctrl + chiffre est réservé par le navigateur aux onglets du navigateur)
+// Raccourcis clavier : Alt + 1…8 change d'onglet (Ctrl + chiffre est réservé par le navigateur aux onglets du navigateur)
 const ALT_KEY = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌥' : 'Alt';
 const isTyping = (el) => el && (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) || el.isContentEditable);
 
@@ -52,8 +55,12 @@ function Fullscreen({ view, onClose }) {
         <h2 style={{ margin: 0, fontSize: 18 }}>{view.kind === 'mc' ? `${t('Simulation Monte-Carlo')} (${horizonLabel(view.forecastDays)})` : t(view.title)}</h2>
         <button type="button" className="btn" onClick={onClose} autoFocus><Minimize2 size={14} /> {t('Quitter le plein écran (Échap)')}</button>
       </div>
+      <p className="hint" style={{ margin: '-8px 0 10px' }}>
+        {t('Glisser : se déplacer (aussi verticalement) · Molette : zoom sur le temps · Maj + molette : zoom sur les prix · Double-clic sur l’axe des prix : échelle automatique · Crayon : outils de dessin')}
+      </p>
       <div style={{ flex: 1, minHeight: 0 }}>
-        {view.kind === 'mc' ? <MonteCarloChart data={view.props.data} big /> : <TradingViewChart {...view.props} height={300} drawable
+        {view.kind === 'mc' ? <MonteCarloDrawChart data={view.props.data} unit={view.props.unit}
+          drawKey={`mc|${view.forecastDays}|${view.props.data?.[0]?.median}|${view.props.data?.length}`} /> : <TradingViewChart {...view.props} height={300} drawable
           drawKey={`${view.title}|${view.props.data?.[0]?.date}|${view.props.data?.length}`} />}
       </div>
     </div>
@@ -72,6 +79,7 @@ export default function App() {
   useEffect(() => { try { localStorage.setItem('visited', '1'); } catch { /* stockage indisponible */ } }, []);
   const [portfolioRequest, setPortfolioRequest] = useState(null);
   const [varInput, setVarInput] = useState('95');
+  const [rfInput, setRfInput] = useState(''); // vide = taux sans risque du marché (devise de l'actif)
   const [forecastDays, setForecastDays] = useState('252');
   const [currency, setCurrency] = useState('€');
   const [fullscreen, setFullscreen] = useState(null);
@@ -94,8 +102,15 @@ export default function App() {
     return Number.isFinite(v) && v >= 50 && v < 100 ? v / 100 : 0.95;
   }, [varInput]);
 
-  const shared = useMemo(() => ({ today, varInput, setVarInput, confLevel, forecastDays, setForecastDays, currency, setCurrency }),
-    [today, varInput, confLevel, forecastDays, currency]);
+  // Taux sans risque saisi (en %), ou null pour garder le taux de marché
+  const rfOverride = useCallback(() => {
+    if (!rfInput.trim()) return null;
+    const v = parseNum(rfInput);
+    return Number.isFinite(v) && v >= -5 && v <= 30 ? v : null;
+  }, [rfInput]);
+
+  const shared = useMemo(() => ({ today, varInput, setVarInput, confLevel, rfInput, setRfInput, rfOverride, forecastDays, setForecastDays, currency, setCurrency }),
+    [today, varInput, confLevel, rfInput, rfOverride, forecastDays, currency]);
   const closeFullscreen = useCallback(() => setFullscreen(null), []);
 
   const current = TABS.find(x => x.id === activeTab) || TABS[0];
@@ -104,7 +119,7 @@ export default function App() {
   const [tip, setTip] = useState(null); // infobulle de l'onglet survolé : { index, left, bottom }
   useEffect(() => {
     const onKey = (e) => {
-      if (e.altKey && !e.ctrlKey && !e.metaKey && /^Digit[1-7]$/.test(e.code)) {
+      if (e.altKey && !e.ctrlKey && !e.metaKey && /^Digit[1-8]$/.test(e.code)) {
         e.preventDefault();
         goTo(TABS[Number(e.code.slice(5)) - 1].id);
       } else if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !isTyping(document.activeElement)) {
@@ -160,6 +175,7 @@ export default function App() {
       <div data-view="bonds" hidden={activeTab !== 'bonds'}><BondsView active={activeTab === 'bonds'} onAnalyze={analyzeFromScreener} /></div>
       <div data-view="derivatives" hidden={activeTab !== 'derivatives'}><DerivativesView onAnalyze={analyzeFromScreener} /></div>
       <div data-view="calendar" hidden={activeTab !== 'calendar'}><CalendarView active={activeTab === 'calendar'} onAnalyze={analyzeFromScreener} /></div>
+      <div data-view="calculator" hidden={activeTab !== 'calculator'}><CalculatorView shared={shared} /></div>
 
       <nav className="sheet-tabs" aria-label={t('Sections')}>
         {TABS.map((tab, i) => {
@@ -177,7 +193,10 @@ export default function App() {
       {tip && (
         <div className="tab-tip" role="tooltip" style={{ left: tip.left, bottom: tip.bottom }}>
           <span>{t(TABS[tip.index].about)}</span>
-          <span className="tab-tip-keys"><kbd>{ALT_KEY}</kbd> + <kbd>{tip.index + 1}</kbd>{!['bonds', 'guide'].includes(TABS[tip.index].id) && <> · {t('recherche')} <kbd>/</kbd></>}</span>
+          {TABS[tip.index].id === 'calendar' && highToday > 0 && (
+            <span className="tab-tip-badge">{t(highToday > 1 ? 'Pastille rouge : {n} annonces à fort impact sont encore à venir aujourd’hui.' : 'Pastille rouge : 1 annonce à fort impact est encore à venir aujourd’hui.', { n: highToday })}</span>
+          )}
+          <span className="tab-tip-keys"><kbd>{ALT_KEY}</kbd> + <kbd>{tip.index + 1}</kbd>{!['bonds', 'guide', 'calculator'].includes(TABS[tip.index].id) && <> · {t('recherche')} <kbd>/</kbd></>}</span>
         </div>
       )}
     </div>

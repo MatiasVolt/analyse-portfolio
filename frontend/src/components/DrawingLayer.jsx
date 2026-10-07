@@ -19,11 +19,33 @@ const TOOLS = [
 ];
 const COLORS = ['#1f2421', '#1e7145', '#107c41', '#c42b1c', '#2e75b6'];
 
+const priceText = (p) => fmt(p, Math.abs(p) < 10 ? 4 : 2);
+
+/** Étiquette de valeur (fond de la couleur du tracé), gardée à l'intérieur du graphique. */
+function Tag({ x, y, text, color, align = 'middle', w }) {
+  const width = text.length * 6.3 + 10;
+  let left = align === 'end' ? x - width : align === 'start' ? x : x - width / 2;
+  left = Math.max(2, Math.min(left, w - width - 2));
+  return (
+    <g style={{ pointerEvents: 'none' }}>
+      <rect x={left} y={y - 9} width={width} height={17} rx={3} fill={color} opacity={0.92} />
+      <text x={left + width / 2} y={y + 3.5} textAnchor="middle" fontSize="10.5" fill="#ffffff" fontWeight="700">{text}</text>
+    </g>
+  );
+}
+
+/** « +5,20 % · 34 séances » entre deux points d'un tracé (barsPerPoint : séances représentées par un point du graphique). */
+function changeText(a, b, t, barsPerPoint = 1) {
+  const pct = a.p ? (b.p / a.p - 1) * 100 : null;
+  const bars = Math.round(Math.abs(b.l - a.l) * barsPerPoint);
+  return `${pct === null ? '' : `${fmt(pct, 2, true)} % · `}${t('{n} séances', { n: bars })}`;
+}
+
 const load = (key) => {
   try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
 };
 
-export default function DrawingLayer({ api, storageKey }) {
+export default function DrawingLayer({ api, storageKey, barsPerPoint = 1 }) {
   const { t } = useLang();
   const [open, setOpen] = useState(false);
   const [tool, setTool] = useState(null);
@@ -129,7 +151,7 @@ export default function DrawingLayer({ api, storageKey }) {
           <line x1={0} x2={w} y1={pts[0].y} y2={pts[0].y} {...common} strokeDasharray="6 4" />
           <line x1={0} x2={w} y1={pts[0].y} y2={pts[0].y} stroke="transparent" strokeWidth={10} style={common.style} onClick={common.onClick} />
           <rect x={w - 64} y={pts[0].y - 9} width={62} height={18} rx={3} fill={d.color} />
-          <text x={w - 33} y={pts[0].y + 4} textAnchor="middle" fontSize="11" fill="#ffffff" fontWeight="700">{fmt(d.pts[0].p, d.pts[0].p < 10 ? 4 : 2)}</text>
+          <text x={w - 33} y={pts[0].y + 4} textAnchor="middle" fontSize="11" fill="#ffffff" fontWeight="700">{priceText(d.pts[0].p)}</text>
         </g>
       );
     }
@@ -145,13 +167,26 @@ export default function DrawingLayer({ api, storageKey }) {
           <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="transparent" strokeWidth={10} style={common.style} onClick={common.onClick} />
           <circle cx={pts[0].x} cy={pts[0].y} r={3} fill={d.color} />
           <circle cx={pts[1].x} cy={pts[1].y} r={3} fill={d.color} />
+          {/* Valeurs aux points A et B, et variation entre les deux */}
+          <Tag x={pts[0].x + (pts[0].x <= pts[1].x ? -7 : 7)} y={pts[0].y} align={pts[0].x <= pts[1].x ? 'end' : 'start'} text={priceText(d.pts[0].p)} color={d.color} w={w} />
+          <Tag x={pts[1].x + (pts[0].x <= pts[1].x ? 7 : -7)} y={pts[1].y} align={pts[0].x <= pts[1].x ? 'start' : 'end'} text={priceText(d.pts[1].p)} color={d.color} w={w} />
+          <Tag x={(pts[0].x + pts[1].x) / 2} y={(pts[0].y + pts[1].y) / 2 - 16} text={changeText(d.pts[0], d.pts[1], t, barsPerPoint)} color={d.color} w={w} />
         </g>
       );
     }
     if (d.type === 'rect') {
       const [a, b] = pts;
-      return <rect key={k} x={Math.min(a.x, b.x)} y={Math.min(a.y, b.y)} width={Math.abs(a.x - b.x)} height={Math.abs(a.y - b.y)}
-        {...common} fill={`${d.color}22`} />;
+      const top = Math.max(d.pts[0].p, d.pts[1].p), bottom = Math.min(d.pts[0].p, d.pts[1].p);
+      const right = Math.max(a.x, b.x), yTop = Math.min(a.y, b.y), yBottom = Math.max(a.y, b.y);
+      return (
+        <g key={k}>
+          <rect x={Math.min(a.x, b.x)} y={yTop} width={Math.abs(a.x - b.x)} height={yBottom - yTop} {...common} fill={`${d.color}22`} />
+          {/* Haut et bas de la zone, et son amplitude */}
+          <Tag x={right + 5} y={yTop} align="start" text={priceText(top)} color={d.color} w={w} />
+          <Tag x={right + 5} y={yBottom} align="start" text={priceText(bottom)} color={d.color} w={w} />
+          {yBottom - yTop > 40 && bottom > 0 && <Tag x={right + 5} y={(yTop + yBottom) / 2} align="start" text={`${fmt((top / bottom - 1) * 100, 2)} %`} color={d.color} w={w} />}
+        </g>
+      );
     }
     if (d.type === 'free') {
       return <polyline key={k} points={pts.map(p => `${p.x},${p.y}`).join(' ')} {...common} strokeLinejoin="round" strokeLinecap="round" />;

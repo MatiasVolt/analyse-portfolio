@@ -93,6 +93,29 @@ export function getAsset(ticker) {
 
 export const DEFAULT_SUGGESTIONS = ASSET_DATABASE.filter(a => a.tier === 1).slice(0, 8);
 
+// Mots qui désignent une catégorie entière (« action », « crypto »…) : la recherche liste alors les actifs de cette catégorie
+const CATEGORY_WORDS = {
+  Actions: ['action', 'actions', 'stock', 'stocks', 'equity', 'equities', 'titre', 'titres'],
+  Indices: ['indice', 'indices', 'index', 'indexes'],
+  ETF: ['etf', 'etfs', 'tracker', 'trackers'],
+  Crypto: ['crypto', 'cryptos', 'cryptomonnaie', 'cryptomonnaies', 'crypto-monnaie', 'crypto-monnaies', 'cryptocurrency', 'cryptocurrencies'],
+  Forex: ['forex', 'fx', 'devise', 'devises', 'paire', 'paires', 'currency', 'currencies'],
+  'Matières 1ères': ['matiere', 'matieres', 'matiere premiere', 'matieres premieres', 'matieres 1eres', 'matiere 1ere', 'commodity', 'commodities'],
+};
+const WORD_TO_CATEGORY = new Map(Object.entries(CATEGORY_WORDS).flatMap(([cat, words]) => words.map(w => [w, cat])));
+
+/** Catégorie désignée par le texte tapé (« Actions », « crypto », « ETF »…), sinon null. */
+export function categoryOf(query) {
+  return WORD_TO_CATEGORY.get(norm(query).trim().replace(/\s+/g, ' ')) || null;
+}
+
+/** Actifs d'une catégorie, les plus connus d'abord. */
+export function assetsInCategory(category, limit = 40) {
+  return ASSET_DATABASE.filter(a => a.category === category)
+    .sort((x, y) => x.tier - y.tier || x.name.localeCompare(y.name))
+    .slice(0, limit);
+}
+
 /** Recherche classée par pertinence : ticker exact > début de ticker > début de nom > mot du nom > alias > contient. */
 export function searchAssets(query, limit = 8) {
   const q = norm(query).trim();

@@ -10,6 +10,10 @@ export function annualNote(t, m) {
 
 /** Pied du tableau : nombre de séances réellement observées et facteur d'annualisation (norme de marché). */
 export function periodFooter(t, m) {
+  if (m.mixed_crypto) {
+    // Portefeuille actions + crypto : seules les dates où tous les actifs cotent sont gardées (jours de bourse)
+    return t('Calculé sur {n} jours où tous les actifs cotent (jours de bourse) · la crypto, cotée aussi le week-end, est relevée ces mêmes jours : ses mouvements du samedi et du dimanche sont inclus dans la variation du lundi · annualisation : 252 séances par an', { n: m.observations });
+  }
   const crypto = m.periods_per_year >= 365;
   return t(crypto ? 'Calculé sur {n} jours de cotation · annualisation : 365 jours par an (la crypto cote tous les jours)'
     : 'Calculé sur {n} séances de cotation (jours fériés exclus) · annualisation : 252 séances par an, la convention des marchés', { n: m.observations });

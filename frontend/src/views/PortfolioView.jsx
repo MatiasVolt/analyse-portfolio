@@ -135,7 +135,7 @@ function CorrelationMatrix({ corr }) {
 }
 
 function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
-  const { today, varInput, setVarInput, confLevel, forecastDays, setForecastDays, currency, setCurrency } = shared;
+  const { today, varInput, setVarInput, confLevel, rfInput, setRfInput, rfOverride, forecastDays, setForecastDays, currency, setCurrency } = shared;
   const { t, lang } = useLang();
 
   const [rows, setRows] = useState(() => [newRow(), newRow()]);
@@ -266,6 +266,7 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
 
   const simulate = async (o = {}) => {
     const fd = o.forecastDays ?? forecastDays;
+    const rf = o.rf !== undefined ? o.rf : rfOverride(); // null = taux de marché
     const valid = rows.map((r, i) => ({ t: r.ticker.trim().toUpperCase(), w: weights[i] })).filter(x => x.t && x.w > 0);
     if (!valid.length) { setError(t('Ajoutez au moins un actif avec une pondération ou un montant.')); return; }
     const dup = valid.find((x, i) => valid.findIndex(y => y.t === x.t) !== i);
@@ -286,6 +287,7 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
         benchmark, rebalance: o.rebalance ?? rebalance,
         var_confidence: confLevel(),
         forecast_days: parseInt(fd, 10) || 252,
+        ...(rf !== null ? { risk_free_pct: rf } : {}),
         ...(timeMode === 'preset' ? { period: o.period ?? period } : { start_date: start, end_date: end }),
         ...(capital > 0 ? { initial_capital: capital } : {}),
       };
@@ -340,7 +342,8 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
             <div key={r.id} className="alloc-row">
               <span className="alloc-dot" style={{ background: COLORS[i % COLORS.length], opacity: r.ticker ? 1 : 0.25 }} />
               <AssetSearchInput value={r.ticker} onChange={(tk) => update(r.id, 'ticker', tk)}
-                onEnter={() => simulate()} placeholder="Rechercher un actif…" />
+                onEnter={() => simulate()} placeholder="Rechercher un actif…"
+                exclude={rows.filter(x => x.id !== r.id).map(x => x.ticker.trim()).filter(Boolean)} />
               {inputMode === 'weight'
                 ? <UnitInput value={r.weight} onChange={(v) => update(r.id, 'weight', v)} unit="%" onEnter={() => simulate()} label={`${t('Poids')} ${nameOf(r.ticker) || ''} (%)`} />
                 : <span className="alloc-derived">{weights[i] ? `${fmt(weights[i], 1)} %` : '—'}</span>}
@@ -426,6 +429,7 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
         rebalance={rebalance} onLoad={loadSaved}
         compareParams={{
           benchmark, var_confidence: confLevel(),
+          ...(rfOverride() !== null ? { risk_free_pct: rfOverride() } : {}),
           ...(timeMode === 'preset' ? { period } : { start_date: start, end_date: end }),
         }} />
 
@@ -474,6 +478,7 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
           </div>
 
           <StatsDashboard metrics={m} interpretations={data.interpretations} varInput={varInput} onVarChange={setVarInput} onVarSubmit={() => simulate()} confUsed={data._conf}
+            rfInput={rfInput} onRfChange={setRfInput} onRfSubmit={(v) => simulate({ rf: v })}
             footer={periodFooter(t, m)} />
 
           <div className="grid-2" style={{ marginBottom: 16 }}>
@@ -484,21 +489,21 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
                   { value: 'drawdown', label: 'Drawdown', icon: <ShieldAlert size={13} />, accent: 'var(--red)' },
                 ]} />
                 <button type="button" className="icon-btn" title={t('Plein écran')} aria-label={t('Plein écran')}
-                  onClick={() => onFullscreen({ kind: 'chart', title: 'Portefeuille', props: { data: data.chart_data, type: chartType, lineColor: '#1e7145', isMoney, currency, compareKey: 'benchmark', compareLabel: data.benchmark_label, mainLabel: 'Portefeuille' } })}>
+                  onClick={() => onFullscreen({ kind: 'chart', title: 'Portefeuille', props: { data: data.chart_data, type: chartType, lineColor: '#1e7145', isMoney, currency, compareKey: 'benchmark', compareLabel: data.benchmark_label, mainLabel: 'Portefeuille', unit: isMoney ? currency : t('Base 100') } })}>
                   <Maximize2 size={15} />
                 </button>
               </div>
               <div style={{ flex: 1, minHeight: 360 }}>
                 <ChartErrorBoundary resetKey={data}>
                   <TradingViewChart data={data.chart_data} type={chartType} lineColor="#1e7145" isMoney={isMoney} currency={currency}
-                    compareKey="benchmark" compareLabel={data.benchmark_label} mainLabel="Portefeuille" />
+                    compareKey="benchmark" compareLabel={data.benchmark_label} mainLabel="Portefeuille" unit={isMoney ? currency : t('Base 100')} />
                 </ChartErrorBoundary>
               </div>
               {chartType === 'line' && <div className="hint" style={{ marginTop: 6 }}>{t('Trait vert : portefeuille · pointillés gris :')} {data.benchmark_label} {isMoney ? t('avec le même capital') : t('(base 100)')}</div>}
             </div>
             <MonteCarloCard mc={data.monte_carlo} forecastDays={pendingDays ?? data._days} computedDays={data._days} currency={currency}
               onHorizonChange={(d) => { setForecastDays(d); simulate({ forecastDays: d }); }}
-              onFullscreen={() => onFullscreen({ kind: 'mc', forecastDays: data._days, props: { data: data.monte_carlo.chart_data } })} />
+              onFullscreen={() => onFullscreen({ kind: 'mc', forecastDays: data._days, props: { data: data.monte_carlo.chart_data, unit: data.monte_carlo.is_money ? currency : '' } })} />
           </div>
 
           {/* Détail par ligne */}
@@ -536,7 +541,8 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
                       <td className="num" style={{ color: signColor(a.return_contribution_pct) }}>{fmt(a.return_contribution_pct, 1, true)} {t('pts')}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <div style={{ flex: 1, height: 6, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
+                          <div style={{ flex: 1, height: 6, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}
+                            title={t('{r} % du risque pour {w} % du capital', { r: fmt(a.risk_contribution_pct, 1), w: fmt(a.weight_pct, 1) })}>
                             <div style={{ width: `${Math.max(0, Math.min(100, a.risk_contribution_pct))}%`, height: '100%', background: a.risk_contribution_pct > a.weight_pct * 1.5 ? 'var(--amber)' : COLORS[data.tickers.indexOf(a.ticker) % COLORS.length] }} />
                           </div>
                           <span style={{ fontVariantNumeric: 'tabular-nums', width: 46, textAlign: 'right' }}>{fmt(a.risk_contribution_pct, 1)} %</span>
@@ -547,7 +553,9 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
                 </tbody>
               </table>
             </div>
-            <div className="hint" style={{ marginTop: 8 }}>{t('Barre orange : la ligne pèse beaucoup plus dans le risque que dans le capital.')}</div>
+            {data.breakdown.assets.some(a => a.risk_contribution_pct > a.weight_pct * 1.5) && (
+              <div className="hint" style={{ marginTop: 8 }}>{t('Dans la colonne « Part du risque », une barre orange signale une ligne qui pèse plus de 1,5 fois plus lourd dans le risque que dans le capital (par exemple 10 % du capital mais 20 % du risque) : c’est elle qui fait le plus bouger le portefeuille.')}</div>
+            )}
           </div>
 
           {data.breakdown.correlation.tickers.length > 1 && (

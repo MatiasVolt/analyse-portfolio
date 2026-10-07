@@ -27,7 +27,7 @@ const CHART_TYPES = [
 ];
 
 function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
-  const { today, varInput, setVarInput, confLevel, forecastDays, setForecastDays, currency, setCurrency } = shared;
+  const { today, varInput, setVarInput, confLevel, rfInput, setRfInput, rfOverride, forecastDays, setForecastDays, currency, setCurrency } = shared;
   const { t, lang } = useLang();
 
   const [ticker, setTicker] = useState('');
@@ -45,7 +45,7 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
   const abortRef = useRef(null);
 
   const run = async (o = {}) => {
-    const p = { ticker, benchmark, timeMode, period, start, end, capital, forecastDays, conf: confLevel(), ...o };
+    const p = { ticker, benchmark, timeMode, period, start, end, capital, forecastDays, conf: confLevel(), rf: rfOverride(), ...o };
     const tk = (p.ticker || '').trim().toUpperCase();
     if (!tk) { setError(t('Choisissez un actif dans la liste ou tapez un symbole.')); return; }
     if (p.timeMode === 'custom' && p.start >= p.end) { setError(t('La date de début doit précéder la date de fin.')); return; }
@@ -59,6 +59,7 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
     try {
       const params = { var_confidence: p.conf, forecast_days: p.forecastDays };
       if (p.benchmark) params.benchmark = p.benchmark;
+      if (p.rf !== null) params.risk_free_pct = p.rf;
       if (p.timeMode === 'preset') params.period = p.period;
       else { params.start_date = p.start; params.end_date = p.end; }
       const cap = parseNum(p.capital);
@@ -93,6 +94,8 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
   const hasCap = cap > 0;
   const m = data?.metrics;
   const isMoneyChart = Boolean(data?.money_summary);
+  // Unité de l'axe : capital dans la devise choisie, sinon devise de cotation (points pour un indice)
+  const chartUnit = isMoneyChart ? currency : data?.asset_class === 'INDEX' ? t('Points') : m?.currency;
 
   return (
     <div>
@@ -170,6 +173,7 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
 
           <StatsDashboard metrics={m} interpretations={data.interpretations} classMetrics={data.class_specific_metrics} assetClass={data.asset_class}
             varInput={varInput} onVarChange={setVarInput} onVarSubmit={() => run()} confUsed={data._conf}
+            rfInput={rfInput} onRfChange={setRfInput} onRfSubmit={(v) => run({ rf: v })}
             footer={periodFooter(t, m)} />
 
           <div className="grid-2" style={{ marginBottom: 24 }}>
@@ -177,19 +181,19 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, gap: 10, flexWrap: 'wrap' }}>
                 <Segmented options={CHART_TYPES} value={chartType} onChange={setChartType} label="Type de graphique" />
                 <button type="button" className="icon-btn" title={t('Plein écran')} aria-label={t('Plein écran')}
-                  onClick={() => onFullscreen({ kind: 'chart', title: trName(getAsset(data.ticker)?.name) || data.ticker, props: { data: data.chart_data, type: chartType, isMoney: isMoneyChart, currency } })}>
+                  onClick={() => onFullscreen({ kind: 'chart', title: trName(getAsset(data.ticker)?.name) || data.ticker, props: { data: data.chart_data, type: chartType, isMoney: isMoneyChart, currency, unit: chartUnit } })}>
                   <Maximize2 size={15} />
                 </button>
               </div>
               <div style={{ flex: 1, minHeight: 360 }}>
                 <ChartErrorBoundary resetKey={data}>
-                  <TradingViewChart data={data.chart_data} type={chartType} isMoney={isMoneyChart} currency={currency} mainLabel="Cours" />
+                  <TradingViewChart data={data.chart_data} type={chartType} isMoney={isMoneyChart} currency={currency} mainLabel="Cours" unit={chartUnit} />
                 </ChartErrorBoundary>
               </div>
             </div>
             <MonteCarloCard mc={data.monte_carlo} forecastDays={pendingDays ?? data._days} computedDays={data._days} currency={currency}
               onHorizonChange={(d) => { setForecastDays(d); run({ forecastDays: d }); }}
-              onFullscreen={() => onFullscreen({ kind: 'mc', forecastDays: data._days, props: { data: data.monte_carlo.chart_data } })} />
+              onFullscreen={() => onFullscreen({ kind: 'mc', forecastDays: data._days, props: { data: data.monte_carlo.chart_data, unit: data.monte_carlo.is_money ? currency : '' } })} />
           </div>
 
           <EventsPanel tickers={[data.ticker]} title="Annonces économiques qui peuvent faire bouger cet actif" onOpenCalendar={onOpenCalendar} />

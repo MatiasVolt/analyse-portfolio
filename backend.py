@@ -554,9 +554,12 @@ def compute_core_metrics(prices: pd.Series, bench_prices: pd.Series, conf: float
 # 9. MÉTRIQUES SPÉCIFIQUES PAR CLASSE D'ACTIF
 # =====================================================================
 
-def _item(id_, label, value, unit="", definition="", interpretation="", tone="neutral"):
-    return {"id": id_, "label": label, "value": value, "unit": unit,
-            "definition": definition, "interpretation": interpretation, "tone": tone}
+def _item(id_, label, value, unit="", definition="", interpretation="", tone="neutral", nd=None):
+    out = {"id": id_, "label": label, "value": value, "unit": unit,
+           "definition": definition, "interpretation": interpretation, "tone": tone}
+    if nd is not None:
+        out["nd"] = nd
+    return out
 
 
 def _tone(v, good_if_positive=True):
@@ -582,6 +585,35 @@ def _rsi_item(close):
         "Relative Strength Index sur 14 séances : compare l'ampleur des hausses et des baisses récentes, sur une échelle de 0 à 100. Au-dessus de 70 = surachat, en dessous de 30 = survente.",
         "Relative Strength Index over 14 sessions: compares the size of recent gains and losses on a 0–100 scale. Above 70 = overbought, below 30 = oversold."),
         txt, "warn" if v is not None and (v >= 70 or v <= 30) else "neutral")
+
+
+def _ma50_item(close):
+    v = dist_to_ma(close, 50)
+    label = T("Écart à la MM50", "Distance to 50-day MA")
+    definition = T("Écart entre le cours actuel et sa moyenne mobile 50 séances (environ 2 mois et demi de cotation). Indicateur de tendance de moyen terme : "
+                   "il réagit plus vite que la MM200. Au-dessus = tendance de moyen terme haussière, en dessous = baissière. "
+                   "Quand la MM50 passe au-dessus de la MM200, on parle de « golden cross » ; en dessous, de « death cross ».",
+                   "Gap between the current price and its 50-session moving average (about two and a half months of trading). A medium-term trend gauge: "
+                   "it reacts faster than the 200-day MA. Above = medium-term uptrend, below = downtrend. "
+                   "When the 50-day MA crosses above the 200-day MA it is called a “golden cross”; below, a “death cross”.")
+    if v is None:
+        return _item("ma50", label, None, "%", definition,
+                     T("Il faut au moins 50 séances d'historique : choisissez une période plus longue.", "At least 50 sessions of history are needed: choose a longer period."))
+    up = v >= 0
+    txt = T(f"Le cours est {fr(abs(v))} % {'au-dessus' if up else 'en dessous'} de sa moyenne des 50 dernières séances : "
+            f"la tendance de moyen terme est {'haussière' if up else 'baissière'}.",
+            f"The price is {fr(abs(v))}% {'above' if up else 'below'} its 50-session average: the medium-term trend is {'up' if up else 'down'}.")
+    ma200 = dist_to_ma(close, 200)
+    if ma200 is not None:
+        if up == (ma200 >= 0):
+            txt += T(" Elle va dans le même sens que la tendance de fond (MM200).", " It points the same way as the long-term trend (200-day MA).")
+        elif up:
+            txt += T(" Mais le cours reste sous sa MM200 : c'est un rebond au sein d'une tendance de fond baissière.",
+                     " But the price is still below its 200-day MA: a rebound within a long-term downtrend.")
+        else:
+            txt += T(" Mais le cours reste au-dessus de sa MM200 : c'est un repli au sein d'une tendance de fond haussière.",
+                     " But the price is still above its 200-day MA: a pullback within a long-term uptrend.")
+    return _item("ma50", label, v, "%", definition, txt, _tone(v))
 
 
 def _ma200_item(close):
@@ -721,6 +753,103 @@ def _dividend_item(dividends, last_price):
         "Sum of dividends paid over the last 12 months divided by the current price. Note: displayed returns already include reinvested dividends (adjusted prices)."), txt)
 
 
+# Noms des devises avec leur genre (pour accorder les phrases sur le sens d'une paire) : (français, genre, anglais)
+_FX_NAMES = {
+    "EUR": ("l'euro", "m", "the euro"), "USD": ("le dollar", "m", "the US dollar"), "GBP": ("la livre sterling", "f", "the pound"),
+    "JPY": ("le yen", "m", "the yen"), "CHF": ("le franc suisse", "m", "the Swiss franc"), "CAD": ("le dollar canadien", "m", "the Canadian dollar"),
+    "AUD": ("le dollar australien", "m", "the Australian dollar"), "NZD": ("le dollar néo-zélandais", "m", "the New Zealand dollar"),
+    "CNY": ("le yuan", "m", "the yuan"), "MXN": ("le peso mexicain", "m", "the Mexican peso"), "TRY": ("la livre turque", "f", "the Turkish lira"),
+    "INR": ("la roupie indienne", "f", "the Indian rupee"), "BRL": ("le réal brésilien", "m", "the Brazilian real"), "ZAR": ("le rand", "m", "the rand"),
+    "SEK": ("la couronne suédoise", "f", "the Swedish krona"), "NOK": ("la couronne norvégienne", "f", "the Norwegian krone"),
+    "SGD": ("le dollar de Singapour", "m", "the Singapore dollar"), "HKD": ("le dollar de Hong Kong", "m", "the Hong Kong dollar"),
+}
+
+
+def _fx_pair(ticker: str):
+    """'EURUSD=X' -> ('EUR', 'USD') ; 'JPY=X' (notation Yahoo de USD/JPY) -> ('USD', 'JPY')."""
+    if not ticker.endswith("=X"):
+        return None
+    code = ticker[:-2]
+    if len(code) == 6:
+        return code[:3], code[3:]
+    if len(code) == 3:
+        return "USD", code
+    return None
+
+
+def _fx_name(ccy):
+    return _FX_NAMES.get(ccy, (ccy, "m", ccy))
+
+
+def _fx_a(ccy):
+    """« au dollar », « à la livre sterling », « à l'euro »."""
+    name = _fx_name(ccy)[0]
+    return "au " + name[3:] if name.startswith("le ") else "à " + name
+
+
+def _cap(s):
+    return s[:1].upper() + s[1:]
+
+
+def _fx_reading_item(pair, last, nd):
+    base, quote = pair
+    nb, nq = _fx_name(base), _fx_name(quote)
+    return _item("fx_reading", T(f"Cours {base}/{quote}", f"{base}/{quote} rate"), round(last, nd), quote, T(
+        f"Une paire de devises indique combien d'unités de la seconde devise ({quote}, la devise de cotation) il faut pour acheter "
+        f"1 unité de la première ({base}, la devise de base). Quand la paire monte, {nb[0]} se renforce face {_fx_a(quote)} ; "
+        f"quand elle baisse, c'est {nq[0]} qui se renforce.",
+        f"A currency pair shows how many units of the second currency ({quote}, the quote currency) it takes to buy 1 unit of the first "
+        f"({base}, the base currency). When the pair rises, {nb[2]} strengthens against {nq[2]}; when it falls, {nq[2]} strengthens."),
+        T(f"Aujourd'hui, 1 {base} = {fr(last, nd)} {quote}. Si ce chiffre monte, {nb[0]} gagne en valeur face {_fx_a(quote)} ; "
+          f"s'il baisse, c'est {nq[0]} qui gagne en valeur face {_fx_a(base)}.",
+          f"Today, 1 {base} = {fr(last, nd)} {quote}. If this number rises, {nb[2]} gains value against {nq[2]}; "
+          f"if it falls, {nq[2]} gains value against {nb[2]}."), nd=nd)
+
+
+def _fx_move_text(pair, v, last, nd):
+    """Traduit une variation de la paire en « quelle devise s'est renforcée »."""
+    base, quote = pair
+    before = last / (1 + v / 100)
+    strong, weak = (base, quote) if v >= 0 else (quote, base)
+    ns = _fx_name(strong)
+    verb = "s'est appréciée" if ns[1] == "f" else "s'est apprécié"
+    return T(f"{_cap(ns[0])} {verb} face {_fx_a(weak)} : 1 {base} valait {fr(before, nd)} {quote}, il en vaut maintenant {fr(last, nd)}.",
+             f"{_cap(ns[2])} strengthened against {_fx_name(weak)[2]}: 1 {base} was worth {fr(before, nd)} {quote}, it is now worth {fr(last, nd)}.")
+
+
+def _range_pos_item(close, pair, pip, nd):
+    year = close.tail(252)
+    hi, lo, last = float(year.max()), float(year.min()), float(close.iloc[-1])
+    pos = (last - lo) / (hi - lo) * 100 if hi > lo else None
+    label = T("Position dans la fourchette 1 an", "Position in the 1-year range")
+    definition = T(
+        "Situe le cours actuel entre le plus bas et le plus haut des 12 derniers mois (252 séances). "
+        "Calcul : (cours − plus bas) ÷ (plus haut − plus bas). 0 % = au plus bas de l'année, 50 % = exactement à mi-chemin, 100 % = au plus haut. "
+        "C'est une photo de l'endroit où se trouve le cours, pas une prévision : un cours près de son plus haut peut continuer de monter.",
+        "Places the current price between the low and the high of the last 12 months (252 sessions). "
+        "Formula: (price − low) ÷ (high − low). 0% = at the yearly low, 50% = exactly halfway, 100% = at the yearly high. "
+        "It is a snapshot of where the price stands, not a forecast: a price near its high can keep rising.")
+    if pos is None:
+        return _item("range_pos", label, None, "%", definition, T("Indisponible (cours constant sur l'année).", "Unavailable (flat price over the year)."))
+    up_pips, down_pips = (hi - last) / pip, (last - lo) / pip
+    txt = T(f"Sur 12 mois, la paire a évolué entre {fr(lo, nd)} et {fr(hi, nd)}. À {fr(last, nd)}, elle a parcouru {fr(pos, 0)} % du chemin entre ce plus bas et ce plus haut "
+            f"({fr(up_pips, 0)} pips sous le plus haut, {fr(down_pips, 0)} pips au-dessus du plus bas). ",
+            f"Over 12 months the pair ranged between {fr(lo, nd)} and {fr(hi, nd)}. At {fr(last, nd)} it has covered {fr(pos, 0)}% of the way from that low to that high "
+            f"({fr(up_pips, 0)} pips below the high, {fr(down_pips, 0)} pips above the low). ")
+    if pair:
+        base, quote = pair
+        nb, nq = _fx_name(base), _fx_name(quote)
+        if pos >= 80:
+            txt += T(f"Elle est près de son sommet annuel : {nb[0]} est proche de son niveau le plus fort de l'année face {_fx_a(quote)}.",
+                     f"It is near its yearly top: {nb[2]} is close to its strongest level of the year against {nq[2]}.")
+        elif pos <= 20:
+            txt += T(f"Elle est près de son plancher annuel : {nb[0]} est proche de son niveau le plus faible de l'année face {_fx_a(quote)}.",
+                     f"It is near its yearly floor: {nb[2]} is close to its weakest level of the year against {nq[2]}.")
+        else:
+            txt += T("Elle est en milieu de fourchette : ni au plus fort, ni au plus faible de l'année.", "It is mid-range: neither at its strongest nor at its weakest of the year.")
+    return _item("range_pos", label, _r(pos, 1), "%", definition, txt, "warn" if pos >= 90 or pos <= 10 else "neutral")
+
+
 def asset_class_metrics(asset_class: str, df: pd.DataFrame, ppy: int, dividends=None) -> list:
     """Métriques propres à chaque type d'actif, avec définition et interprétation."""
     close = df["Close"].dropna()
@@ -732,7 +861,7 @@ def asset_class_metrics(asset_class: str, df: pd.DataFrame, ppy: int, dividends=
     if asset_class in ("ACTION", "ETF", "INDEX"):
         items += [_ytd_item(close)]
         items += _perf_items(close, [91, 182, 365])
-        items += [_high_item(close), _ma200_item(close), _rsi_item(close), _atr_item(df)]
+        items += [_high_item(close), _ma50_item(close), _ma200_item(close), _rsi_item(close), _atr_item(df)]
         if asset_class != "INDEX":
             div = _dividend_item(dividends, float(close.iloc[-1]))
             if div:
@@ -771,7 +900,13 @@ def asset_class_metrics(asset_class: str, df: pd.DataFrame, ppy: int, dividends=
         items.append(_rsi_item(close))
 
     elif asset_class == "FOREX":
-        pip = 0.01 if "JPY" in str(df.attrs.get("ticker", "")).upper() else 0.0001
+        tk = str(df.attrs.get("ticker", "")).upper()
+        pip = 0.01 if "JPY" in tk else 0.0001
+        nd = 2 if "JPY" in tk else 4
+        pair = _fx_pair(tk)
+        last = float(close.iloc[-1])
+        if pair:
+            items.append(_fx_reading_item(pair, last, nd))
         last30 = close.tail(30)
         rng = (last30.max() - last30.min()) / pip
         items.append(_item("range_30", T("Range 30 séances", "30-session range"), _r(rng, 0), "pips",
@@ -784,15 +919,14 @@ def asset_class_metrics(asset_class: str, df: pd.DataFrame, ppy: int, dividends=
                                T("Amplitude moyenne d'une séance (plus haut − plus bas) sur 20 jours, en pips.", "Average session range (high − low) over 20 days, in pips."),
                                T(f"Une journée type fait bouger la paire d'environ {fr(adr, 0)} pips entre son plus haut et son plus bas.",
                                  f"A typical day moves the pair about {fr(adr, 0)} pips between its high and low.")))
-        items += _perf_items(close, [30, 91, 365])
-        hi, lo = close.tail(252).max(), close.tail(252).min()
-        pos = (close.iloc[-1] - lo) / (hi - lo) * 100 if hi > lo else None
-        items.append(_item("range_pos", T("Position dans la range 1 an", "Position in 1-year range"), _r(pos, 1), "%",
-                           T("0 % = au plus bas de l'année, 100 % = au plus haut de l'année.", "0% = at the yearly low, 100% = at the yearly high."),
-                           T("Indisponible.", "Unavailable.") if pos is None else
-                           T(f"Le cours se situe à {fr(pos, 1)} % de sa fourchette annuelle (0 % = plus bas, 100 % = plus haut).",
-                             f"The price sits at {fr(pos, 1)}% of its yearly range (0% = low, 100% = high).")))
-        items += [_vol_regime_item(close, ppy), _ma200_item(close), _rsi_item(close)]
+        perf = _perf_items(close, [30, 91, 365])
+        if pair:
+            for it in perf:
+                if it["value"] is not None:
+                    it["interpretation"] += " " + _fx_move_text(pair, it["value"], last, nd)
+        items += perf
+        items.append(_range_pos_item(close, pair, pip, nd))
+        items += [_vol_regime_item(close, ppy), _ma50_item(close), _ma200_item(close), _rsi_item(close)]
 
     elif asset_class == "COMMODITY":
         items += [_ytd_item(close)]
@@ -815,7 +949,7 @@ def asset_class_metrics(asset_class: str, df: pd.DataFrame, ppy: int, dividends=
                                T(f"Historiquement, le meilleur mois est {names[best - 1]} ({fr(by_month.max(), 2, True)} % en moyenne) et le pire est {names[worst - 1]} ({fr(by_month.min(), 2, True)} %). Calculé sur {n_years} années.",
                                  f"Historically, the best month is {names[best - 1]} ({fr(by_month.max(), 2, True)}% on average) and the worst is {names[worst - 1]} ({fr(by_month.min(), 2, True)}%). Computed over {n_years} years."),
                                "neutral"))
-        items += [_ma200_item(close), _rsi_item(close)]
+        items += [_ma50_item(close), _ma200_item(close), _rsi_item(close)]
 
     return items
 

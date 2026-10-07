@@ -54,7 +54,11 @@ def listing_currency(ticker: str) -> str:
     t = ticker.upper()
     if t in INDEX_CCY:
         return INDEX_CCY[t]
-    if t.endswith("=X") or t.endswith("=F"):
+    if t.endswith("=X"):
+        # Paire de devises : cotée dans la seconde devise (EURJPY=X -> JPY ; JPY=X = USD/JPY -> JPY)
+        pair = t[:-2]
+        return pair[3:] if len(pair) == 6 else pair if len(pair) == 3 else "USD"
+    if t.endswith("=F"):
         return "USD"
     if "-" in t and t.rsplit("-", 1)[1] in ("USD", "EUR", "GBP"):
         return t.rsplit("-", 1)[1]

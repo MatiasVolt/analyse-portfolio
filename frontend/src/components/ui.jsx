@@ -1,4 +1,5 @@
-import { cloneElement, isValidElement, useId, useRef, useState, memo } from 'react';
+import { cloneElement, isValidElement, useEffect, useId, useRef, useState, memo } from 'react';
+import { createPortal } from 'react-dom';
 import { Info, BookOpen } from 'lucide-react';
 import { fmt } from '../format';
 import { useLang } from '../i18n';
@@ -6,24 +7,41 @@ import { useLang } from '../i18n';
 // Les composants de base traduisent eux-mêmes les textes reçus (clés françaises) : les écrans passent du français.
 const txt = (t, v) => (typeof v === 'string' ? t(v) : v);
 
+const BUBBLE_W = 300;
+
 /**
  * Deux boutons d'aide (interprétation / définition) + bulle compacte.
- * La bulle s'ouvre au survol ou au clic (utile sur écran tactile) et se cale à droite si elle déborde.
+ * La bulle s'ouvre au survol ou au clic (utile sur écran tactile). Elle est affichée au niveau de la page (portail),
+ * en position fixe : un tableau à défilement ou un panneau étroit ne peut plus la couper. Elle reste dans l'écran
+ * et passe au-dessus du bouton s'il n'y a pas la place en dessous.
  */
 export function HelpButtons({ interpretation, definition, size = 15 }) {
   const { t } = useLang();
   const [open, setOpen] = useState(null); // 'analysis' | 'definition' | null
-  const [alignRight, setAlignRight] = useState(false);
+  const [pos, setPos] = useState(null); // { left, top | bottom } en coordonnées de la fenêtre
   const ref = useRef(null);
   const bubbleId = useId();
 
   const show = (kind) => {
-    if (ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      setAlignRight(rect.left + 310 > window.innerWidth);
+    if (kind && ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      const w = Math.min(BUBBLE_W, window.innerWidth * 0.9);
+      const left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8));
+      // Sous le bouton s'il reste au moins ~220 px, sinon au-dessus
+      setPos(window.innerHeight - r.bottom > 220 || r.top < 220
+        ? { left, top: r.bottom + 4 } : { left, bottom: window.innerHeight - r.top + 4 });
     }
     setOpen(kind);
   };
+
+  // La bulle est en position fixe : on la ferme si la page (ou un tableau) défile, sinon elle resterait décalée
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(null);
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+    return () => { window.removeEventListener('scroll', close, true); window.removeEventListener('resize', close); };
+  }, [open]);
 
   if (!interpretation && !definition) return null;
 
@@ -45,10 +63,10 @@ export function HelpButtons({ interpretation, definition, size = 15 }) {
           <BookOpen size={size} />
         </button>
       )}
-      {open && (
+      {open && pos && createPortal(
         <div id={bubbleId} role="tooltip" style={{
-          position: 'absolute', top: 'calc(100% + 4px)', [alignRight ? 'right' : 'left']: 0, zIndex: 200,
-          width: 300, maxWidth: '85vw', background: 'var(--raised)', border: '1px solid var(--border-2)',
+          position: 'fixed', ...pos, zIndex: 10000,
+          width: BUBBLE_W, maxWidth: '90vw', maxHeight: '70vh', overflowY: 'auto', background: 'var(--raised)', border: '1px solid var(--border-2)',
           borderLeft: `3px solid ${open === 'analysis' ? 'var(--accent)' : 'var(--muted)'}`,
           padding: '10px 12px', borderRadius: 6, fontSize: 12.5, lineHeight: 1.55,
           color: 'var(--text-2)', boxShadow: '0 6px 20px rgba(0,0,0,.14)',
@@ -58,7 +76,8 @@ export function HelpButtons({ interpretation, definition, size = 15 }) {
             {open === 'analysis' ? t('Interprétation') : t('Définition')}
           </div>
           {txt(t, open === 'analysis' ? interpretation : definition)}
-        </div>
+        </div>,
+        document.body,
       )}
     </span>
   );

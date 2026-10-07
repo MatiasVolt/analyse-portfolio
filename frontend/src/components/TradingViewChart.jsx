@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, memo, Component } from 'react';
+import { Magnet } from 'lucide-react';
 import * as LightweightCharts from 'lightweight-charts';
 import { fmt } from '../format';
 import DrawingLayer from './DrawingLayer';
+import { usePriceNavigation } from './chartNav';
 import { tr, useLang, getLocale } from '../i18n';
 import { useTheme, chartColors, themed } from '../theme';
 
@@ -28,6 +30,16 @@ export class ChartErrorBoundary extends Component {
   }
 }
 
+// Comportement de la croix (crosshair) : libre, semi-aimantée (s'accroche à un prix de la bougie quand la souris en est proche)
+// ou aimantée (toujours sur le prix O/H/B/C le plus proche). Choix mémorisé dans le navigateur.
+const MAGNET_MODES = ['free', 'weak', 'strong'];
+const MAGNET_LABELS = { free: 'Croix libre', weak: 'Croix semi-aimantée', strong: 'Croix aimantée' };
+const SNAP_PX = 12;
+const loadMagnet = () => {
+  try { const v = localStorage.getItem('crosshairMagnet'); return MAGNET_MODES.includes(v) ? v : 'weak'; } catch { return 'weak'; }
+};
+const crosshairMode = (magnet, type) => (magnet !== 'strong' ? 0 /* Normal */ : type === 'candle' ? 3 /* MagnetOHLC */ : 1 /* Magnet */);
+
 const addSeries = (chart, kind, opts) => {
   const legacy = { line: 'addLineSeries', area: 'addAreaSeries', candle: 'addCandlestickSeries' }[kind];
   if (chart[legacy]) return chart[legacy](opts);
@@ -38,13 +50,18 @@ const addSeries = (chart, kind, opts) => {
 /**
  * Graphique TradingView (lightweight-charts).
  * type : 'line' | 'candle' | 'drawdown'.  compareKey : 2e courbe optionnelle (ex. benchmark en base 100).
+ * unit : unité de l'axe des prix affichée dans le coin (« USD », « Base 100 »…).
  * Mémorisé : n'est reconstruit que si les données ou le type changent (plus à chaque survol d'une infobulle).
  */
-function TradingViewChart({ data, type = 'line', lineColor = '#1e7145', isMoney = false, currency = '€', compareKey, compareLabel, mainLabel, height = 360, drawable = false, drawKey }) {
+function TradingViewChart({ data, type = 'line', lineColor = '#1e7145', isMoney = false, currency = '€', compareKey, compareLabel, mainLabel, height = 360, drawable = false, drawKey, unit }) {
   const containerRef = useRef(null);
   const { t } = useLang();
   const [legend, setLegend] = useState(null);
-  const [api, setApi] = useState(null); // { chart, series } pour le calque de dessin
+  const [api, setApi] = useState(null); // { chart, series } : calque de dessin et navigation verticale
+  const nav = usePriceNavigation(containerRef, api);
+  const [magnet, setMagnet] = useState(loadMagnet);
+  const magnetRef = useRef(magnet); // lu par le graphique sans le reconstruire
+  useEffect(() => { magnetRef.current = magnet; }, [magnet]);
   const theme = useTheme();
   const c = chartColors(theme);
   const mainColor = themed(lineColor, theme);
@@ -62,7 +79,7 @@ function TradingViewChart({ data, type = 'line', lineColor = '#1e7145', isMoney 
       grid: { vertLines: { color: c.grid }, horzLines: { color: c.grid } },
       timeScale: { borderColor: c.border },
       rightPriceScale: { borderColor: c.border, scaleMargins: { top: 0.1, bottom: 0.08 } },
-      crosshair: { vertLine: { color: c.text, width: 1, style: 2 }, horzLine: { color: c.text, width: 1, style: 2 } },
+      crosshair: { mode: crosshairMode(magnetRef.current, type), vertLine: { color: c.text, width: 1, style: 2 }, horzLine: { color: c.text, width: 1, style: 2 } },
       localization: { locale: getLocale(), priceFormatter: (p) => (isMoney && type === 'line' ? fmt(p, 0) : fmt(p, Math.abs(p) < 10 ? 4 : Math.abs(p) >= 10000 ? 0 : 2)) },
     });
 
@@ -94,14 +111,34 @@ function TradingViewChart({ data, type = 'line', lineColor = '#1e7145', isMoney 
     chart.subscribeCrosshairMove((param) => {
       if (!param.time || !param.seriesData) { setLegend(null); return; }
       const bar = param.seriesData.get(main);
+      // Semi-aimant : si la souris passe près d'un prix de la bougie (O/H/B/C, ou la valeur d'une courbe), la croix s'y accroche.
+      // Seuls les mouvements de souris (sourceEvent) déclenchent l'accroche, pas le repositionnement qu'elle provoque.
+      if (magnetRef.current === 'weak' && bar && param.point && param.sourceEvent) {
+        const prices = bar.open !== undefined ? [bar.open, bar.high, bar.low, bar.close] : [bar.value];
+        let best = null, bestDist = SNAP_PX;
+        for (const p of prices) {
+          const y = main.priceToCoordinate(p);
+          if (y !== null && Math.abs(y - param.point.y) <= bestDist) { best = p; bestDist = Math.abs(y - param.point.y); }
+        }
+        if (best !== null) chart.setCrosshairPosition(best, param.time, main);
+      }
       const cmp = compare ? param.seriesData.get(compare) : null;
       if (bar) setLegend({ time: param.time, ...bar, compareValue: cmp?.value });
     });
-    chart.timeScale().fitContent();
-    if (drawable) setApi({ chart, series: main });
+    // Chandeliers : sur des années d'historique ils seraient trop fins pour être lus, on cadre sur les ~6 derniers mois
+    if (type === 'candle' && rows.length > 140) chart.timeScale().setVisibleLogicalRange({ from: rows.length - 130, to: rows.length + 2 });
+    else chart.timeScale().fitContent();
+    setApi({ chart, series: main });
 
     return () => { setApi(null); chart.remove(); setLegend(null); };
-  }, [data, type, mainColor, isMoney, currency, compareKey, drawable, c]);
+  }, [data, type, mainColor, isMoney, currency, compareKey, c]);
+
+  // Changement de mode sans reconstruire le graphique
+  useEffect(() => {
+    api?.chart.applyOptions({ crosshair: { mode: crosshairMode(magnet, type) } });
+    try { localStorage.setItem('crosshairMagnet', magnet); } catch { /* stockage indisponible */ }
+  }, [api, magnet, type]);
+  const nextMagnet = () => setMagnet(m => MAGNET_MODES[(MAGNET_MODES.indexOf(m) + 1) % MAGNET_MODES.length]);
 
   const dec = (v) => fmt(v, Math.abs(v) < 10 ? 4 : 2);
   return (
@@ -128,6 +165,20 @@ function TradingViewChart({ data, type = 'line', lineColor = '#1e7145', isMoney 
         </>}
       </div>
       <div ref={containerRef} style={{ position: 'absolute', inset: 0, borderRadius: 4, overflow: 'hidden' }} />
+      {(unit || type === 'drawdown') && (
+        <span className="chart-unit" title={t('Unité de l’axe des prix')}>{type === 'drawdown' ? '%' : unit}</span>
+      )}
+      {type !== 'drawdown' && (
+        <button type="button" className={`chart-magnet ${magnet}`} style={{ top: drawable ? 48 : 8 }} onClick={nextMagnet}
+          title={`${t(MAGNET_LABELS[magnet])} · ${t('cliquer pour changer (libre → semi-aimantée → aimantée)')}`} aria-label={t(MAGNET_LABELS[magnet])}>
+          <Magnet size={13} aria-hidden="true" /> {t({ free: 'Libre', weak: 'Semi-aimant', strong: 'Aimant' }[magnet])}
+        </button>
+      )}
+      {nav.manual && (
+        <button type="button" className="chart-autoscale" onClick={nav.reset} title={t('Revenir à l’échelle automatique des prix')}>
+          ↕ {t('Échelle auto')}
+        </button>
+      )}
       {drawable && api && <DrawingLayer key={`${drawKey}|${type}`} api={api} storageKey={`${drawKey}|${type}`} />}
     </div>
   );
