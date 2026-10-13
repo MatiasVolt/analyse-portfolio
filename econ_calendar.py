@@ -155,6 +155,150 @@ CURRENCY_EN = {"USD": "United States", "EUR": "Euro area", "GBP": "United Kingdo
                "CAD": "Canada", "AUD": "Australia", "NZD": "New Zealand", "CNY": "China"}
 
 
+# ───────────── Importance sur 5 niveaux ─────────────
+# La source classe les annonces en 3 niveaux, et beaucoup d'annonces « fortes » bougent peu les marchés mondiaux
+# (confiance des consommateurs en Australie, permis de construire…). L'échelle du site croise deux critères simples :
+# le type d'indicateur et le poids de la zone économique. Elle ne dépasse jamais ce que le classement de la source permet.
+ZONE_WEIGHT = {"US": 3, "EU": 2, "DE": 1, "GB": 1, "JP": 1, "CN": 1}  # 3 = fait bouger tous les marchés
+CCY_ZONE = {"USD": "US", "EUR": "EU", "GBP": "GB", "JPY": "JP", "CNY": "CN"}
+# Niveau A : décisions de taux, emploi américain, inflation annuelle
+TIER_A = (r"Interest Rate Decision|Federal Funds Rate|Deposit Facility Rate|Main Refinancing Rate|Official Bank Rate|"
+          r"Non[- ]?Farm Payrolls|Non-Farm Employment|(Core )?Inflation Rate YoY|Harmonised Inflation Rate YoY|\bCPI y/y|\bCore CPI\b")
+# Niveau B : croissance, consommation, emploi, communication des banques centrales
+TIER_B = (r"Core PCE|PCE Price|GDP Growth Rate|\bGDP\b|Press Conference|FOMC|Meeting Minutes|Monetary Policy (Statement|Report)|"
+          r"Unemployment Rate|Retail Sales|ISM (Manufacturing|Services)|Inflation Rate MoM|\bCPI m/m|"
+          r"(Fed Chair|ECB President|BoE Gov|BoJ Gov)\w* \w+ (Speech|Speaks|Testifies)")
+
+
+def importance(title: str, country_code, ccy: str, source_impact: str) -> int:
+    """Importance de 1 (négligeable) à 5 (majeure) ; 0 pour un jour férié."""
+    if source_impact == "Holiday":
+        return 0
+    zone = ZONE_WEIGHT.get(country_code or CCY_ZONE.get(ccy, ""), 0)
+    if re.search(TIER_A, title, re.IGNORECASE):
+        level = 5 if zone >= 2 else 4 if zone == 1 else 3
+    elif re.search(TIER_B, title, re.IGNORECASE):
+        level = 4 if zone == 3 else 3 if zone >= 1 else 2
+    else:
+        level = 3 if (source_impact == "High" and zone >= 1) else 2 if source_impact in ("High", "Medium") else 1
+    if re.search(r"\bFinal\b", title):  # simple révision d'un chiffre déjà connu
+        level -= 1
+    cap = {"High": 5, "Medium": 3, "Low": 2}.get(source_impact, 2)
+    return max(1, min(level, cap))
+
+
+# ───────────── Lecture d'une annonce : dans quel sens joue une surprise ─────────────
+KINDS = [
+    ("rate", r"Interest Rate Decision|Funds Rate|Facility Rate|Refinancing Rate|Bank Rate|Cash Rate|Policy Rate|Overnight Rate"),
+    ("talk", r"Speech|Speaks|Testifies|Press Conference|Minutes|Statement|Monetary Policy Report|Budget|Election"),
+    ("unemployment", r"Unemployment Rate|Jobless Claims|Unemployment Claims|Unemployment Change|Claimant Count"),
+    ("jobs", r"Payrolls|Non-Farm Employment|\bADP\b|Employment Change|JOLT|Job Openings"),
+    ("oil", r"Crude Oil|Gasoline Stocks|Natural Gas (Stocks|Storage)|Distillate"),
+    ("inflation", r"Inflation|\bCPI\b|\bPPI\b|PCE Price|Price Index|Earnings|Wage"),
+    ("growth", r"\bGDP\b|Retail Sales|\bPMI\b|Industrial Production|Factory Orders|Durable Goods|Consumer (Confidence|Sentiment)|"
+               r"Business (Confidence|Climate)|\bIfo\b|\bZEW\b|Economic Sentiment|Housing Starts|Building Permits|Home Sales|"
+               r"Personal (Spending|Income)|Exports|Tankan|Machinery Orders"),
+]
+
+# (au-dessus des attentes, en dessous des attentes) en français puis en anglais
+SURPRISE = {
+    "inflation": (
+        "inflation plus tenace que prévu. La banque centrale risque de garder des taux élevés plus longtemps : en général, la devise monte, les obligations et les actions baissent.",
+        "inflation qui ralentit plus vite que prévu. Des baisses de taux deviennent plus probables : en général, la devise recule, les obligations et les actions montent.",
+        "inflation stickier than expected. The central bank may keep rates high for longer: in general the currency rises, bonds and stocks fall.",
+        "inflation slowing faster than expected. Rate cuts become more likely: in general the currency falls, bonds and stocks rise."),
+    "growth": (
+        "économie plus solide que prévu. En général favorable à la devise et aux actions (nuance : quand l'inflation inquiète, une économie trop forte fait aussi craindre des taux plus hauts).",
+        "économie plus faible que prévu. En général défavorable à la devise et aux actions, favorable aux obligations.",
+        "economy stronger than expected. Generally good for the currency and stocks (nuance: when inflation is a worry, an economy that is too strong also raises fears of higher rates).",
+        "economy weaker than expected. Generally bad for the currency and stocks, good for bonds."),
+    "jobs": (
+        "marché de l'emploi plus solide que prévu. En général favorable à la devise ; pour les actions, cela dépend du contexte (bonne nouvelle pour l'économie, mais moins de chances de baisse des taux).",
+        "marché de l'emploi plus faible que prévu. En général défavorable à la devise et favorable aux obligations.",
+        "labour market stronger than expected. Generally good for the currency; for stocks it depends on context (good news for the economy, but lower odds of rate cuts).",
+        "labour market weaker than expected. Generally bad for the currency and good for bonds."),
+    "unemployment": (
+        "chômage plus élevé que prévu, signe d'une économie qui ralentit. En général défavorable à la devise, favorable aux obligations.",
+        "chômage plus bas que prévu, signe d'une économie solide. En général favorable à la devise.",
+        "unemployment higher than expected, a sign of a slowing economy. Generally bad for the currency, good for bonds.",
+        "unemployment lower than expected, a sign of a solid economy. Generally good for the currency."),
+    "rate": (
+        "taux plus haut que prévu. En général, la devise monte, les obligations et les actions baissent.",
+        "taux plus bas que prévu. En général, la devise recule, les obligations et les actions montent.",
+        "rate higher than expected. In general the currency rises, bonds and stocks fall.",
+        "rate lower than expected. In general the currency falls, bonds and stocks rise."),
+    "oil": (
+        "stocks plus élevés que prévu : l'offre est abondante, en général baissier pour le prix du pétrole.",
+        "stocks plus bas que prévu : l'offre se resserre, en général haussier pour le prix du pétrole.",
+        "inventories higher than expected: supply is plentiful, generally bearish for the oil price.",
+        "inventories lower than expected: supply is tightening, generally bullish for the oil price."),
+}
+
+
+def kind_of(title: str) -> str:
+    for kind, pattern in KINDS:
+        if re.search(pattern, title, re.IGNORECASE):
+            return kind
+    return "other"
+
+
+def reading(e: dict) -> str:
+    """Comment lire l'annonce : ce que le marché attend avant, puis l'écart à la prévision une fois le chiffre publié."""
+    kind = e.get("kind") or "other"
+    a, f, p = e.get("actual_n"), e.get("forecast_n"), e.get("previous_n")
+    fa, ff, fp = e.get("actual"), e.get("forecast"), e.get("previous")
+    sc = SURPRISE.get(kind)
+    en = lang() == "en"
+
+    if kind == "talk":
+        return T("Pas de chiffre attendu : c'est le ton qui compte. Un discours jugé ferme sur l'inflation (« hawkish » : des taux élevés plus longtemps) "
+                 "fait en général monter la devise et baisser les obligations et les actions ; un ton accommodant (« dovish ») fait l'inverse.",
+                 "No figure is expected: the tone is what matters. A speech seen as tough on inflation (“hawkish”: rates high for longer) "
+                 "generally lifts the currency and weighs on bonds and stocks; a soft (“dovish”) tone does the opposite.")
+
+    if fa is None:  # pas encore publié
+        if ff is None:
+            base = (T(f"La source ne donne pas de prévision pour cette annonce : le marché comparera le chiffre au précédent ({fp}).",
+                      f"The source gives no forecast for this release: the market will compare the figure with the previous one ({fp}).") if fp
+                    else T("La source ne donne ni prévision ni chiffre précédent pour cette annonce.", "The source gives neither a forecast nor a previous figure for this release."))
+        else:
+            trend = ""
+            if f is not None and p is not None and fp:
+                trend = (T(f", soit une hausse par rapport au chiffre précédent ({fp})", f", a rise from the previous figure ({fp})") if f > p else
+                         T(f", soit une baisse par rapport au chiffre précédent ({fp})", f", a fall from the previous figure ({fp})") if f < p else
+                         T(f", comme le chiffre précédent ({fp})", f", the same as the previous figure ({fp})"))
+            base = T(f"Les économistes attendent {ff}{trend}. Cette prévision est déjà dans les cours : beaucoup d'investisseurs se positionnent avant l'annonce. "
+                     f"Le marché bougera donc surtout si le chiffre publié s'écarte de {ff}.",
+                     f"Economists expect {ff}{trend}. That forecast is already priced in: many investors position themselves before the release. "
+                     f"So the market will mostly move if the published figure differs from {ff}.")
+        if kind == "rate":
+            base += T(" Le plus souvent la décision est celle que le marché attend : ce sont alors le communiqué et la conférence de presse qui font bouger les cours.",
+                      " Most of the time the decision is the one the market expects: the statement and the press conference then move prices.")
+        if sc:
+            base += (f" Above expectations: {sc[2]} Below expectations: {sc[3]}" if en else
+                     f" Au-dessus des attentes : {sc[0]} En dessous des attentes : {sc[1]}")
+        return base
+
+    # publié
+    if a is None or f is None or ff is None:
+        return (T(f"Publié : {fa} (précédent : {fp}). Sans prévision de la source, la surprise ne peut pas être mesurée.",
+                  f"Published: {fa} (previous: {fp}). Without a forecast from the source, the surprise cannot be measured.") if fp
+                else T(f"Publié : {fa}.", f"Published: {fa}."))
+    if a == f:
+        return T(f"Publié : {fa}, exactement la prévision. Aucune surprise : ce chiffre était déjà dans les cours. "
+                 "Si le marché a bougé, c'est pour une autre raison (détail du rapport, révision du chiffre précédent, autre nouvelle du jour).",
+                 f"Published: {fa}, exactly the forecast. No surprise: the figure was already priced in. "
+                 "If the market moved, it was for another reason (details of the report, a revision of the previous figure, other news that day).")
+    above = a > f
+    head = (T(f"Publié : {fa} pour {ff} attendu, donc au-dessus des attentes", f"Published: {fa} versus {ff} expected, so above expectations") if above
+            else T(f"Publié : {fa} pour {ff} attendu, donc en dessous des attentes", f"Published: {fa} versus {ff} expected, so below expectations"))
+    if not sc:
+        return head + T(". Le sens de la réaction dépend de l'indicateur : voir sa description.", ". Which way markets react depends on the indicator: see its description.")
+    effect = " : " + ((sc[2] if above else sc[3]) if en else (sc[0] if above else sc[1]))
+    return head + effect + T(" C'est la théorie : comparez avec la réaction mesurée, le marché ne la suit pas toujours.",
+                             " That is the theory: compare with the measured reaction, the market does not always follow it.")
+
+
 def localize_event(e: dict) -> dict:
     """Traduit les champs textuels d'une annonce (copie) selon la langue de la requête."""
     e = dict(e)
@@ -165,6 +309,7 @@ def localize_event(e: dict) -> dict:
         for k in ("actual", "forecast", "previous"):
             if isinstance(e.get(k), str):
                 e[k] = e[k].replace(",", ".")
+    e["reading"] = reading(e)
     return e
 
 
@@ -198,9 +343,11 @@ def _fmt_value(v, unit, scale):
     return f"{pre}{txt}{(' ' + post) if post else ''}"
 
 
-def _base_event(uid, title, ccy, country_code, country_name, dt, impact, actual, forecast, previous, surprise=None):
+def _base_event(uid, title, ccy, country_code, country_name, dt, impact, actual, forecast, previous, surprise=None, extra=None):
     fr, why = explain(title)
     return {
+        **(extra or {}),
+        "level": importance(title, country_code, ccy, impact), "kind": kind_of(title),
         "id": uid, "title": title, "title_fr": fr, "why": why,
         "currency": ccy, "country_code": country_code, "country": country_name,
         "datetime": dt.isoformat(), "timestamp": dt.timestamp(), "impact": impact,
@@ -226,9 +373,12 @@ def _from_tradingview():
         surprise = None
         if a is not None and f is not None and f != a:
             surprise = "above" if a > f else "below"
+        # Ce que la source fournit en plus : description de l'indicateur, organisme qui publie, période mesurée, valeurs brutes
+        extra = {"description": e.get("comment") or None, "publisher": e.get("source") or None, "publisher_url": e.get("source_url") or None,
+                 "period": e.get("period") or None, "actual_n": a, "forecast_n": f, "previous_n": e.get("previous")}
         out.append(_base_event(f"tv{e['id']}", (e.get("title") or "").strip(), ccy, e.get("country"),
                                COUNTRY_FR.get(e.get("country"), e.get("country")), dt, TV_IMPORTANCE.get(e.get("importance"), "Low"),
-                               _fmt_value(a, unit, scale), _fmt_value(f, unit, scale), _fmt_value(e.get("previous"), unit, scale), surprise))
+                               _fmt_value(a, unit, scale), _fmt_value(f, unit, scale), _fmt_value(e.get("previous"), unit, scale), surprise, extra))
     return out
 
 
@@ -281,6 +431,10 @@ def get_events() -> dict:
     if not events:
         raise RuntimeError(T("Calendrier économique indisponible (sources injoignables et aucune copie locale).", "Economic calendar unavailable (sources unreachable and no local copy)."))
     events.sort(key=lambda e: e["timestamp"])
+    for e in events:  # copie locale enregistrée avant l'échelle à 5 niveaux
+        if "level" not in e:
+            e["level"] = importance(e["title"], e.get("country_code"), e["currency"], e["impact"])
+            e["kind"] = kind_of(e["title"])
     try:
         _merge_history(events)
     except Exception:

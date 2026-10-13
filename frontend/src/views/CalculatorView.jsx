@@ -55,11 +55,14 @@ function Result({ label, value, sub, tone, big }) {
 /** La formule utilisée, et ce que représente chaque lettre. */
 function Formula({ formula, legend, children }) {
   const { t } = useLang();
+  // Les lettres d'une formule changent avec la langue (VF en français, FV en anglais). Clé « §lettre » dans le
+  // dictionnaire pour ne pas entrer en conflit avec un autre texte d'une seule lettre ; sans traduction, la lettre reste telle quelle.
+  const symbol = (k) => { const v = t(`§${k}`); return v.startsWith('§') ? k : v; };
   return (
     <div className="calc-formula">
       <span className="label">{t('Formule')}</span>
-      <div className="calc-formula-eq">{formula}</div>
-      {legend && <ul>{legend.map(([k, v]) => <li key={k}><b>{k}</b> : {t(v)}</li>)}</ul>}
+      <div className="calc-formula-eq">{t(formula)}</div>
+      {legend && <ul>{legend.map(([k, v]) => <li key={k}><b>{symbol(k)}</b> : {t(v)}</li>)}</ul>}
       {children && <p className="hint">{children}</p>}
     </div>
   );

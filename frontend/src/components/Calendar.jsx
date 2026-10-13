@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
-import { CalendarDays, ArrowRight, ChevronRight } from 'lucide-react';
-import { impactOf, eventTime, dayLabel, eventDayKey, fetchCalendar, countdown } from '../calendar';
+import { CalendarDays, ArrowRight, ChevronRight, ExternalLink } from 'lucide-react';
+import { impactOf, levelOf, SOURCE_IMPACT, eventTime, dayLabel, eventDayKey, fetchCalendar, countdown } from '../calendar';
 import { fmt, fmtDate } from '../format';
 import { useLang, tr } from '../i18n';
 
-export function ImpactBadge({ impact, compact = false }) {
-  const m = impactOf(impact);
+/** Importance d'une annonce : 5 barres (échelle du site), libellé facultatif. */
+export function ImpactBadge({ level, compact = false }) {
+  const m = impactOf(level);
+  const text = level === 0 ? m.label : tr('Importance {n} sur 5 : {x}', { n: level, x: m.label.toLowerCase() });
   return (
-    <span className="impact" style={{ '--impact': m.color }} title={tr('Impact {x}', { x: m.label.toLowerCase() })}>
-      <span className="impact-bars">
-        {[1, 2, 3].map(i => <i key={i} className={i <= m.rank ? 'on' : ''} />)}
+    <span className="impact" style={{ '--impact': m.color }} title={text} role="img" aria-label={text}>
+      <span className="impact-bars" aria-hidden="true">
+        {[1, 2, 3, 4, 5].map(i => <i key={i} className={i <= m.rank ? 'on' : ''} />)}
       </span>
       {!compact && m.label}
     </span>
@@ -34,6 +36,34 @@ export function ReactionChip({ r, onAnalyze }) {
       <span style={{ color: r.change_pct >= 0 ? 'var(--green)' : 'var(--red)' }}>{fmt(r.change_pct, 2, true)} %</span>
       {r.vs_normal !== null && <span className="reaction-x">{tr('{x}× la normale', { x: fmt(r.vs_normal, 1) })}</span>}
     </button>
+  );
+}
+
+/**
+ * Explication d'une annonce : comment la lire (attentes, puis écart à la prévision), ce que mesure l'indicateur,
+ * et qui le publie. Partagée par le calendrier complet et le mini-calendrier.
+ */
+export function EventReading({ e, isPast }) {
+  const { t, lang } = useLang();
+  return (
+    <div className="ev-reading">
+      <div className="label">{t(isPast && e.actual != null ? 'Ce qui a été publié, et ce que ça veut dire' : 'Ce qui est attendu, et comment le lire')}</div>
+      <div>{e.reading || t('Pas d’explication disponible pour cette annonce.')}</div>
+      {e.why && <><div className="label" style={{ marginTop: 8 }}>{t('Pourquoi cet indicateur est suivi')}</div><div>{e.why}</div></>}
+      {e.description && (
+        <details className="ev-desc" onClick={(ev) => ev.stopPropagation()}>
+          <summary>{t('Ce que mesure cet indicateur')}{lang === 'fr' ? ` ${t('(description de la source, en anglais)')}` : ''}</summary>
+          <p lang="en">{e.description}</p>
+        </details>
+      )}
+      <div className="ev-source hint">
+        {e.period && <span>{t('Période mesurée : {p}', { p: e.period })}</span>}
+        {e.publisher && (e.publisher_url
+          ? <a href={e.publisher_url} target="_blank" rel="noreferrer" onClick={(ev) => ev.stopPropagation()}>{t('Publié par {s}', { s: e.publisher })} <ExternalLink size={10} style={{ display: 'inline' }} /></a>
+          : <span>{t('Publié par {s}', { s: e.publisher })}</span>)}
+        {SOURCE_IMPACT[e.impact] && <span>{t('Classement de la source : {x}', { x: t(SOURCE_IMPACT[e.impact]) })}</span>}
+      </div>
+    </div>
   );
 }
 
@@ -69,14 +99,14 @@ export function EventsPanel({ tickers, weights, title, onOpenCalendar }) {
   if (error) return null; // le calendrier est un complément : on ne bloque pas l'analyse
   if (!data) return null;
 
-  const relevant = data.events.filter(e => e.impact === 'High' || e.impact === 'Medium');
+  const relevant = data.events.filter(e => levelOf(e) >= 3);
   const upcoming = relevant.filter(e => e.timestamp >= now);
   const past = relevant.filter(e => e.timestamp < now && e.reaction?.length)
     .sort((a, b) => Math.max(...b.reaction.map(r => r.vs_normal || 0)) - Math.max(...a.reaction.map(r => r.vs_normal || 0)));
-  // À venir (la plus proche en haut), puis passées les plus marquantes (la plus récente en haut)
-  const list = [...upcoming.slice(0, 5), ...past.slice(0, Math.max(0, 6 - Math.min(upcoming.length, 5)))]
-    .sort((a, b) => (a.timestamp >= now) !== (b.timestamp >= now) ? (a.timestamp >= now ? -1 : 1)
-      : a.timestamp >= now ? a.timestamp - b.timestamp : b.timestamp - a.timestamp);
+  // Ordre du temps, comme un calendrier de matchs : les annonces passées les plus marquantes au-dessus, puis celles à venir
+  const list = [...past.slice(0, Math.max(2, 6 - Math.min(upcoming.length, 5))), ...upcoming.slice(0, 5)]
+    .sort((a, b) => a.timestamp - b.timestamp);
+  const firstUpcoming = list.find(e => e.timestamp >= now)?.id;
   const strongest = (e) => [...e.reaction].sort((a, b) => (b.vs_normal || 0) - (a.vs_normal || 0))[0];
 
   // Devises suivies, en clair : « USD 100 % » ne disait pas ce que cela signifiait
@@ -105,8 +135,9 @@ export function EventsPanel({ tickers, weights, title, onOpenCalendar }) {
             const open = openId === e.id;
             return (
               <div key={e.id} className={`mini-event-wrap ${open ? 'open' : ''}`}>
+              {e.id === firstUpcoming && <div className="mini-now">{t('Maintenant · les annonces à venir sont en dessous')}</div>}
               {/* div cliquable (et non <button>) : la ligne contient déjà un bouton, la réaction du marché */}
-              <div role="button" tabIndex={0} className={`mini-event ${isPast ? 'past' : ''}`} style={{ '--impact': impactOf(e.impact).color }}
+              <div role="button" tabIndex={0} className={`mini-event ${isPast ? 'past' : ''}`} style={{ '--impact': impactOf(levelOf(e)).color }}
                 aria-expanded={open} title={t('Voir le détail de l’annonce')} onClick={() => setOpenId(open ? null : e.id)}
                 onKeyDown={(ev) => { if (ev.target === ev.currentTarget && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); setOpenId(open ? null : e.id); } }}>
                 <div className="mini-event-when">
@@ -114,7 +145,7 @@ export function EventsPanel({ tickers, weights, title, onOpenCalendar }) {
                   <strong>{eventTime(e)}</strong>
                 </div>
                 <span className="ccy">{e.currency}</span>
-                <ImpactBadge impact={e.impact} compact />
+                <ImpactBadge level={levelOf(e)} compact />
                 <div className="ellipsis" style={{ flex: 1 }} title={e.title}>
                   <span style={{ color: 'var(--text)' }}>{e.title_fr || e.title}</span>
                   {e.title_fr && <span className="hint" style={{ marginLeft: 6 }}>{e.title}</span>}
@@ -126,8 +157,7 @@ export function EventsPanel({ tickers, weights, title, onOpenCalendar }) {
               </div>
               {open && (
                 <div className="mini-event-detail">
-                  <div className="label">{t("Pourquoi c'est important")}</div>
-                  <div>{e.why || t('Indicateur secondaire : il fait rarement bouger les marchés, sauf grosse surprise par rapport à la prévision.')}</div>
+                  <EventReading e={e} isPast={isPast} />
                   {(e.actual || e.forecast || e.previous) && (
                     <div className="mini-event-figures">
                       <span>{t('Réel')} <b>{e.actual ?? '—'}</b></span>
@@ -135,7 +165,6 @@ export function EventsPanel({ tickers, weights, title, onOpenCalendar }) {
                       <span>{t('Précédent')} <b>{e.previous ?? '—'}</b></span>
                     </div>
                   )}
-                  {e.forecast && <div className="hint">{t("Le marché réagit surtout à l'écart entre le chiffre publié et la prévision ({f}).", { f: e.forecast })}</div>}
                   {e.reaction?.length > 0 && (
                     <>
                       <div className="label" style={{ marginTop: 8 }}>{t("Réaction le jour de l'annonce")}</div>

@@ -5,6 +5,8 @@ import { getAsset } from '../tickerDatabase';
 import { tr, trName } from '../i18n';
 
 const nameOf = (tk) => trName(getAsset(tk)?.name) || tk;
+// Mêmes libellés qu'à l'écran (le serveur renvoie le code : none, monthly, daily)
+const REBALANCE_LABELS = { none: 'Aucun (achat-conservation)', monthly: 'Mensuel', daily: 'Quotidien (poids constants)' };
 const unitType = (unit) => (unit === '%' ? 'pct' : 'num');
 const today = () => new Date().toLocaleString();
 
@@ -72,9 +74,13 @@ export function exportPortfolio(data, currency) {
       name: tr('Synthèse'), title: tr('Simulation de portefeuille'), subtitle: `${tr('Exporté le')} ${today()}`,
       pairs: [
         [tr('Période'), `${data.period_start} → ${data.period_end}`],
-        [tr('Benchmark'), data.benchmark_label],
-        [tr('Rééquilibrage'), data.rebalance],
+        [tr('Indice de référence'), data.benchmark_label],
+        [tr('Rééquilibrage'), tr(REBALANCE_LABELS[data.rebalance] || data.rebalance)],
+        ...(m.currency ? [[tr('Devise'), m.listing_currencies?.some(c => c !== m.currency)
+          ? tr('{b} (lignes en {a} converties au taux de change de chaque jour)', { a: m.listing_currencies.filter(c => c !== m.currency).join(', '), b: m.currency })
+          : m.currency]] : []),
         [tr('Taux sans risque'), m.risk_free_pct, 'pct'],
+        ...(m.risk_free_source ? [[tr('Source du taux sans risque'), m.risk_free_source]] : []),
         ...(data.money_summary ? [
           [`${tr('Capital initial')} (${currency})`, data.money_summary.initial_capital, 'money'],
           [`${tr('Valeur finale')} (${currency})`, data.money_summary.final_value, 'money'],
@@ -109,7 +115,7 @@ export function exportPortfolio(data, currency) {
       rows: corr.matrix.map((row, i) => ({ t: corr.tickers[i], ...Object.fromEntries(row.map((v, j) => [corr.tickers[j], v])) })),
     },
     historySheet(data.chart_data, false, [
-      { header: `${tr('Benchmark')} (${tr('Base 100')})`, key: 'benchmark', type: 'num', width: 18 },
+      { header: `${data.benchmark_label} (${tr('Base 100')})`, key: 'benchmark', type: 'num', width: 18 },
       ...(data.money_summary ? [{ header: `${tr('Valeur du capital')} (${currency})`, key: 'money_value', type: 'money', width: 18 }] : []),
     ]),
     monteCarloSheet(data.monte_carlo),
@@ -123,6 +129,8 @@ export async function exportComparisonReport(portfolios, compareParams) {
   const res = await axios.post(`${API}/api/export/comparison`, {
     portfolios: portfolios.map(p => ({ name: p.name, items: p.items, rebalance: p.rebalance || 'none' })),
     benchmark: compareParams.benchmark, period: compareParams.period, start_date: compareParams.start_date, end_date: compareParams.end_date,
+    // mêmes réglages que la simulation à l'écran : devise d'analyse et taux sans risque éventuellement saisi
+    currency: compareParams.currency, risk_free_pct: compareParams.risk_free_pct,
   }, { responseType: 'blob' }).catch(async (err) => {
     // L'erreur arrive sous forme de blob : on la relit pour afficher le vrai message
     const text = err.response?.data ? await err.response.data.text() : '';

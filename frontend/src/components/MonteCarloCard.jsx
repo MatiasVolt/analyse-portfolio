@@ -60,7 +60,9 @@ function MonteCarloCard({ mc, forecastDays, computedDays = forecastDays, onHoriz
       <div style={{ fontSize: 13, color: 'var(--muted-2)', marginBottom: 8 }}>
         {t('Probabilité de finir en perte :')} <strong style={{ color: s.probabilite_perte_pct > 40 ? 'var(--red)' : 'var(--text-2)' }}>{fmt(s.probabilite_perte_pct, 1)} %</strong>
       </div>
-      <div style={{ width: '100%', flex: 1, minHeight: 240 }}>
+      <div style={{ width: '100%', flex: 1, minHeight: 240 }} role="img"
+        aria-label={t('Projection Monte-Carlo sur {h} : scénario pessimiste {a}, médian {b}, optimiste {c}.', {
+          h: horizonLabel(computedDays), a: `${fmt(s.scenario_pessimiste_5pct, 0)}${unit}`, b: `${fmt(s.scenario_median_50pct, 0)}${unit}`, c: `${fmt(s.scenario_optimiste_95pct, 0)}${unit}` })}>
         <MonteCarloChart data={mc.chart_data} />
       </div>
     </div>

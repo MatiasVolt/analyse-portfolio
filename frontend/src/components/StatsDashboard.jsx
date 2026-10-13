@@ -67,8 +67,12 @@ function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, va
   const { t, lang } = useLang();
   const [tab, setTab] = useState('overview');
   const uid = useId();
+  // Paire de devises : la comparer à un indice d'actions n'a pas de sens (bêta, alpha… masqués)
+  const noBench = assetClass === 'FOREX';
+  const benchKeys = METRIC_TABS.find(x => x.id === 'market').keys;
+  const visible = (keys) => (noBench ? keys.filter(k => !benchKeys.includes(k)) : keys);
   const tabs = [
-    ...METRIC_TABS,
+    ...METRIC_TABS.filter(x => !(noBench && x.id === 'market')),
     ...(classMetrics?.length ? [{ id: 'specific', label: `${t('Spécifique')} ${t(ASSET_CLASS_LABELS[assetClass] || '')}`.trim() }] : []),
     { id: 'all', label: 'Tout' },
   ];
@@ -113,9 +117,9 @@ function StatsDashboard({ metrics, interpretations, classMetrics, assetClass, va
           ))}
         </div>
       ) : active === 'all' ? (
-        <MetricGrid keys={Object.keys(METRICS)} metrics={metrics} interpretations={interpretations} confLabel={confLabel} />
+        <MetricGrid keys={visible(Object.keys(METRICS))} metrics={metrics} interpretations={interpretations} confLabel={confLabel} />
       ) : (
-        <MetricGrid keys={tabs.find(x => x.id === active).keys} metrics={metrics} interpretations={interpretations} confLabel={confLabel} />
+        <MetricGrid keys={visible(tabs.find(x => x.id === active).keys)} metrics={metrics} interpretations={interpretations} confLabel={confLabel} />
       )}
       {footer && <div className="hint" style={{ marginTop: 16, paddingTop: 10, borderTop: '1px solid var(--border)' }}>{footer}</div>}
     </div>

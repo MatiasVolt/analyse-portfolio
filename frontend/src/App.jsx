@@ -8,7 +8,7 @@ import BondsView from './views/BondsView';
 import DerivativesView from './views/DerivativesView';
 import GuideView from './views/GuideView';
 import CalculatorView from './views/CalculatorView';
-import { fetchCalendar } from './calendar';
+import { fetchCalendar, levelOf } from './calendar';
 import TradingViewChart from './components/TradingViewChart';
 import MonteCarloDrawChart from './components/MonteCarloDrawChart';
 import { horizonLabel, parseNum } from './format';
@@ -29,7 +29,7 @@ const TABS = [
   { id: 'calendar', label: 'Calendrier', icon: CalendarDays,
     about: 'Les annonces économiques qui peuvent faire bouger les marchés, heure par heure.' },
   { id: 'bonds', label: 'Obligations', icon: Landmark,
-    about: "Les taux d'intérêt du moment et un calculateur de prix d'obligation." },
+    about: "Les taux directeurs des banques centrales, les taux d'État du moment et un calculateur de prix d'obligation." },
   { id: 'derivatives', label: 'Dérivés', icon: Sigma,
     about: "Comprenez le prix d'une option et testez une stratégie, sans engager d'argent." },
   { id: 'calculator', label: 'Calculatrice', icon: Calculator,
@@ -90,7 +90,7 @@ export default function App() {
   useEffect(() => {
     const count = () => fetchCalendar().then(d => {
       const now = Date.now() / 1000, today = new Date().toLocaleDateString('sv-SE');
-      setHighToday(d.events.filter(e => e.impact === 'High' && e.timestamp >= now && new Date(e.datetime).toLocaleDateString('sv-SE') === today).length);
+      setHighToday(d.events.filter(e => levelOf(e) >= 4 && e.timestamp >= now && new Date(e.datetime).toLocaleDateString('sv-SE') === today).length);
     }).catch(() => {});
     count();
     const id = setInterval(count, 5 * 60 * 1000);
@@ -172,7 +172,7 @@ export default function App() {
       <div data-view="asset" hidden={activeTab !== 'asset'}><AssetView shared={shared} externalRequest={assetRequest} onFullscreen={setFullscreen} onOpenCalendar={openCalendar} /></div>
       <div data-view="portfolio" hidden={activeTab !== 'portfolio'}><PortfolioView shared={shared} externalRequest={portfolioRequest} onFullscreen={setFullscreen} onOpenCalendar={openCalendar} /></div>
       <div data-view="screener" hidden={activeTab !== 'screener'}><ScreenerView active={activeTab === 'screener'} onAnalyze={analyzeFromScreener} /></div>
-      <div data-view="bonds" hidden={activeTab !== 'bonds'}><BondsView active={activeTab === 'bonds'} onAnalyze={analyzeFromScreener} /></div>
+      <div data-view="bonds" hidden={activeTab !== 'bonds'}><BondsView active={activeTab === 'bonds'} onAnalyze={analyzeFromScreener} onOpenCalendar={openCalendar} /></div>
       <div data-view="derivatives" hidden={activeTab !== 'derivatives'}><DerivativesView onAnalyze={analyzeFromScreener} /></div>
       <div data-view="calendar" hidden={activeTab !== 'calendar'}><CalendarView active={activeTab === 'calendar'} onAnalyze={analyzeFromScreener} /></div>
       <div data-view="calculator" hidden={activeTab !== 'calculator'}><CalculatorView shared={shared} /></div>
@@ -185,7 +185,7 @@ export default function App() {
               aria-keyshortcuts={`Alt+${i + 1}`} onMouseEnter={showTip(i)} onMouseLeave={() => setTip(null)} onFocus={showTip(i)} onBlur={() => setTip(null)}
               onClick={() => { goTo(tab.id); setTip(null); }}>
               <Icon size={14} aria-hidden="true" /> <span className="sheet-tab-label">{t(tab.label)}</span>
-              {tab.id === 'calendar' && highToday > 0 && <span className="nav-badge" title={t("Annonces à fort impact restant aujourd'hui")} aria-label={`${highToday} · ${t("Annonces à fort impact restant aujourd'hui")}`}>{highToday}</span>}
+              {tab.id === 'calendar' && highToday > 0 && <span className="nav-badge" title={t('Annonces importantes (niveau 4 ou 5) restant aujourd’hui')} aria-label={`${highToday} · ${t('Annonces importantes (niveau 4 ou 5) restant aujourd’hui')}`}>{highToday}</span>}
             </button>
           );
         })}
@@ -194,7 +194,7 @@ export default function App() {
         <div className="tab-tip" role="tooltip" style={{ left: tip.left, bottom: tip.bottom }}>
           <span>{t(TABS[tip.index].about)}</span>
           {TABS[tip.index].id === 'calendar' && highToday > 0 && (
-            <span className="tab-tip-badge">{t(highToday > 1 ? 'Pastille rouge : {n} annonces à fort impact sont encore à venir aujourd’hui.' : 'Pastille rouge : 1 annonce à fort impact est encore à venir aujourd’hui.', { n: highToday })}</span>
+            <span className="tab-tip-badge">{t(highToday > 1 ? 'Pastille rouge : {n} annonces importantes (niveau 4 ou 5 sur 5) sont encore à venir aujourd’hui.' : 'Pastille rouge : 1 annonce importante (niveau 4 ou 5 sur 5) est encore à venir aujourd’hui.', { n: highToday })}</span>
           )}
           <span className="tab-tip-keys"><kbd>{ALT_KEY}</kbd> + <kbd>{tip.index + 1}</kbd>{!['bonds', 'guide', 'calculator'].includes(TABS[tip.index].id) && <> · {t('recherche')} <kbd>/</kbd></>}</span>
         </div>

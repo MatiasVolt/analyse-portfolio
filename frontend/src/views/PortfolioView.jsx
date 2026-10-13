@@ -14,7 +14,7 @@ import { EventsPanel } from '../components/Calendar';
 import TradingViewChart, { ChartErrorBoundary } from '../components/TradingViewChart';
 import { Field, Segmented, HelpButtons, EmptyState } from '../components/ui';
 import { getAsset } from '../tickerDatabase';
-import { API, BENCHMARKS, COLORS, fmt, fmtDate, parseNum, signColor } from '../format';
+import { API, BENCHMARKS, COLORS, fmt, fmtDate, parseNum, signColor, CURRENCY_CODE } from '../format';
 import { DEFINITIONS } from '../definitions';
 import { useLang, trName } from '../i18n';
 
@@ -286,6 +286,7 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
         weights: Object.fromEntries(valid.map(x => [x.t, x.w])),
         benchmark, rebalance: o.rebalance ?? rebalance,
         var_confidence: confLevel(),
+        currency: CURRENCY_CODE[o.currency ?? currency], // tous les cours sont convertis dans cette devise
         forecast_days: parseInt(fd, 10) || 252,
         ...(rf !== null ? { risk_free_pct: rf } : {}),
         ...(timeMode === 'preset' ? { period: o.period ?? period } : { start_date: start, end_date: end }),
@@ -405,7 +406,8 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
               </select>
             </Field>
             <Field label="Devise" style={{ width: 80 }}>
-              <select aria-label={t('Devise')} value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%' }}><option value="€">€</option><option value="$">$</option></select>
+              <select aria-label={t('Devise')} value={currency} onChange={(e) => { setCurrency(e.target.value); if (data) simulate({ currency: e.target.value }); }} style={{ width: '100%' }}
+                title={t('Devise du portefeuille : les actifs cotés dans une autre devise sont convertis au taux de change de chaque jour.')}><option value="€">€</option><option value="$">$</option></select>
             </Field>
           </div>
           <Field label="Rééquilibrage">
@@ -428,7 +430,7 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
         currentItems={rows.map((r, i) => [r.ticker.trim().toUpperCase(), round2(weights[i])]).filter(([tk, w]) => tk && w > 0)}
         rebalance={rebalance} onLoad={loadSaved}
         compareParams={{
-          benchmark, var_confidence: confLevel(),
+          benchmark, var_confidence: confLevel(), currency: CURRENCY_CODE[currency],
           ...(rfOverride() !== null ? { risk_free_pct: rfOverride() } : {}),
           ...(timeMode === 'preset' ? { period } : { start_date: start, end_date: end }),
         }} />
@@ -477,6 +479,11 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
               <span className="kpi-sub">{annualNote(t, m)}</span></div>
           </div>
 
+          {m.listing_currencies?.some(c => c !== m.currency) && (
+            <p className="hint" style={{ margin: '-8px 0 12px' }}>
+              {t('Portefeuille calculé en {b} : les lignes cotées en {a} sont converties au taux de change de clôture de chaque jour. La performance et le risque incluent donc l’effet de change.', { a: m.listing_currencies.filter(c => c !== m.currency).join(', '), b: m.currency })}
+            </p>
+          )}
           <StatsDashboard metrics={m} interpretations={data.interpretations} varInput={varInput} onVarChange={setVarInput} onVarSubmit={() => simulate()} confUsed={data._conf}
             rfInput={rfInput} onRfChange={setRfInput} onRfSubmit={(v) => simulate({ rf: v })}
             footer={periodFooter(t, m)} />
@@ -485,7 +492,7 @@ function PortfolioView({ shared, externalRequest, onFullscreen, onOpenCalendar }
             <div className="panel" style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, gap: 10, flexWrap: 'wrap' }}>
                 <Segmented label="Type de graphique" value={chartType} onChange={setChartType} options={[
-                  { value: 'line', label: 'Valeur vs benchmark', icon: <Activity size={13} /> },
+                  { value: 'line', label: 'Valeur vs indice de référence', icon: <Activity size={13} /> },
                   { value: 'drawdown', label: 'Drawdown', icon: <ShieldAlert size={13} />, accent: 'var(--red)' },
                 ]} />
                 <button type="button" className="icon-btn" title={t('Plein écran')} aria-label={t('Plein écran')}

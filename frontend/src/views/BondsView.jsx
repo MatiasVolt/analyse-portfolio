@@ -7,6 +7,7 @@ import { analyzeBond, priceYieldCurve, cashflows, yieldFromPrice } from '../fina
 import { API, fmt, parseNum } from '../format';
 import { useLang, tr } from '../i18n';
 import { BOND_DEFS as DEF } from '../definitions';
+import PolicyRates from '../components/PolicyRates';
 
 const AXIS = { stroke: '#69716c', fontSize: 11 };
 const TOOLTIP = { contentStyle: { backgroundColor: '#ffffff', borderColor: '#c6c9c6', color: 'var(--text)', fontSize: 12 } };
@@ -160,7 +161,7 @@ function BondCalculator({ market }) {
   );
 }
 
-function BondsView({ active, onAnalyze }) {
+function BondsView({ active, onAnalyze, onOpenCalendar }) {
   const { t, lang } = useLang();
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -188,6 +189,8 @@ function BondsView({ active, onAnalyze }) {
           <span>{t("Taux d'État et écarts de crédit · source FRED (Réserve fédérale de Saint-Louis)")}{data && ` · ${t('données du {d}', { d: data.updated })}`}{data?.stale && ` · ${t('copie locale')}`}</span>
         </div>
       </div>
+      {/* Les taux directeurs pilotent tout le reste de la page : ils viennent en premier */}
+      <PolicyRates active={active} onOpenCalendar={onOpenCalendar} />
       {error && <div className="error-box" role="alert">{error}</div>}
       {!data && !error && <EmptyState icon={Landmark} busy title="Chargement des taux…" />}
 

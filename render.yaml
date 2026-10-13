@@ -1,0 +1,16 @@
+# Hébergement de l'API sur Render (offre gratuite). Le site, lui, est sur Cloudflare Pages.
+# Sur Render : New > Blueprint, puis choisir ce dépôt. L'adresse obtenue (https://…onrender.com)
+# est à mettre dans la variable VITE_API_URL du projet Cloudflare, avant de relancer un déploiement.
+services:
+  - type: web
+    name: yield-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/screener/status
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: PYTHONIOENCODING
+        value: utf-8

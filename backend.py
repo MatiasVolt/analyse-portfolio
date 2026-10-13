@@ -178,7 +178,6 @@ def descriptive_stats(returns: pd.Series, ppy: int = 252) -> dict:
     return {
         "mean_daily_return_pct": _r(r.mean() * 100, 4),
         "median_daily_return_pct": _r(r.median() * 100, 4),
-        "daily_volatility_pct": _r(r.std() * 100),
         "annualized_volatility_pct": _r(r.std() * np.sqrt(ppy) * 100),
         "downside_volatility_pct": _r(np.sqrt(np.mean(np.minimum(r, 0) ** 2)) * np.sqrt(ppy) * 100),
         "max_daily_return_pct": _r(r.max() * 100),
@@ -213,15 +212,6 @@ def win_rate(returns: pd.Series) -> float:
     r = returns.dropna()
     r = r[r != 0]
     return _r((r > 0).mean() * 100) if not r.empty else 0.0
-
-
-def profit_factor(returns: pd.Series) -> float:
-    r = returns.dropna()
-    gains = r[r > 0].sum()
-    losses = abs(r[r < 0].sum())
-    if losses == 0:
-        return None if gains > 0 else 0.0
-    return _r(gains / losses)
 
 
 def omega_ratio(returns: pd.Series, threshold: float = 0.0) -> float:
@@ -513,14 +503,20 @@ def compute_core_metrics(prices: pd.Series, bench_prices: pd.Series, conf: float
 
     # Rendements du benchmark alignés sur les mêmes dates (évite les décalages crypto 7j/7 vs bourse 5j/7)
     aligned = pd.concat([prices, bench_prices], axis=1, join="inner").dropna()
-    rel = market_relation(aligned.iloc[:, 0].pct_change(), aligned.iloc[:, 1].pct_change(), ppy) if len(aligned) > 10 else market_relation(pd.Series(dtype=float), pd.Series(dtype=float))
+    # Annualisation de la comparaison : une crypto (365 j/an) comparée à un indice de bourse n'a que ~252 dates communes par an.
+    # Annualiser ces rendements avec 365 gonflerait l'alpha et la tracking error d'environ 45 %.
+    rel_ppy = ppy
+    if ppy == 365 and len(aligned) > 10:
+        span_years = (aligned.index[-1] - aligned.index[0]).days / 365.25
+        if span_years > 0 and (len(aligned) - 1) / span_years < 300:
+            rel_ppy = 252
+    rel = market_relation(aligned.iloc[:, 0].pct_change(), aligned.iloc[:, 1].pct_change(), rel_ppy) if len(aligned) > 10 else market_relation(pd.Series(dtype=float), pd.Series(dtype=float))
 
     m = descriptive_stats(returns, ppy)
     m.update({
         "total_change_pct": total_return_pct(prices),
         "cagr_pct": cagr(prices),
         "win_rate_pct": win_rate(returns),
-        "profit_factor": profit_factor(returns),
         "omega_ratio": omega_ratio(returns),
         "tail_ratio": tail_ratio(returns),
         "max_drawdown_pct": max_drawdown(prices),
@@ -984,9 +980,8 @@ def interpret_metrics(m: dict, benchmark_label: str = None, portfolio: bool = Fa
                           f"Over a one-year period, the annual return ({fr(v, 2, True)}%) is naturally almost the same as the total change. This indicator becomes useful to compare periods of different lengths.")
         else:
             c["cagr"] = T(f"En moyenne, l'actif a rapporté {fr(v)} % par an (intérêts composés). ", f"On average, the asset returned {fr(v)}% per year (compounded). ") + (
-                T("C'est supérieur à la moyenne historique des actions mondiales (environ 7 à 8 % par an).", "That is above the long-run average of global equities (about 7–8% a year).") if v > 8 else
-                T("C'est dans la moyenne historique des actions (environ 5 à 8 % par an).", "That is in line with the long-run average of equities (about 5–8% a year).") if v >= 5 else
-                T("C'est un rendement modeste.", "That is a modest return.") if v >= 0 else T("Le rendement annuel est négatif.", "The annual return is negative."))
+                T(f"À ce rythme, un capital double en {fr(math.log(2) / math.log(1 + v / 100), 1)} ans environ.", f"At that pace, capital doubles in about {fr(math.log(2) / math.log(1 + v / 100), 1)} years.") if v > 0 else
+                T("Le capital n'a pas progressé sur la période.", "Capital did not grow over the period.") if v == 0 else T("Le rendement annuel est négatif.", "The annual return is negative."))
 
     v = g("sharpe_ratio")
     if v is not None:
@@ -1192,9 +1187,9 @@ def interpret_metrics(m: dict, benchmark_label: str = None, portfolio: bool = Fa
     v = g("information_ratio")
     if v is not None:
         c["information_ratio"] = T(f"Ratio d'information de {fr(v)} : ", f"Information ratio of {fr(v)}: ") + (
-            T("surperformance régulière et significative face au benchmark.", "consistent and significant outperformance versus the benchmark.") if v > 0.5 else
-            T("légère surperformance par rapport au benchmark.", "slight outperformance versus the benchmark.") if v > 0 else
-            T("sous-performance par rapport au benchmark.", "underperformance versus the benchmark."))
+            T("surperformance régulière et significative face à l'indice de référence.", "consistent and significant outperformance versus the benchmark.") if v > 0.5 else
+            T("légère surperformance par rapport à l'indice de référence.", "slight outperformance versus the benchmark.") if v > 0 else
+            T("sous-performance par rapport à l'indice de référence.", "underperformance versus the benchmark."))
 
     up, down = g("up_capture_pct"), g("down_capture_pct")
     if up is not None and down is not None:
@@ -1236,7 +1231,8 @@ def interpret_metrics(m: dict, benchmark_label: str = None, portfolio: bool = Fa
             T("Les baisses sont plus brutales que les hausses : quand l'actif recule, il le fait plus fort qu'il ne monte.", "Falls are sharper than rises: when the asset drops, it does so harder than it climbs.") if ratio > 1.1 else
             T("Les hausses sont plus amples que les baisses : une bonne partie de la volatilité vient de mouvements vers le haut, ce qui est plutôt bon signe.", "Rises are larger than falls: much of the volatility comes from upward moves, which is rather a good sign.") if ratio < 0.9 else
             T("Hausses et baisses ont à peu près la même ampleur.", "Rises and falls are roughly the same size.")) + T(
-            " C'est cette mesure qu'utilise le ratio de Sortino.", " This is the measure used by the Sortino ratio.")
+            " Le ratio de Sortino s'appuie sur une mesure très proche : les baisses sous le taux sans risque, et non sous zéro.",
+            " The Sortino ratio relies on a very similar measure: falls below the risk-free rate rather than below zero.")
 
     for key, field, date_key in (("best_day", "max_daily_return_pct", "best_day_date"), ("worst_day", "min_daily_return_pct", "worst_day_date")):
         v = g(field)
@@ -1415,7 +1411,6 @@ def screener_metrics(df: pd.DataFrame, bench_close: pd.Series, ppy: int = 252) -
         "ulcer_index": ulcer_index(window),
         "recovery_days": mean_time_to_recovery(window),
         "win_rate_pct": win_rate(returns),
-        "profit_factor": profit_factor(returns),
         "var_95_historical_pct": value_at_risk_h(returns, 0.95),
         "var_95_parametric_pct": value_at_risk_p(returns, 0.95),
         "cvar_95_pct": conditional_var(returns, 0.95),

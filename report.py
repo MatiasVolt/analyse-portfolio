@@ -67,8 +67,12 @@ def _style_chart(ch, title, y_fmt=None, height=7.5, width=17):
     ch.x_axis.delete = False
 
 
-def build_comparison(portfolios, fetch, period="5y", start=None, end=None, benchmark="^GSPC", capital=10000.0):
-    """portfolios : [{name, items: [[ticker, poids %], …], rebalance}]. Renvoie les octets du fichier .xlsx."""
+def build_comparison(portfolios, fetch, period="5y", start=None, end=None, benchmark="^GSPC", capital=10000.0,
+                     benchmark_label=None, currency=None, risk_free_source=None):
+    """portfolios : [{name, items: [[ticker, poids %], …], rebalance}]. Renvoie les octets du fichier .xlsx.
+    `fetch` renvoie des cours déjà convertis dans `currency` (None = chaque actif dans sa devise de cotation)."""
+    bench_name = benchmark_label or benchmark
+    money = f" {currency}" if currency else ""
     all_tickers = sorted({tk for p in portfolios for tk, _ in p["items"]} | {benchmark})
     data = fetch(all_tickers, period=period, start=start, end=end)
 
@@ -81,7 +85,7 @@ def build_comparison(portfolios, fetch, period="5y", start=None, end=None, bench
         series[p["name"]] = backend.portfolio_value_series(prices, w, p.get("rebalance") or "none")
     values = pd.concat(series, axis=1, join="inner").dropna()
     bench = data[benchmark]["Close"].reindex(values.index).ffill().bfill()
-    values[T("Benchmark", "Benchmark")] = bench
+    values[T(f"Indice de référence ({bench_name})", f"Benchmark ({bench_name})")] = bench
     if len(values) < 20:
         raise ValueError(T("Historique commun trop court pour comparer ces portefeuilles.", "Shared history too short to compare these portfolios."))
     values = values / values.iloc[0] * capital  # même capital de départ, même date
@@ -104,7 +108,7 @@ def build_comparison(portfolios, fetch, period="5y", start=None, end=None, bench
     monthly = pd.concat([values.iloc[[0]], monthly]).pct_change().dropna()
     dd = values / values.cummax() - 1
 
-    add(T(f"Valeur finale de {capital:,.0f}".replace(",", " "), f"Final value of {capital:,.0f}"), "#,##0", 1, lambda n: float(values[n].iloc[-1]))
+    add(T(f"Valeur finale de {capital:,.0f}{money}".replace(",", " "), f"Final value of {capital:,.0f}{money}"), "#,##0", 1, lambda n: float(values[n].iloc[-1]))
     add(T("Gain / perte", "Gain / loss"), "#,##0;[Red]-#,##0", 1, lambda n: float(values[n].iloc[-1] - capital))
     add(T("Rendement total", "Total return"), "0.0%", 1, lambda n: float(values[n].iloc[-1] / capital - 1))
     add(T("Rendement annuel composé (CAGR)", "Compound annual return (CAGR)"), "0.00%", 1, lambda n: metrics[n]["cagr_pct"] / 100)
@@ -121,8 +125,8 @@ def build_comparison(portfolios, fetch, period="5y", start=None, end=None, bench
     add(T("Meilleur mois", "Best month"), "0.0%", 1, lambda n: float(monthly[n].max()))
     add(T("Pire mois", "Worst month"), "0.0%", 1, lambda n: float(monthly[n].min()))
     add(T("Mois positifs", "Positive months"), "0%", 1, lambda n: float((monthly[n] > 0).mean()))
-    add(T("Bêta vs benchmark", "Beta vs benchmark"), "0.00", 0, lambda n: metrics[n]["beta"])
-    add(T("Corrélation au benchmark", "Correlation with benchmark"), "0.00", 0, lambda n: metrics[n]["correlation"])
+    add(T("Bêta vs indice de référence", "Beta vs benchmark"), "0.00", 0, lambda n: metrics[n]["beta"])
+    add(T("Corrélation à l'indice de référence", "Correlation with benchmark"), "0.00", 0, lambda n: metrics[n]["correlation"])
 
     wb = Workbook()
     ws = wb.active
@@ -130,11 +134,16 @@ def build_comparison(portfolios, fetch, period="5y", start=None, end=None, bench
     ws.sheet_view.showGridLines = False
     ws["A1"] = T("Comparaison de portefeuilles", "Portfolio comparison")
     ws["A1"].font = Font(bold=True, size=18, color=GREEN)
+    rf_src = f" ({risk_free_source})" if risk_free_source else ""
+    ccy_note = (T(f" · tous les cours sont convertis en {currency} au taux de change de chaque jour",
+                  f" · all prices are converted to {currency} at each day's exchange rate") if currency
+                else T(" · chaque actif reste dans sa devise de cotation (pas de conversion de change)",
+                       " · each asset stays in its quote currency (no currency conversion)"))
     ws["A2"] = T(
-        f"Du {values.index[0]:%d/%m/%Y} au {values.index[-1]:%d/%m/%Y} · benchmark {benchmark} · capital de départ {capital:,.0f} · taux sans risque {backend.risk_free() * 100:.2f} % · exporté le {datetime.now():%d/%m/%Y %H:%M}".replace(",", " "),
-        f"From {values.index[0]:%Y-%m-%d} to {values.index[-1]:%Y-%m-%d} · benchmark {benchmark} · starting capital {capital:,.0f} · risk-free rate {backend.risk_free() * 100:.2f}% · exported {datetime.now():%Y-%m-%d %H:%M}")
+        f"Du {values.index[0]:%d/%m/%Y} au {values.index[-1]:%d/%m/%Y} · indice de référence : {bench_name} · capital de départ {capital:,.0f}{money} · taux sans risque {backend.risk_free() * 100:.2f} %{rf_src} · exporté le {datetime.now():%d/%m/%Y %H:%M}".replace(",", " ") + ccy_note,
+        f"From {values.index[0]:%Y-%m-%d} to {values.index[-1]:%Y-%m-%d} · benchmark: {bench_name} · starting capital {capital:,.0f}{money} · risk-free rate {backend.risk_free() * 100:.2f}%{rf_src} · exported {datetime.now():%Y-%m-%d %H:%M}" + ccy_note)
     ws["A2"].font = Font(italic=True, color="69716C")
-    ws["A3"] = T("En vert : le meilleur portefeuille de chaque ligne · en rouge : le moins bon (benchmark exclu).",
+    ws["A3"] = T("En vert : le meilleur portefeuille de chaque ligne · en rouge : le moins bon (indice de référence exclu).",
                  "Green: best portfolio on each row · red: weakest (benchmark excluded).")
     ws["A3"].font = Font(size=9, color="69716C")
 

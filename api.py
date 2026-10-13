@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 import backend
 import risk_free
+import policy_rates
 import i18n
 from i18n import T
 import json
@@ -125,6 +126,7 @@ class PortfolioRequest(BaseModel):
     initial_capital: Optional[float] = None
     rebalance: Optional[str] = "none"
     risk_free_pct: Optional[float] = None  # None = taux de marché de la devise
+    currency: Optional[str] = None  # EUR ou USD : cours convertis ; None = chaque actif dans sa devise de cotation
 
 
 # -------------------------------------------------------------
@@ -193,6 +195,43 @@ def fetch_many(tickers: List[str], period: Optional[str] = "5y", start: Optional
     return result
 
 
+ANALYSIS_CURRENCIES = ("EUR", "USD")
+
+
+def parse_currency(value: Optional[str]) -> Optional[str]:
+    """Devise d'analyse demandée (EUR ou USD), ou None pour rester dans la devise de cotation."""
+    if not value:
+        return None
+    v = value.strip().upper()
+    if v not in ANALYSIS_CURRENCIES:
+        raise ValueError(T("Devise d'analyse inconnue : choisissez EUR ou USD.", "Unknown analysis currency: choose EUR or USD."))
+    return v
+
+
+def convert_currency(df: pd.DataFrame, ticker: str, target: Optional[str], **span) -> pd.DataFrame:
+    """
+    Cours convertis dans la devise `target` au taux de change de clôture de chaque jour (dernier taux connu les jours
+    où le marché des changes est fermé). Les dates antérieures au premier taux disponible sont écartées.
+    Sans effet si l'actif cote déjà dans cette devise, ou pour une paire de devises.
+    """
+    src = risk_free.listing_currency(ticker)
+    if not target or src == target or backend.detecter_classe_actif(ticker) == "FOREX":
+        return df
+    pair = f"{src}{target}=X"
+    fx = fetch_many([pair], **span)[pair]["Close"]
+    rate = fx.reindex(df.index.union(fx.index)).ffill().reindex(df.index)
+    keep = rate.notna()
+    out = df.loc[keep].copy()
+    # Londres cote en pence : 100 pence = 1 livre
+    factor = rate[keep] * (0.01 if ticker.upper().endswith(".L") else 1.0)
+    for col in ("Open", "High", "Low", "Close"):
+        out[col] = out[col] * factor
+    out.attrs = dict(df.attrs)
+    if len(out) < 5:
+        raise ValueError(T(f"Taux de change {src}/{target} indisponible sur cette période.", f"{src}/{target} exchange rate unavailable over this period."))
+    return out
+
+
 def fetch_dividends(ticker: str):
     now = time.time()
     hit = _div_cache.get(ticker)
@@ -204,6 +243,13 @@ def fetch_dividends(ticker: str):
         d = None
     _div_cache[ticker] = (now, d)
     return d
+
+
+def horizon_days(forecast_days, ppy: int) -> int:
+    """Horizon de projection en pas de simulation. Les horizons sont exprimés en séances de bourse (252 = 1 an) ;
+    pour un actif qui cote tous les jours (crypto, 365 pas par an), « 1 an » doit valoir 365 pas, pas 252."""
+    days = int(forecast_days or 252)
+    return round(days * ppy / 252) if ppy != 252 else days
 
 
 def parse_conf(value) -> float:
@@ -241,7 +287,8 @@ def get_asset_analysis(
     forecast_days: Optional[int] = 252,
     var_confidence: Optional[float] = 0.95,
     initial_capital: Optional[float] = None,
-    risk_free_pct: Optional[float] = None
+    risk_free_pct: Optional[float] = None,
+    currency: Optional[str] = None
 ):
     try:
         ticker = ticker.strip().upper()
@@ -254,6 +301,11 @@ def get_asset_analysis(
         div_future = _executor.submit(fetch_dividends, ticker) if classe in ("ACTION", "ETF") else None
         data = fetch_many([ticker, benchmark], period=period, start=start_date, end=end_date)
         df_asset, df_bench = data[ticker], data[benchmark]
+        # Devise d'analyse : l'actif ET son indice de comparaison sont convertis, pour comparer ce qui est comparable
+        target = None if classe == "FOREX" else parse_currency(currency)
+        span = {"period": period, "start": start_date, "end": end_date}
+        df_asset = convert_currency(df_asset, ticker, target, **span)
+        df_bench = convert_currency(df_bench, benchmark, target, **span)
         if len(df_asset) < 5:
             raise ValueError(T("Historique trop court pour une analyse (moins de 5 séances).", "History too short for an analysis (fewer than 5 sessions)."))
 
@@ -261,14 +313,17 @@ def get_asset_analysis(
         prices = df_asset["Close"]
         b_label = benchmark_label(benchmark)
 
-        rf = with_override(risk_free.for_ticker(ticker), risk_free_pct)
+        # Le taux sans risque est celui de la devise dans laquelle on raisonne
+        rf = with_override(risk_free.for_currency(target) if target else risk_free.for_ticker(ticker), risk_free_pct)
         use_risk_free(rf)
         stats = backend.compute_core_metrics(prices, df_bench["Close"], conf, ppy)
         stats["risk_free_source"] = rf["source"]
-        stats["currency"] = rf["currency"]
+        stats["currency"] = target or risk_free.listing_currency(ticker)
+        stats["listing_currency"] = risk_free.listing_currency(ticker)
+        stats["converted"] = bool(target and target != risk_free.listing_currency(ticker))
         # Drawdown actuel : toujours mesuré depuis le record historique, quelle que soit la période affichée
         try:
-            whole = prices if (period == "max" and not (start_date and end_date)) else fetch_many([ticker], period="max")[ticker]["Close"].dropna()
+            whole = prices if (period == "max" and not (start_date and end_date)) else convert_currency(fetch_many([ticker], period="max")[ticker], ticker, target, period="max")["Close"].dropna()
             stats["current_drawdown_pct"] = round(float(whole.iloc[-1] / whole.max() - 1) * 100, 2)
             stats["high_date"] = whole.idxmax().strftime("%Y-%m-%d")
             stats["high_scope"] = "all"
@@ -279,7 +334,7 @@ def get_asset_analysis(
         class_metrics = backend.asset_class_metrics(classe, df_asset, ppy, dividends)
 
         has_capital = bool(initial_capital and initial_capital > 0)
-        mc = backend.monte_carlo_simulation(prices, days_forecast=int(forecast_days or 252), n_simulations=5000,
+        mc = backend.monte_carlo_simulation(prices, days_forecast=horizon_days(forecast_days, ppy), n_simulations=5000,
                                             initial_capital=float(initial_capital) if has_capital else 100.0)
 
         money_summary = None
@@ -328,6 +383,10 @@ def analyze_portfolio(req: PortfolioRequest):
 
         bench_ticker = (req.benchmark or "^GSPC").upper()
         data = fetch_many(tickers + [bench_ticker], period=req.period, start=req.start_date, end=req.end_date)
+        # Devise d'analyse : chaque ligne (et l'indice de comparaison) est convertie, l'effet de change est donc compté
+        target = parse_currency(req.currency)
+        span = {"period": req.period, "start": req.start_date, "end": req.end_date}
+        data = {t: convert_currency(df, t, target, **span) for t, df in data.items()}
 
         prices_df = pd.concat({t: data[t]["Close"] for t in tickers}, axis=1, join="inner").dropna()
         if len(prices_df) < 5:
@@ -341,13 +400,16 @@ def analyze_portfolio(req: PortfolioRequest):
         conf = parse_conf(req.var_confidence)
         b_label = benchmark_label(bench_ticker)
 
-        rf = with_override(risk_free.for_portfolio(weights_in), req.risk_free_pct)
+        rf = with_override(risk_free.for_currency(target) if target else risk_free.for_portfolio(weights_in), req.risk_free_pct)
         use_risk_free(rf)
         stats = backend.compute_core_metrics(value, data[bench_ticker]["Close"], conf, ppy)
         stats["risk_free_source"] = rf["source"]
         # Crypto (7 j/7) mêlée à des actifs de bourse : seules les dates communes (jours de bourse) sont gardées
         n_crypto = sum(c == "CRYPTO" for c in classes.values())
         stats["mixed_crypto"] = 0 < n_crypto < len(classes)
+        # Devises de cotation des lignes : sert à dire à l'écran ce qui a été converti (ou non)
+        stats["currency"] = target
+        stats["listing_currencies"] = sorted({risk_free.listing_currency(t) for t in tickers})
         interpretations = backend.interpret_metrics(stats, b_label, portfolio=True)
         breakdown = backend.portfolio_breakdown(prices_df, w, ppy)
 
@@ -363,7 +425,7 @@ def analyze_portfolio(req: PortfolioRequest):
                 "performance_pct": round((final_val / cap - 1) * 100, 2),
             }
 
-        mc = backend.monte_carlo_simulation(value, days_forecast=int(req.forecast_days or 252), n_simulations=5000,
+        mc = backend.monte_carlo_simulation(value, days_forecast=horizon_days(req.forecast_days, ppy), n_simulations=5000,
                                             initial_capital=cap if has_capital else 100.0)
 
         # Courbe du benchmark en base 100 sur les mêmes dates, pour comparaison
@@ -541,7 +603,7 @@ import econ_calendar
 
 def _event_reactions(events: list) -> None:
     """Pour chaque annonce passée : variation de ses actifs de référence le jour concerné, comparée à un jour normal."""
-    past = [e for e in events if e["timestamp"] < time.time() and e["impact"] in ("High", "Medium")]
+    past = [e for e in events if e["timestamp"] < time.time() and e.get("level", 0) >= 3]
     refs = sorted({a["ticker"] for e in past for a in e["assets"][:2]})
     if not refs:
         return
@@ -614,7 +676,7 @@ def get_calendar(tickers: Optional[str] = None, weights: Optional[str] = None):
         events = [e for e in events if e["currency"] in wanted]
 
     now = time.time()
-    upcoming_high = [e for e in events if e["impact"] == "High" and e["timestamp"] >= now]
+    upcoming_high = [e for e in events if e.get("level", 0) >= 4 and e["timestamp"] >= now]
     return {
         "source": feed["source"],
         "updated": datetime.fromtimestamp(econ_calendar._mem["ts"] or now).strftime("%Y-%m-%d %H:%M"),
@@ -644,6 +706,15 @@ def get_bonds():
         raise HTTPException(status_code=503, detail=T(f"Données obligataires indisponibles : {e}", f"Bond data unavailable: {e}"))
 
 
+@app.get("/api/policy-rates")
+def get_policy_rates():
+    """Taux directeurs des grandes banques centrales : taux en vigueur, dernière décision, prochaine réunion."""
+    try:
+        return policy_rates.localize(policy_rates.get(), i18n.lang())
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=T(f"Taux directeurs indisponibles pour le moment ({e}).", f"Policy rates unavailable right now ({e})."))
+
+
 @app.get("/api/options/{ticker}")
 def get_options(ticker: str, expiry: Optional[str] = None):
     """Cours, volatilités historiques, taux sans risque et chaîne d'options (si Yahoo en fournit pour ce sous-jacent)."""
@@ -655,11 +726,12 @@ def get_options(ticker: str, expiry: Optional[str] = None):
         ppy = backend.periods_per_year(classe)
         spot = float(close.iloc[-1])
         chain = fixed_income.get_option_chain(t, expiry, spot)
-        rf = round(risk_free.for_ticker(t)["rate"] * 100, 2)
+        rf_info = risk_free.for_ticker(t)
+        rf = round(rf_info["rate"] * 100, 2)
         return {
             "ticker": t, "spot": round(spot, 4 if spot < 10 else 2), "asset_class": classe,
             "hv_30": fixed_income.historical_vol(close, 30, ppy), "hv_1y": fixed_income.historical_vol(close, 252, ppy),
-            "risk_free_pct": rf if rf is not None else 4.0,
+            "risk_free_pct": rf, "risk_free_source": rf_info["source"],
             **chain,
         }
     except HTTPException:
@@ -686,6 +758,9 @@ def portfolio_frontier(req: PortfolioRequest):
         if len(tickers) < 2:
             raise ValueError(T("Il faut au moins deux actifs pour chercher un meilleur dosage.", "At least two assets are needed to look for a better mix."))
         data = fetch_many(tickers, period=req.period, start=req.start_date, end=req.end_date)
+        target = parse_currency(req.currency)
+        span = {"period": req.period, "start": req.start_date, "end": req.end_date}
+        data = {t: convert_currency(df, t, target, **span) for t, df in data.items()}
         prices = pd.concat({t: data[t]["Close"] for t in tickers}, axis=1, join="inner").dropna()
         if len(prices) < 60:
             raise ValueError(T("Historique commun trop court (moins de 60 séances) pour une estimation fiable.", "Shared history too short (under 60 sessions) for a reliable estimate."))
@@ -693,7 +768,7 @@ def portfolio_frontier(req: PortfolioRequest):
         ppy = 365 if all(c == "CRYPTO" for c in classes.values()) else 252
         total = sum(weights_in.values())
         current = np.array([weights_in[t] / total for t in tickers])
-        rf = with_override(risk_free.for_portfolio(weights_in), req.risk_free_pct)
+        rf = with_override(risk_free.for_currency(target) if target else risk_free.for_portfolio(weights_in), req.risk_free_pct)
         out = frontier.compute(prices, current, ppy, rf["rate"])
         out["risk_free_source"] = rf["source"]
         return out
@@ -722,6 +797,8 @@ class ComparisonRequest(BaseModel):
     end_date: Optional[str] = None
     benchmark: Optional[str] = "^GSPC"
     capital: Optional[float] = 10000.0
+    currency: Optional[str] = None  # EUR ou USD : cours convertis, comme dans la simulation
+    risk_free_pct: Optional[float] = None
 
 
 @app.post("/api/export/comparison")
@@ -729,8 +806,18 @@ def export_comparison(req: ComparisonRequest):
     try:
         if len(req.portfolios) < 1:
             raise ValueError(T("Aucun portefeuille à exporter.", "No portfolio to export."))
-        content = report.build_comparison(req.portfolios, fetch_many, period=req.period, start=req.start_date, end=req.end_date,
-                                          benchmark=(req.benchmark or "^GSPC").upper(), capital=req.capital or 10000.0)
+        # Mêmes règles que la simulation à l'écran : cours convertis dans la devise choisie, taux sans risque de cette devise
+        target = parse_currency(req.currency)
+        bench = (req.benchmark or "^GSPC").upper()
+
+        def fetch_converted(tickers, **span):
+            return {t: convert_currency(df, t, target, **span) for t, df in fetch_many(tickers, **span).items()}
+
+        rf = with_override(risk_free.for_currency(target or "USD"), req.risk_free_pct)
+        use_risk_free(rf)
+        content = report.build_comparison(req.portfolios, fetch_converted, period=req.period, start=req.start_date, end=req.end_date,
+                                          benchmark=bench, capital=req.capital or 10000.0,
+                                          benchmark_label=benchmark_label(bench), currency=target, risk_free_source=rf["source"])
         return Response(content, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         headers={"Content-Disposition": 'attachment; filename="comparaison.xlsx"'})
     except HTTPException:

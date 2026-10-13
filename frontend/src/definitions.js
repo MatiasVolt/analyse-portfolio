@@ -1,11 +1,11 @@
 // Définitions des indicateurs (bouton « livre ») — les interprétations chiffrées (bouton « i ») viennent du backend.
 
 export const DEFINITIONS = {
-  total_change: "Variation du cours entre le premier et le dernier jour de la période. Les cours sont ajustés : dividendes et divisions d'actions sont pris en compte.",
+  total_change: "Variation du cours entre le premier et le dernier jour de la période. Pour les actions et les ETF, les cours sont ajustés : dividendes et divisions d'actions sont pris en compte. Exception : les indices (S&P 500, CAC 40…) sont des indices de prix, ils ne comptent pas les dividendes.",
   cagr: "Taux de croissance annuel composé (CAGR) : le rendement annuel constant qui aurait mené du point de départ au point d'arrivée. Utile pour comparer des périodes de durées différentes. Sur un an, il est presque égal à la variation totale ; sur moins d'un an, c'est une extrapolation.",
-  sharpe: "Ce que l'actif a rapporté en plus d'un placement sans risque, pour chaque unité de risque prise. Calcul : (rendement annualisé − taux sans risque) ÷ volatilité annualisée. Le taux sans risque est celui de la devise de l'actif (bon du Trésor US pour le dollar, taux de la BCE pour l'euro…), indiqué en haut du tableau. Repères : < 0 mauvais, 0,5 à 1 correct, > 1 très bon, > 2 exceptionnel.",
-  sortino: "Variante du Sharpe qui ne compte comme risque que la volatilité des baisses : les fortes hausses ne sont pas pénalisées. Plus pertinent pour les actifs aux hausses brusques.",
-  calmar: "CAGR ÷ |Max Drawdown|. Compare le gain annuel moyen à la pire chute subie. Au-dessus de 1, une année moyenne suffit à effacer la pire baisse.",
+  sharpe: "Ce que l'actif a rapporté en plus d'un placement sans risque, pour chaque unité de risque prise. Calcul : (rendement moyen par séance − taux sans risque par séance) ÷ écart-type des rendements par séance, le tout ramené à l'année (× √252, ou × √365 pour la crypto). Le rendement utilisé est la moyenne arithmétique des séances, et non le CAGR affiché à côté : refaire le calcul avec le CAGR donne un chiffre un peu plus bas. Le taux sans risque est celui de la devise d'analyse (bon du Trésor US pour le dollar, taux de la BCE pour l'euro…), indiqué en haut du tableau. Repères : < 0 mauvais, 0,5 à 1 correct, > 1 très bon, > 2 exceptionnel.",
+  sortino: 'Variante du Sharpe qui ne compte comme risque que les mauvaises séances : celles où le rendement passe sous le taux sans risque. Les fortes hausses ne sont pas pénalisées. Plus pertinent pour les actifs aux hausses brusques.',
+  calmar: "CAGR ÷ |Max Drawdown|. Compare le gain annuel moyen à la pire chute subie. Au-dessus de 1, le gain d'une année moyenne dépasse en ampleur la pire chute. Attention : cela ne veut pas dire qu'une année suffit à l'effacer, car une chute se rattrape avec une hausse plus grande (après −50 %, il faut +100 %).",
   omega: "Additionnez toutes les hausses journalières d'un côté et toutes les baisses de l'autre : l'Omega est le rapport entre les deux. Au-dessus de 1, le bilan est gagnant. Contrairement au Sharpe, il tient compte de la taille réelle des bons et des mauvais jours. (Les traders l'appellent aussi « Profit Factor » : c'est le même calcul.)",
   win_rate: "Pourcentage de séances terminées en hausse (séances sans variation exclues). À lire avec le ratio Omega : on peut gagner souvent un peu et perdre rarement beaucoup.",
   mdd: "Max Drawdown : la plus grosse chute entre un sommet et le point le plus bas qui a suivi. Imaginez que vous achetez au pire moment (au sommet) et que vous vendez au pire moment (au creux) : c'est votre perte. Une chute se rattrape toujours avec une hausse plus grande : après −50 %, il faut +100 % pour revenir au départ.",
@@ -14,17 +14,17 @@ export const DEFINITIONS = {
   recovery: "Durée moyenne des périodes passées sous un ancien record : du record jusqu'au jour où l'actif en établit un nouveau. Ce ne sont pas des jours de baisse d'affilée : l'actif peut monter et descendre pendant ce temps, tant qu'il reste sous son record. Une période pas encore terminée est comptée jusqu'à aujourd'hui.",
   ulcer: "L'Ulcer Index mesure le stress de détenir un actif : il grimpe quand les baisses sont profondes et quand elles durent. Deux actifs peuvent avoir la même volatilité, mais celui qui reste longtemps loin de son record est bien plus pénible à garder (d'où le nom : « l'indice de l'ulcère »). Calcul : racine carrée de la moyenne des drawdowns au carré. Repères : < 5 serein, > 15 éprouvant.",
   vol: "La volatilité mesure l'ampleur habituelle des variations, à la hausse comme à la baisse (écart-type des rendements journaliers, ramené à l'année : × √252, ou × √365 pour la crypto qui cote tous les jours). Plus elle est élevée, plus le prix fait le yoyo.",
-  downside_vol: "Volatilité calculée uniquement à partir des journées de baisse, ramenée à l'année. Elle ne mesure que le risque qui fait mal. Si elle vaut nettement plus que la volatilité totale ÷ 1,4, les baisses sont plus brutales que les hausses.",
+  downside_vol: "Volatilité calculée en ne retenant que les séances de baisse (les séances de hausse comptent pour zéro), ramenée à l'année. Elle ne mesure que le risque qui fait mal. Si elle vaut nettement plus que la volatilité totale ÷ 1,4, les baisses sont plus brutales que les hausses.",
   var_h: "Value at Risk historique sur 1 jour : seuil de perte qui n'a été dépassé que dans (100 − niveau de confiance) % des séances observées. Ce n'est pas la perte maximale : les pires jours vont au-delà (voir CVaR).",
   var_p: "Value at Risk paramétrique sur 1 jour : même seuil que la VaR historique, mais calculé en supposant que les variations suivent une courbe en cloche (loi normale). Calcul : moyenne − z × écart-type, où z est le nombre d'écarts-types qui correspond au niveau de confiance (1,645 à 95 %, 2,326 à 99 %). Elle sous-estime souvent le risque de krach, car les très mauvais jours sont plus fréquents que ne le prévoit la courbe en cloche.",
   cvar: "CVaR = Conditional Value at Risk (« VaR conditionnelle »), aussi appelée Expected Shortfall. C'est la perte moyenne des séances qui dépassent la VaR historique. Elle répond à la question : « quand ça va mal, on perd combien en moyenne ? »",
-  beta: "Sensibilité aux mouvements du benchmark (covariance ÷ variance du benchmark). 1 = suit le marché, > 1 = amplifie, < 1 = amortit, < 0 = évolue à l'inverse.",
+  beta: "Sensibilité aux mouvements de l'indice de référence (covariance ÷ variance de l'indice). 1 = suit le marché, > 1 = amplifie, < 1 = amortit, < 0 = évolue à l'inverse.",
   alpha: "L'alpha mesure ce que l'actif a gagné en plus (ou en moins) de ce que l'on pouvait attendre vu son lien avec l'indice de référence (son bêta). Exemple : avec un bêta de 1,2, si l'indice gagne 10 % de plus que le taux sans risque, on attend environ 12 % de plus que ce taux ; si l'actif a fait 3 points de mieux, son alpha est de +3 %. Positif = il a battu ce que le marché laissait prévoir. (Méthode : alpha de Jensen, issu du modèle MEDAF / CAPM.)",
-  correlation: "Corrélation des rendements journaliers avec le benchmark, de −1 (mouvements opposés) à +1 (mouvements identiques). Plus elle est basse, plus l'actif diversifie un portefeuille investi dans le benchmark.",
+  correlation: "Corrélation des rendements journaliers avec l'indice de référence, de −1 (mouvements opposés) à +1 (mouvements identiques). Plus elle est basse, plus l'actif diversifie un portefeuille investi dans cet indice.",
   r_squared: "Le R² indique quelle part des variations de l'actif va de pair avec celles de l'indice de référence (0 % = aucun lien, 100 % = l'actif bouge exactement comme l'indice). Il mesure un mouvement commun, pas une cause : deux actifs peuvent bouger ensemble parce qu'ils réagissent aux mêmes nouvelles (taux d'intérêt, appétit pour le risque).",
   tracking_error: "Chaque jour, l'actif fait un peu mieux ou un peu moins bien que l'indice de référence. La tracking error mesure l'ampleur de ces écarts sur une année. Faible (moins de 3 %) pour un ETF qui réplique l'indice, élevée pour un actif qui vit sa propre vie.",
-  information_ratio: "Surperformance annualisée face au benchmark ÷ tracking error. Mesure la régularité de la surperformance : > 0,5 bon, > 1 excellent.",
-  capture: "Capture haussière / baissière : part de la hausse (ou de la baisse) moyenne du benchmark que l'actif enregistre les mêmes jours. L'idéal : capture haussière élevée, capture baissière faible.",
+  information_ratio: "Surperformance annualisée face à l'indice de référence ÷ tracking error. Mesure la régularité de la surperformance : > 0,5 bon, > 1 excellent.",
+  capture: "Capture haussière / baissière : part de la hausse (ou de la baisse) moyenne de l'indice de référence que l'actif enregistre les mêmes jours. L'idéal : capture haussière élevée, capture baissière faible.",
   skew: "Asymétrie (skewness) des rendements journaliers. Négative : les grosses surprises sont plutôt des chutes. Positive : plutôt des envolées. 0 = symétrique.",
   kurt: "Excès de kurtosis : épaisseur des queues de distribution comparée à une loi normale (qui vaut 0). Une valeur élevée signale des journées extrêmes (krachs ou envolées) plus fréquentes que prévu.",
   tail_ratio: "Quantile 95 % ÷ |quantile 5 %| des rendements journaliers : compare l'ampleur des meilleures journées à celle des pires.",
@@ -32,6 +32,7 @@ export const DEFINITIONS = {
   best_day: "Plus forte hausse en une séance sur la période, avec sa date.",
   worst_day: "Plus forte baisse en une séance sur la période, avec sa date.",
   mean_daily: "Rendement moyen par séance (moyenne arithmétique).",
+  median_daily: "Rendement médian par séance : une séance sur deux a fait mieux, une sur deux moins bien. S'il est nettement au-dessus du rendement moyen, quelques très mauvaises séances tirent la moyenne vers le bas ; nettement en dessous, quelques très bonnes séances la tirent vers le haut.",
   monte_carlo: "5 000 trajectoires futures sont simulées à partir de la tendance et de la volatilité historiques (mouvement brownien géométrique). Pessimiste = 5e centile (5 % des simulations finissent plus bas), médian = scénario central, optimiste = 95e centile. Hypothèse forte : le futur ressemble statistiquement au passé, et les krachs extrêmes sont sous-représentés. Ce n'est pas une prévision.",
   return_contribution: "Combien de points de la performance du portefeuille viennent de cette ligne. Calcul : poids au départ × performance de l'actif sur la période. Exemple : 20 % du portefeuille placés dans un actif qui a pris +50 % apportent +10 points. Additionnées, les contributions donnent la performance d'un portefeuille acheté au départ puis laissé tel quel (avec rééquilibrage, le total peut légèrement différer). Une contribution négative signale une ligne qui a fait perdre de l'argent au portefeuille.",
   risk_contribution: "Part du risque (variance) du portefeuille due à cette ligne. Tient compte de son poids, de sa volatilité et de sa corrélation avec les autres lignes. Une ligne peut peser 10 % du capital et 30 % du risque.",
@@ -56,7 +57,7 @@ export const METRICS = {
   mdd: { field: 'max_drawdown_pct', label: 'Max Drawdown (période)', unit: '%', def: 'mdd', interp: 'mdd', color: 'red' },
   mean_dd: { field: 'mean_drawdown_pct', label: 'Drawdown moyen', unit: '%', def: 'mean_dd', interp: 'mean_dd', color: 'red' },
   current_dd: { field: 'current_drawdown_pct', label: 'Drawdown actuel (vs record)', unit: '%', def: 'current_dd', interp: 'current_dd', color: 'red' },
-  recovery: { field: 'mean_time_to_recovery_days', label: 'Durée moyenne des baisses', unit: 'séances', def: 'recovery', interp: 'recovery', nd: 0 },
+  recovery: { field: 'mean_time_to_recovery_days', label: 'Durée moyenne sous un record', unit: 'séances', def: 'recovery', interp: 'recovery', nd: 0 },
   ulcer: { field: 'ulcer_index', label: 'Ulcer Index', def: 'ulcer', interp: 'ulcer' },
   vol: { field: 'annualized_volatility_pct', label: 'Volatilité annualisée', unit: '%', def: 'vol', interp: 'vol' },
   downside_vol: { field: 'downside_volatility_pct', label: 'Volatilité baissière', unit: '%', def: 'downside_vol', interp: 'downside_vol' },
@@ -76,14 +77,15 @@ export const METRICS = {
   best_day: { field: 'max_daily_return_pct', label: 'Meilleure séance', unit: '%', def: 'best_day', interp: 'best_day', color: 'sign', signed: true },
   worst_day: { field: 'min_daily_return_pct', label: 'Pire séance', unit: '%', def: 'worst_day', interp: 'worst_day', color: 'sign', signed: true },
   mean_daily: { field: 'mean_daily_return_pct', label: 'Rendement moyen / séance', unit: '%', def: 'mean_daily', nd: 3, color: 'sign', signed: true },
+  median_daily: { field: 'median_daily_return_pct', label: 'Rendement médian / séance', unit: '%', def: 'median_daily', nd: 3, color: 'sign', signed: true },
 };
 
 export const METRIC_TABS = [
   { id: 'overview', label: "Vue d'ensemble", keys: ['total_change', 'cagr', 'sharpe', 'sortino', 'vol', 'mdd', 'beta'] },
   { id: 'perf', label: 'Rendement / risque', keys: ['sharpe', 'sortino', 'calmar', 'omega', 'win_rate', 'positive_months', 'tail_ratio'] },
   { id: 'risk', label: 'Risque', keys: ['vol', 'downside_vol', 'mdd', 'mean_dd', 'current_dd', 'recovery', 'ulcer', 'var_h', 'var_p', 'cvar'] },
-  { id: 'market', label: 'Vs benchmark', keys: ['beta', 'alpha', 'correlation', 'r_squared', 'tracking_error', 'information_ratio', 'up_capture', 'down_capture'] },
-  { id: 'distribution', label: 'Distribution', keys: ['skew', 'kurt', 'best_day', 'worst_day', 'mean_daily', 'tail_ratio'] },
+  { id: 'market', label: 'Vs indice de référence', keys: ['beta', 'alpha', 'correlation', 'r_squared', 'tracking_error', 'information_ratio', 'up_capture', 'down_capture'] },
+  { id: 'distribution', label: 'Distribution', keys: ['skew', 'kurt', 'best_day', 'worst_day', 'mean_daily', 'median_daily', 'tail_ratio'] },
 ];
 
 export const ASSET_CLASS_LABELS = {
@@ -129,7 +131,7 @@ export const SCREENER_GROUPS = [
   },
   {
     id: 'market', label: 'Vs marché', metrics: [
-      { key: 'beta', label: 'Bêta', def: DEFINITIONS.beta + ' Benchmark : S&P 500 (US, ETF…), Stoxx 600 (Europe), Bitcoin (crypto).' },
+      { key: 'beta', label: 'Bêta', def: DEFINITIONS.beta + ' Indice de référence : S&P 500 (US, ETF…), Stoxx 600 (Europe), Bitcoin (crypto).' },
       { key: 'alpha_annual_pct', label: 'Alpha', unit: '%', signed: true, def: DEFINITIONS.alpha },
       { key: 'correlation', label: 'Corrélation', def: DEFINITIONS.correlation },
     ]

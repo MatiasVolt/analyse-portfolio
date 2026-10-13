@@ -46,8 +46,6 @@ PROFILES = [
 # Nom des grands marchés baissiers selon l'année du sommet
 CRASH_NAMES = {
     1929: ("Krach de 1929 et Grande Dépression", "1929 crash and Great Depression"),
-    1937: ("Rechute de 1937-1938", "1937-38 relapse"),
-    1946: ("Après-guerre", "Post-war slump"),
     1961: ("Krach « Kennedy » de 1962", "1962 “Kennedy slide”"),
     1966: ("Resserrement monétaire de 1966", "1966 credit crunch"),
     1968: ("Fin des années 60", "Late-1960s bear market"),
@@ -70,7 +68,7 @@ def _stats(prices, ppy=252):
     r = prices.pct_change().dropna()
     dd = prices / prices.cummax() - 1
     yearly = prices.resample("YE").last().pct_change().dropna()
-    return {"cagr": _cagr(prices), "vol": float(r.std() * np.sqrt(ppy)), "mdd": float(dd.min()),
+    return {"cagr": _cagr(prices), "mean": float(r.mean() * ppy), "vol": float(r.std() * np.sqrt(ppy)), "mdd": float(dd.min()),
             "worst_year": float(yearly.min()) if not yearly.empty else None, "best_year": float(yearly.max()) if not yearly.empty else None,
             "worst_12m": float(prices.pct_change(ppy).min()) if len(prices) > ppy else None}
 
@@ -163,7 +161,7 @@ def build(fetch) -> dict:
         classes.append({"ticker": t, "name_fr": fr, "name_en": en, "start": s.index[0].strftime("%Y-%m-%d"),
                         "cagr_pct": round(st["cagr"] * 100, 2), "vol_pct": round(st["vol"] * 100, 1),
                         "mdd_pct": round(st["mdd"] * 100, 1), "worst_year_pct": round(st["worst_year"] * 100, 1) if st["worst_year"] is not None else None,
-                        "sharpe": round((st["cagr"] - cash_cagr) / st["vol"], 2) if st["vol"] else None})
+                        "sharpe": round((st["mean"] - cash_cagr) / st["vol"], 2) if st["vol"] else None})
 
     prices = pd.concat({t: data[t]["Close"] for t in ("ACWI", "AGG", "BIL")}, axis=1, join="inner").dropna().loc[COMMON_START:]
     profiles = []

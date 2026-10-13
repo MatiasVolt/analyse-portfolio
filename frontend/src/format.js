@@ -23,10 +23,11 @@ export function fmt(v, nd = 2, signed = false) {
   return signed && n > 0 ? `+${s}` : s;
 }
 
-export function fmtMoney(v, currency = '€', nd = 0) {
-  if (v === null || v === undefined || Number.isNaN(Number(v))) return '—';
-  return `${fmt(v, nd)} ${currency}`;
-}
+// Devises d'analyse proposées (cours convertis par l'API) et symboles d'affichage
+export const CURRENCY_CODE = { '€': 'EUR', '$': 'USD' };
+const CURRENCY_SYMBOL = { EUR: '€', USD: '$', GBP: '£', JPY: '¥' };
+/** 'EUR' -> '€' ; une devise sans symbole courant garde son code ('CHF'). */
+export const currencySymbol = (code) => (code ? CURRENCY_SYMBOL[code] || code : '');
 
 /** Volumes en millions : 14 794 M -> « 14,8 Md » */
 export function fmtMillions(v) {

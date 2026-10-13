@@ -141,8 +141,18 @@ function TradingViewChart({ data, type = 'line', lineColor = '#1e7145', isMoney 
   const nextMagnet = () => setMagnet(m => MAGNET_MODES[(MAGNET_MODES.indexOf(m) + 1) % MAGNET_MODES.length]);
 
   const dec = (v) => fmt(v, Math.abs(v) < 10 ? 4 : 2);
+  // Texte alternatif pour les lecteurs d'écran : le graphique est un dessin, on en résume le contenu en une phrase
+  const rows = Array.isArray(data) ? data.filter(d => d && d.date) : [];
+  const first = rows[0], last = rows[rows.length - 1];
+  const pick = (d) => (type === 'drawdown' ? d.drawdown : isMoney ? (d.money_value ?? d.value) : (d.close ?? d.value));
+  const alt = first && last
+    ? t('Graphique « {n} » du {a} au {b} : de {x} à {y}.', {
+      n: type === 'drawdown' ? 'Drawdown' : t(mainLabel || 'Valeur'), a: first.date, b: last.date,
+      x: `${fmt(pick(first), 2)}${type === 'drawdown' ? ' %' : unit ? ` ${unit}` : ''}`, y: `${fmt(pick(last), 2)}${type === 'drawdown' ? ' %' : unit ? ` ${unit}` : ''}`,
+    })
+    : t('Graphique sans données.');
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: height }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: height }} role="img" aria-label={alt}>
       <div style={{
         position: 'absolute', top: 8, left: 12, zIndex: 10, display: 'flex', gap: 12, fontSize: 11, flexWrap: 'wrap',
         background: c.legendBg, color: c.strong, padding: '4px 8px', borderRadius: 4, border: `1px solid ${c.border}`, pointerEvents: 'none',
@@ -159,7 +169,7 @@ function TradingViewChart({ data, type = 'line', lineColor = '#1e7145', isMoney 
             <span style={{ color: c.text }}>{type === 'drawdown' ? 'Drawdown' : t(mainLabel || 'Valeur')} <b style={{ color: type === 'drawdown' ? c.red : mainColor }}>
               {type === 'drawdown' ? `${fmt(legend.value, 2)} %` : isMoney ? `${fmt(legend.value, 0)} ${currency}` : dec(legend.value)}</b></span>
             {legend.compareValue !== undefined && (
-              <span style={{ color: c.text }}>{compareLabel || 'Benchmark'} <b style={{ color: c.compare }}>{isMoney ? `${fmt(legend.compareValue, 0)} ${currency}` : dec(legend.compareValue)}</b></span>
+              <span style={{ color: c.text }}>{compareLabel || t('Indice de référence')} <b style={{ color: c.compare }}>{isMoney ? `${fmt(legend.compareValue, 0)} ${currency}` : dec(legend.compareValue)}</b></span>
             )}
           </>)}
         </>}

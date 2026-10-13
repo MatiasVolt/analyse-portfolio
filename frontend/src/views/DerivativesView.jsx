@@ -134,7 +134,7 @@ function DerivativesView({ onAnalyze }) {
 
       <div className="warn-box">
         <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 1 }} />
-        <div>{t("Outil pédagogique : les prix calculés sont théoriques. Les options sont des produits à effet de levier ; la majorité des particuliers qui les échangent perdent de l'argent, surtout en vendant des options sans couverture (pertes potentiellement illimitées).")}</div>
+        <div>{t("Outil pédagogique : les prix calculés sont théoriques (modèle de Black-Scholes, options européennes ; les options sur actions américaines, exerçables à tout moment, peuvent valoir un peu plus). Les options sont des produits à effet de levier : l'acheteur peut perdre toute sa prime, et le vendeur d'une option sans couverture s'expose à des pertes potentiellement illimitées.")}</div>
       </div>
 
       <div className="panel" style={{ marginBottom: 16 }}>
@@ -172,7 +172,7 @@ function DerivativesView({ onAnalyze }) {
             {t('Volatilité :')} <button type="button" className="link-btn" onClick={() => setVol(String(mkt.hv_30))}>{t('historique 30 j')}</button>
             <button type="button" className="link-btn" onClick={() => setVol(String(mkt.hv_1y))}>{t('historique 1 an')}</button>
             {atmIv && <button type="button" className="link-btn" onClick={() => setVol(String(atmIv))}>{t('implicite du marché')}</button>}
-            · {t('taux sans risque = bon du Trésor US à 3 mois (onglet Obligations).')}
+            · {t('taux sans risque : {s}', { s: mkt.risk_free_source || '—' })}
             {!mkt.expiries?.length && ` ${t('Aucune option cotée sur Yahoo pour ce sous-jacent : le calcul reste possible avec vos paramètres.')}`}
           </div>
         )}

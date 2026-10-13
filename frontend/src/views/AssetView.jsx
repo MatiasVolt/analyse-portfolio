@@ -10,7 +10,7 @@ import { EventsPanel } from '../components/Calendar';
 import TradingViewChart, { ChartErrorBoundary } from '../components/TradingViewChart';
 import { Field, Segmented, EmptyState } from '../components/ui';
 import { getAsset } from '../tickerDatabase';
-import { API, BENCHMARKS, fmt, fmtDate, parseNum, signColor } from '../format';
+import { API, BENCHMARKS, currencySymbol, fmt, fmtDate, parseNum, signColor } from '../format';
 import { ASSET_CLASS_LABELS } from '../definitions';
 import { useLang, trName } from '../i18n';
 
@@ -27,7 +27,7 @@ const CHART_TYPES = [
 ];
 
 function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
-  const { today, varInput, setVarInput, confLevel, rfInput, setRfInput, rfOverride, forecastDays, setForecastDays, currency, setCurrency } = shared;
+  const { today, varInput, setVarInput, confLevel, rfInput, setRfInput, rfOverride, forecastDays, setForecastDays } = shared;
   const { t, lang } = useLang();
 
   const [ticker, setTicker] = useState('');
@@ -37,6 +37,7 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
   const [start, setStart] = useState('2020-01-01');
   const [end, setEnd] = useState(today);
   const [capital, setCapital] = useState('');
+  const [ccy, setCcy] = useState(''); // devise d'analyse : '' = devise de cotation, sinon 'EUR' ou 'USD' (cours convertis)
   const [chartType, setChartType] = useState('line');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -45,7 +46,7 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
   const abortRef = useRef(null);
 
   const run = async (o = {}) => {
-    const p = { ticker, benchmark, timeMode, period, start, end, capital, forecastDays, conf: confLevel(), rf: rfOverride(), ...o };
+    const p = { ticker, benchmark, timeMode, period, start, end, capital, forecastDays, conf: confLevel(), rf: rfOverride(), ccy, ...o };
     const tk = (p.ticker || '').trim().toUpperCase();
     if (!tk) { setError(t('Choisissez un actif dans la liste ou tapez un symbole.')); return; }
     if (p.timeMode === 'custom' && p.start >= p.end) { setError(t('La date de début doit précéder la date de fin.')); return; }
@@ -60,6 +61,7 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
       const params = { var_confidence: p.conf, forecast_days: p.forecastDays };
       if (p.benchmark) params.benchmark = p.benchmark;
       if (p.rf !== null) params.risk_free_pct = p.rf;
+      if (p.ccy) params.currency = p.ccy;
       if (p.timeMode === 'preset') params.period = p.period;
       else { params.start_date = p.start; params.end_date = p.end; }
       const cap = parseNum(p.capital);
@@ -95,7 +97,9 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
   const m = data?.metrics;
   const isMoneyChart = Boolean(data?.money_summary);
   // Unité de l'axe : capital dans la devise choisie, sinon devise de cotation (points pour un indice)
-  const chartUnit = isMoneyChart ? currency : data?.asset_class === 'INDEX' ? t('Points') : m?.currency;
+  const currency = currencySymbol(m?.currency); // symbole de la devise dans laquelle les chiffres sont exprimés
+  const isForex = data?.asset_class === 'FOREX';
+  const chartUnit = isMoneyChart ? currency : data?.asset_class === 'INDEX' && !m?.converted ? t('Points') : m?.currency;
 
   return (
     <div>
@@ -147,7 +151,7 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
               <span className="tag">{t(ASSET_CLASS_LABELS[data.asset_class] || data.asset_class)}</span>
             </div>
             <div className="result-meta" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              <span>{t('Du {a} au {b}', { a: fmtDate(data.period_start), b: fmtDate(data.period_end) })} · {t('Référence :')} <strong>{data.benchmark_label}</strong></span>
+              <span>{t('Du {a} au {b}', { a: fmtDate(data.period_start), b: fmtDate(data.period_end) })} {!isForex && <> · {t('Référence :')} <strong>{data.benchmark_label}</strong></>}</span>
             </div>
           </div>
 
@@ -158,7 +162,11 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
                 <input type="text" inputMode="decimal" value={capital} onChange={(e) => setCapital(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && run()} onBlur={() => { if (data && (parseNum(capital) > 0) !== isMoneyChart) run(); }}
                   style={{ width: 0, flex: 1, maxWidth: 120, textAlign: 'right' }} aria-label={t('Capital investi')} />
-                <select value={currency} onChange={(e) => setCurrency(e.target.value)} aria-label={t('Devise')}><option value="€">€</option><option value="$">$</option></select>
+                <select value={isForex ? '' : ccy} disabled={isForex} onChange={(e) => { setCcy(e.target.value); run({ ccy: e.target.value }); }}
+                  aria-label={t('Devise d’analyse')} title={t('Devise dans laquelle l’actif est analysé. En choisissant € ou $, les cours sont convertis au taux de change de chaque jour : la performance inclut alors l’effet de change.')}>
+                  <option value="">{t('Devise de cotation')}{m?.listing_currency ? ` (${m.listing_currency})` : ''}</option>
+                  <option value="EUR">€ (EUR)</option><option value="USD">$ (USD)</option>
+                </select>
               </div>
             </Field>
             <div><span className="label">{t('Valeur finale')}</span>
@@ -171,6 +179,11 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
               <span className="kpi-sub">{annualNote(t, m)}</span></div>
           </div>
 
+          {m.converted && (
+            <p className="hint" style={{ margin: '-8px 0 12px' }}>
+              {t('Cours convertis de {a} en {b} au taux de change de clôture de chaque jour : tous les chiffres (performance, risque, graphique) incluent l’effet de change. L’indice de comparaison est converti de la même façon.', { a: m.listing_currency, b: m.currency })}
+            </p>
+          )}
           <StatsDashboard metrics={m} interpretations={data.interpretations} classMetrics={data.class_specific_metrics} assetClass={data.asset_class}
             varInput={varInput} onVarChange={setVarInput} onVarSubmit={() => run()} confUsed={data._conf}
             rfInput={rfInput} onRfChange={setRfInput} onRfSubmit={(v) => run({ rf: v })}
@@ -190,6 +203,9 @@ function AssetView({ shared, externalRequest, onFullscreen, onOpenCalendar }) {
                   <TradingViewChart data={data.chart_data} type={chartType} isMoney={isMoneyChart} currency={currency} mainLabel="Cours" unit={chartUnit} />
                 </ChartErrorBoundary>
               </div>
+              {['ACTION', 'ETF'].includes(data.asset_class) && chartType !== 'drawdown' && (
+                <div className="hint" style={{ marginTop: 6 }}>{t('Cours ajustés des dividendes et des divisions d’actions : les cours anciens affichés sont donc plus bas que ceux réellement cotés à l’époque. Source : Yahoo Finance.')}</div>
+              )}
             </div>
             <MonteCarloCard mc={data.monte_carlo} forecastDays={pendingDays ?? data._days} computedDays={data._days} currency={currency}
               onHorizonChange={(d) => { setForecastDays(d); run({ forecastDays: d }); }}

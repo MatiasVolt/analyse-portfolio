@@ -130,7 +130,7 @@ function GuideView({ active, onGoTo, onSimulate }) {
               </tbody>
             </table>
           </div>
-          <p className="guide-p">{t('Ce qu’il faut retenir : l’argent dont vous aurez besoin dans moins de 2 ou 3 ans n’a rien à faire en bourse. Plus votre horizon est long, plus les mauvaises années ont le temps d’être compensées. Avec les dividendes réinvestis (environ 2 % par an en plus), les chiffres seraient encore meilleurs.')}</p>
+          <p className="guide-p">{t('Ce qu’il faut retenir : l’argent dont vous aurez besoin dans moins de 2 ou 3 ans n’a rien à faire en bourse. Plus votre horizon est long, plus les mauvaises années ont le temps d’être compensées. Ces chiffres ne comptent pas les dividendes : en les réinvestissant, ils seraient meilleurs.')}</p>
         </Section>
 
         {/* 3. Rendement / risque */}
@@ -211,7 +211,7 @@ function GuideView({ active, onGoTo, onSimulate }) {
 
         {/* 5. Krachs */}
         <Section icon={ShieldAlert} title={t('Les krachs arrivent… et passent')}
-          lead={t('Les plus fortes baisses du S&P 500 depuis 1928. Elles semblent toujours être « la fin du monde » sur le moment ; avec le recul, ce sont des étapes.')}>
+          lead={t('Les plus fortes baisses du S&P 500 depuis {y}. Elles semblent toujours être « la fin du monde » sur le moment ; avec le recul, ce sont des étapes.', { y: data.spx_start.slice(0, 4) })}>
           <div className="table-scroll">
             <table className="table guide-crashes">
               <thead><tr><th>{t('Événement')}</th><th>{t('Sommet')}</th><th>{t('Chute')}</th><th className="num">{t('Durée de la chute')}</th><th className="num">{t('Retour au sommet')}</th></tr></thead>
@@ -230,7 +230,7 @@ function GuideView({ active, onGoTo, onSimulate }) {
               </tbody>
             </table>
           </div>
-          <p className="guide-p">{t('Cours sans dividendes : en les réinvestissant, la récupération a été nettement plus rapide (après 1929, environ 7 ans au lieu de 25). Leçon : ne placez en actions que l’argent que vous pouvez laisser plusieurs années, et attendez-vous à voir un jour votre portefeuille perdre un tiers ou la moitié de sa valeur.')}</p>
+          <p className="guide-p">{t('Durées mesurées sur le cours seul, sans les dividendes : en les réinvestissant, le retour au sommet aurait été plus rapide. Leçon : ne placez en actions que l’argent que vous pouvez laisser plusieurs années, et attendez-vous à voir un jour votre portefeuille perdre un tiers ou la moitié de sa valeur.')}</p>
         </Section>
 
         {/* 6. Market timing */}

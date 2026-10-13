@@ -145,7 +145,7 @@ export default function PortfolioLibrary({ currentItems, rebalance, onLoad, comp
           <button type="button" className="btn btn-primary" disabled={selected.length < 2 || loading} onClick={compare}>
             {loading ? <Loader2 size={14} className="spin" /> : <GitCompare size={14} />} {t('Comparer ({n})', { n: selected.length })}
           </button>
-          <span className="hint">{t('Cochez 2 à {m} portefeuilles. Ils sont comparés sur la période et le benchmark choisis dans les paramètres de simulation.', { m: MAX_COMPARE })}</span>
+          <span className="hint">{t('Cochez 2 à {m} portefeuilles. Ils sont comparés sur la période, la devise et l’indice de référence choisis dans les paramètres de simulation.', { m: MAX_COMPARE })}</span>
         </div>
       </>)}
 

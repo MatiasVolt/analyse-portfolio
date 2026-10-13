@@ -61,7 +61,8 @@ export default function MonteCarloDrawChart({ data, unit, drawKey }) {
 
   const v = (x) => (x === undefined ? '—' : `${fmt(x, Math.abs(x) >= 1000 ? 0 : 2)}${unit ? ` ${unit}` : ''}`);
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: 300 }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: 300 }} role="img"
+      aria-label={t('Projection Monte-Carlo : trois courbes (scénario pessimiste, médian et optimiste) du départ à l’horizon choisi.')}>
       <div style={{ position: 'absolute', top: 8, left: 12, zIndex: 10, display: 'flex', gap: 12, fontSize: 11, flexWrap: 'wrap', pointerEvents: 'none',
         background: c.legendBg, color: c.text, padding: '4px 8px', borderRadius: 4, border: `1px solid ${c.border}` }}>
         <span>{legend?.day ?? t('Survolez la courbe')}</span>

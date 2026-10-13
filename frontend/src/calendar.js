@@ -2,18 +2,25 @@ import axios from 'axios';
 import { API } from './format';
 import { getLang, getLocale, tr } from './i18n';
 
-// Code couleur inspiré de Forex Factory : rouge = fort, orange = moyen, jaune = faible, gris = férié
-export const IMPACT = {
-  High: { label: 'Fort', color: '#c42b1c', rank: 3 },
-  Medium: { label: 'Moyen', color: '#d86b00', rank: 2 },
-  Low: { label: 'Faible', color: '#b89a00', rank: 1 },
-  Holiday: { label: 'Férié', color: '#8a8f8b', rank: 0 },
+// Importance d'une annonce sur 5 niveaux (échelle du site : type d'indicateur × poids de la zone économique), 0 = jour férié.
+// Couleurs : du rouge (majeure) au gris (mineure), dans l'esprit de Forex Factory.
+export const LEVELS = {
+  5: { label: 'Majeure', color: '#c42b1c' },
+  4: { label: 'Forte', color: '#d86b00' },
+  3: { label: 'Moyenne', color: '#b89a00' },
+  2: { label: 'Faible', color: '#6f8f5f' },
+  1: { label: 'Mineure', color: '#8a8f8b' },
+  0: { label: 'Férié', color: '#8a8f8b' },
 };
+/** Niveau d'une annonce (les copies locales anciennes n'ont que le classement de la source). */
+export const levelOf = (e) => e.level ?? ({ High: 4, Medium: 3, Low: 1, Holiday: 0 }[e.impact] ?? 1);
 // Le libellé est traduit à l'affichage (clé française)
-export const impactOf = (i) => {
-  const m = IMPACT[i] || { label: i, color: '#69716c', rank: 0 };
-  return { ...m, label: tr(m.label) };
+export const impactOf = (level) => {
+  const m = LEVELS[level] || LEVELS[1];
+  return { ...m, rank: level, label: tr(m.label) };
 };
+/** Classement d'origine de la source, affiché à côté du nôtre. */
+export const SOURCE_IMPACT = { High: 'fort', Medium: 'moyen', Low: 'faible' };
 
 // Petit cache mémoire : plusieurs onglets lisent les mêmes données sans refaire d'appel
 const cache = new Map();
