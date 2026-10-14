@@ -1164,3 +1164,15 @@ kbd {
 .policy-rate { font-size: 15px; font-variant-numeric: tabular-nums; }
 .policy-link { margin-left: 6px; color: var(--accent-text); vertical-align: -1px; }
 .policy-table .hint { margin-top: 1px; }
+
+/* Calendrier : ce que représente le chiffre, sous le titre de l'annonce */
+.ev-measure { font-size: 11px; color: var(--muted); margin-top: 1px; max-width: 520px; }
+.ev-measure-text { color: var(--text); }
+
+/* Calendrier : la liste défile dans son cadre, les titres de colonnes restent figés */
+.cal-scroll { overflow: auto; overscroll-behavior: contain; }
+.cal-scroll .cal-table thead th { position: sticky; top: 0; z-index: 3; box-shadow: 0 1px 0 var(--border-2); }
+.cal-table .now-row { scroll-margin-top: 0; }
+
+/* Recherche d'actif : titres de groupe dans la liste (suggestions, catégorie) */
+.search-group { padding: 7px 12px 5px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--panel); }

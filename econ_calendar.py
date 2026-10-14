@@ -190,7 +190,8 @@ def importance(title: str, country_code, ccy: str, source_impact: str) -> int:
 # ───────────── Lecture d'une annonce : dans quel sens joue une surprise ─────────────
 KINDS = [
     ("rate", r"Interest Rate Decision|Funds Rate|Facility Rate|Refinancing Rate|Bank Rate|Cash Rate|Policy Rate|Overnight Rate"),
-    ("talk", r"Speech|Speaks|Testifies|Press Conference|Minutes|Statement|Monetary Policy Report|Budget|Election"),
+    ("talk", r"Speech|Speaks|Testifies|Press Conference|Minutes|(?<!Budget )Statement|Monetary Policy Report|Budget \d|Budget$|Election|"
+             r"Outlook|Survey of|Credit Conditions Survey|Business Outlook Survey|Meeting Accounts|Plenum|Quarterly Outlook Report"),
     ("unemployment", r"Unemployment Rate|Jobless Claims|Unemployment Claims|Unemployment Change|Claimant Count"),
     ("jobs", r"Payrolls|Non-Farm Employment|\bADP\b|Employment Change|JOLT|Job Openings"),
     ("oil", r"Crude Oil|Gasoline Stocks|Natural Gas (Stocks|Storage)|Distillate"),
@@ -299,6 +300,186 @@ def reading(e: dict) -> str:
                              " That is the theory: compare with the measured reaction, the market does not always follow it.")
 
 
+# ───────────── Ce que mesure le chiffre ─────────────
+# La source donne souvent un nombre sans dire de quoi il s'agit (« 29 », « 3,99 M », « 0,3 % »). Chaque règle :
+# (motif du titre, texte français, texte anglais, unité si la source n'en donne pas, échelle si la source n'en donne pas).
+# {c} = devise de l'annonce. Première règle qui correspond = la bonne : les plus précises sont en tête.
+MEASURES = [
+    (r"MPC Vote Cut", "Nombre de membres du comité qui ont voté pour une baisse du taux", "Number of committee members who voted for a rate cut", None, None),
+    (r"MPC Vote Hike", "Nombre de membres du comité qui ont voté pour une hausse du taux", "Number of committee members who voted for a rate hike", None, None),
+    (r"MPC Vote Unchanged", "Nombre de membres du comité qui ont voté pour garder le taux inchangé", "Number of committee members who voted to keep the rate unchanged", None, None),
+    (r"Mortgage Rate", "Taux moyen des nouveaux crédits immobiliers, en %", "Average rate on new mortgages, in %", "%", None),
+    (r"Interest Rate Decision|Funds Rate|Facility Rate|Refinancing Rate|Bank Rate|Cash Rate|Policy Rate|Prime Rate",
+     "Taux directeur décidé par la banque centrale, en %", "Policy rate set by the central bank, in %", "%", None),
+    (r"GDPNow", "Estimation en temps réel de la croissance du PIB du trimestre en cours, en rythme annuel, en %",
+     "Real-time estimate of current-quarter GDP growth, annualised, in %", "%", None),
+    (r"ADP Employment Change Weekly", "Emplois créés dans le privé, moyenne hebdomadaire sur 4 semaines, en milliers",
+     "Private-sector jobs created, 4-week weekly average, in thousands", None, "K"),
+    (r"Non ?Farm Payrolls|Nonfarm Payrolls Private|Non-Farm Employment|ADP Employment Change",
+     "Emplois créés sur le mois, en milliers (négatif = emplois détruits)", "Jobs created over the month, in thousands (negative = jobs lost)", None, "K"),
+    (r"^(Full Time |Part Time )?Employment Ch(an)?g(e)?$", "Variation du nombre d'emplois sur le mois, en milliers",
+     "Change in the number of jobs over the month, in thousands", None, "K"),
+    (r"Jobless Claims|Unemployment Claims", "Nouvelles inscriptions au chômage sur la semaine, en milliers de personnes",
+     "New unemployment claims over the week, in thousands of people", None, "K"),
+    (r"^Unemployment Change$", "Variation du nombre de chômeurs sur le mois, en milliers (positif = plus de chômeurs)",
+     "Change in the number of unemployed over the month, in thousands (positive = more unemployed)", None, "K"),
+    (r"Unemployed Persons", "Nombre de chômeurs, en millions", "Number of unemployed people, in millions", None, "M"),
+    (r"U-6 Unemployment Rate", "Part de la population active sans emploi au sens large (temps partiel subi inclus), en %",
+     "Share of the labour force without work in the broad sense (involuntary part-time included), in %", "%", None),
+    (r"Unemployment Rate", "Part de la population active sans emploi, en %", "Share of the labour force without a job, in %", "%", None),
+    (r"Participation Rate", "Part des personnes en âge de travailler qui ont ou cherchent un emploi, en %",
+     "Share of working-age people who have or are looking for a job, in %", "%", None),
+    (r"JOLT", "Nombre d'offres d'emploi non pourvues, en millions", "Number of unfilled job openings, in millions", None, "M"),
+    (r"Crude Oil Stocks? Change|Gasoline Stocks Change|Distillate", "Variation des stocks sur la semaine, en millions de barils (positif = stocks en hausse)",
+     "Change in inventories over the week, in millions of barrels (positive = inventories up)", None, "M"),
+    (r"Natural Gas", "Variation des stocks de gaz sur la semaine, en milliards de pieds cubes", "Change in gas inventories over the week, in billions of cubic feet", None, "B"),
+    (r"ISM \w+ (Employment|New Orders|Prices|Business Activity)",
+     "Sous-indice d'enquête auprès des entreprises : au-dessus de 50, la composante progresse ; en dessous, elle recule",
+     "Business-survey sub-index: above 50 the component is growing; below 50 it is shrinking", None, None),
+    (r"PMI", "Indice d'enquête auprès des directeurs d'achat : au-dessus de 50, l'activité progresse ; en dessous, elle recule",
+     "Purchasing managers' survey index: above 50 activity is growing; below 50 it is shrinking", None, None),
+    (r"Chicago Fed National Activity", "Indice d'activité : 0 = croissance à son rythme moyen, positif = plus rapide, négatif = plus lente",
+     "Activity index: 0 = growth at its average pace, positive = faster, negative = slower", None, None),
+    (r"Empire State|Philadelphia Fed|Dallas Fed|Richmond Fed|Kansas", "Indice d'enquête régional : positif = activité en hausse, négatif = en baisse",
+     "Regional survey index: positive = activity rising, negative = falling", None, None),
+    (r"Confidence Change", "Variation de l'indice de confiance sur le mois, en %", "Change in the confidence index over the month, in %", "%", None),
+    (r"Confidence|Sentiment|Climate|Optimism|Ifo|ZEW|GfK|KOF|NAHB|CBI|RICS|Tankan|Industry Index",
+     "Indice d'enquête (en points) : plus il est élevé, plus les personnes interrogées sont optimistes ; c'est surtout son évolution qui compte",
+     "Survey index (in points): the higher it is, the more optimistic respondents are; what matters most is how it changes", None, None),
+    (r"Balance of Trade|Trade Balance", "Exportations moins importations sur la période, en {c} (négatif = déficit)",
+     "Exports minus imports over the period, in {c} (negative = deficit)", None, "B"),
+    (r"Current Account", "Solde des échanges avec l'étranger (biens, services, revenus), en {c} (négatif = déficit)",
+     "Balance of transactions with the rest of the world (goods, services, income), in {c} (negative = deficit)", None, "B"),
+    (r"Budget Statement", "Solde du budget de l'État sur le mois, en {c} (négatif = déficit)", "Government budget balance for the month, in {c} (negative = deficit)", None, None),
+    (r"TIC Flows", "Achats nets de titres américains à long terme par les investisseurs étrangers, en {c}",
+     "Net purchases of long-term US securities by foreign investors, in {c}", None, None),
+    (r"^Exports$", "Valeur des exportations sur la période, en {c}", "Value of exports over the period, in {c}", None, None),
+    (r"^Imports$", "Valeur des importations sur la période, en {c}", "Value of imports over the period, in {c}", None, None),
+    (r"^(Existing|New|Pending) Home Sales$", "Nombre de logements vendus, en millions, en rythme annuel (corrigé des variations saisonnières)",
+     "Number of homes sold, in millions, at an annual rate (seasonally adjusted)", None, "M"),
+    (r"^Housing Starts$", "Nombre de logements mis en chantier, en rythme annuel (corrigé des variations saisonnières)",
+     "Number of housing starts, at an annual rate (seasonally adjusted)", None, None),
+    (r"^Building Permits$", "Nombre de permis de construire accordés, en millions, en rythme annuel",
+     "Number of building permits issued, in millions, at an annual rate", None, "M"),
+    (r"Mortgage Approvals", "Nombre de crédits immobiliers accordés sur le mois, en milliers", "Number of mortgages approved over the month, in thousands", None, "K"),
+    (r"Mortgage Lending", "Montant net des nouveaux crédits immobiliers sur le mois, en milliards de {c}", "Net new mortgage lending over the month, in billions of {c}", None, "B"),
+    (r"Consumer Credit", "Crédit à la consommation net accordé sur le mois, en milliards de {c}", "Net consumer credit extended over the month, in billions of {c}", None, "B"),
+    (r"New Yuan Loans", "Nouveaux prêts en yuans accordés sur le mois, en {c}", "New yuan loans extended over the month, in {c}", None, None),
+    (r"^(Core )?CPI( s\.a)?$", "Niveau de l'indice des prix à la consommation (en points) : c'est sa variation qui compte",
+     "Level of the consumer price index (in points): what matters is how it changes", None, None),
+]
+
+# Sujet d'une variation (« Variation des prix sur un mois »)
+SUBJECTS = [
+    (r"Core (Inflation|CPI|PCE)", "des prix hors énergie et alimentation", "prices excluding food and energy"),
+    (r"Trimmed Mean", "des prix (moyenne tronquée, hors variations extrêmes)", "prices (trimmed mean, excluding extreme moves)"),
+    (r"PCE", "des prix (indice PCE, suivi par la Fed)", "prices (PCE index, watched by the Fed)"),
+    (r"Inflation|CPI", "des prix à la consommation", "consumer prices"),
+    (r"Import Prices", "des prix à l'importation", "import prices"),
+    (r"Export Prices", "des prix à l'exportation", "export prices"),
+    (r"PPI|Wholesale Prices", "des prix à la production", "producer prices"),
+    (r"GDP Price Index", "des prix dans le PIB", "prices in GDP"),
+    (r"Earnings|Wage", "des salaires", "wages"),
+    (r"Employment Cost", "du coût du travail", "labour costs"),
+    (r"Productivity", "de la productivité", "productivity"),
+    (r"Employment|Payrolls", "de l'emploi", "employment"),
+    (r"Retail Sales", "des ventes au détail", "retail sales"),
+    (r"Retail Inventories|Business Inventories|Wholesale Inventories", "des stocks des entreprises", "business inventories"),
+    (r"Industrial Production|Manufacturing Production", "de la production industrielle", "industrial production"),
+    (r"Durable Goods", "des commandes de biens durables", "durable goods orders"),
+    (r"Factory Orders|Machinery Orders", "des commandes aux entreprises", "orders to companies"),
+    (r"Personal Income", "des revenus des ménages", "household income"),
+    (r"Personal Spending|Household Spending", "des dépenses des ménages", "household spending"),
+    (r"GDP", "du PIB", "GDP"),
+    (r"Exports", "des exportations", "exports"),
+    (r"Imports", "des importations", "imports"),
+    (r"Home Sales", "des ventes de logements", "home sales"),
+    (r"Housing Starts", "des mises en chantier de logements", "housing starts"),
+    (r"Building Permits", "des permis de construire", "building permits"),
+    (r"House Price|Housing Price|Home Price|Case-Shiller", "des prix de l'immobilier", "house prices"),
+    (r"Car Registrations", "des immatriculations de voitures neuves", "new car registrations"),
+    (r"Fixed Asset Investment", "des investissements en capital fixe", "fixed asset investment"),
+    (r"FDI", "des investissements étrangers", "foreign direct investment"),
+]
+# Variations : (motif, période française, période anglaise)
+PERIODS = [
+    (r"\(YTD\) YoY", "cumulée depuis janvier, par rapport à la même période l'an dernier", "year to date, versus the same period last year"),
+    (r"3Mo/Yr|3-Month Avg", "sur les 3 derniers mois", "over the last 3 months"),
+    (r"YoY", "sur un an (par rapport à la même période l'an dernier)", "over a year (versus the same period last year)"),
+    (r"QoQ", "sur un trimestre", "over a quarter"),
+    (r"MoM", "sur un mois", "over a month"),
+]
+CCY_WORDS = {"USD": ("dollars", "dollars"), "EUR": ("euros", "euros"), "GBP": ("livres sterling", "pounds"), "JPY": ("yens", "yen"),
+             "CNY": ("yuans", "yuan"), "CAD": ("dollars canadiens", "Canadian dollars"), "CHF": ("francs suisses", "Swiss francs"),
+             "AUD": ("dollars australiens", "Australian dollars"), "NZD": ("dollars néo-zélandais", "New Zealand dollars")}
+
+
+_MONTHS_FR = {"Jan": "janv.", "Feb": "févr.", "Mar": "mars", "Apr": "avr.", "May": "mai", "Jun": "juin", "Jul": "juil.",
+              "Aug": "août", "Sep": "sept.", "Oct": "oct.", "Nov": "nov.", "Dec": "déc."}
+
+
+def period_fr(p: str) -> str:
+    """Période de la source en français : « Sep » -> « sept. », « Q3 » -> « T3 », « Oct/02 » -> « 2 oct. » (semaine)."""
+    m = re.fullmatch(r"([A-Z][a-z]{2})/(\d{1,2})", p)
+    if m and m.group(1) in _MONTHS_FR:
+        return f"{int(m.group(2))} {_MONTHS_FR[m.group(1)]}"
+    p = re.sub(r"\bQ([1-4])\b", r"T\1", p)
+    return re.sub(r"\b([A-Z][a-z]{2})\b", lambda x: _MONTHS_FR.get(x.group(1), x.group(1)), p)
+
+
+# Mentions de version d'un chiffre (provisoire, définitif…) : sans effet sur ce qu'il mesure
+_VERSION = re.compile(r"\s+(Prel|Flash|Final|Adv|2nd Est|3rd Est)\b")
+
+
+def unit_rule(title: str, country=None):
+    """(unité, échelle) à appliquer quand la source n'en donne pas."""
+    title = _VERSION.sub("", title)
+    if country == "US" and re.fullmatch(r"Housing Starts", title):
+        return None, "M"  # les mises en chantier américaines sont publiées en millions (rythme annuel)
+    for pattern, _, _, unit, scale in MEASURES:
+        if re.search(pattern, title, re.IGNORECASE):
+            return unit, scale
+    if any(re.search(p, title) for p, _, _ in PERIODS):
+        return "%", None
+    return None, None
+
+
+def measure(e: dict):
+    """Phrase qui dit ce que représente le chiffre (unité, période, sens), ou None (discours, réunion…)."""
+    if e.get("kind") == "talk":
+        return None
+    title, en = _VERSION.sub("", e["title"]), lang() == "en"
+    ccy = CCY_WORDS.get(e.get("currency"), (e.get("currency"), e.get("currency")))[1 if en else 0]
+    scale = e.get("scale")
+    amount = {"K": T("milliers de ", "thousands of "), "M": T("millions de ", "millions of "), "B": T("milliards de ", "billions of "),
+              "T": T("milliers de milliards de ", "trillions of ")}.get(scale, "")
+    text = None
+    for pattern, fr, en_txt, _, _ in MEASURES:
+        if re.search(pattern, title, re.IGNORECASE):
+            text = (en_txt if en else fr).replace("{c}", f"{amount}{ccy}" if "{c}" in (en_txt if en else fr) else "")
+            break
+    if text is None:
+        period = next(((p_fr, p_en) for p, p_fr, p_en in PERIODS if re.search(p, title)), None)
+        if period:
+            subject = next(((s_fr, s_en) for p, s_fr, s_en in SUBJECTS if re.search(p, title, re.IGNORECASE)), None)
+            annual = e.get("country_code") == "US" and "QoQ" in title and re.search(r"GDP|PCE Prices|Productivity", title)
+            if en:
+                text = f"Change in {subject[1]} {period[1]}" if subject else f"Change {period[1]}"
+                text += ", annualised, in %" if annual else ", in %"
+            else:
+                text = f"Variation {subject[0]} {period[0]}" if subject else f"Variation {period[0]}"
+                text += ", ramenée à un rythme annuel, en %" if annual else ", en %"
+    if text is None:  # dernier recours : l'unité donnée par la source
+        unit = e.get("unit")
+        if unit == "%":
+            text = T("En %", "In %")
+        elif scale:
+            text = T(f"En {amount}{ccy}", f"In {amount}{ccy}") if unit else T(f"En {amount.rstrip(' de ')}", f"In {amount.rstrip(' of ')}")
+    if text and e.get("period"):
+        text += T(f" · période : {e['period']}", f" · period: {e['period']}")
+    return text
+
+
 def localize_event(e: dict) -> dict:
     """Traduit les champs textuels d'une annonce (copie) selon la langue de la requête."""
     e = dict(e)
@@ -309,6 +490,13 @@ def localize_event(e: dict) -> dict:
         for k in ("actual", "forecast", "previous"):
             if isinstance(e.get(k), str):
                 e[k] = e[k].replace(",", ".")
+    if lang() == "fr":  # échelles anglaises (B = billion) écrites à la française
+        for k in ("actual", "forecast", "previous"):
+            if isinstance(e.get(k), str):
+                e[k] = re.sub(r"(\d) B\b", r"\1 Md", re.sub(r"(\d) K\b", r"\1 k", re.sub(r"(\d) T\b", r"\1 000 Md", e[k])))
+    if lang() == "fr" and e.get("period"):
+        e["period"] = period_fr(e["period"])
+    e["measure"] = measure(e)
     e["reading"] = reading(e)
     return e
 
@@ -369,13 +557,16 @@ def _from_tradingview():
             continue
         dt = datetime.fromisoformat(e["date"].replace("Z", "+00:00"))
         unit, scale = e.get("unit"), e.get("scale")
+        rule_unit, rule_scale = unit_rule((e.get("title") or "").strip(), e.get("country"))
+        unit, scale = unit or rule_unit, scale or rule_scale
         a, f = e.get("actual"), e.get("forecast")
         surprise = None
         if a is not None and f is not None and f != a:
             surprise = "above" if a > f else "below"
         # Ce que la source fournit en plus : description de l'indicateur, organisme qui publie, période mesurée, valeurs brutes
         extra = {"description": e.get("comment") or None, "publisher": e.get("source") or None, "publisher_url": e.get("source_url") or None,
-                 "period": e.get("period") or None, "actual_n": a, "forecast_n": f, "previous_n": e.get("previous")}
+                 "period": e.get("period") or None, "actual_n": a, "forecast_n": f, "previous_n": e.get("previous"),
+                 "unit": unit, "scale": scale}
         out.append(_base_event(f"tv{e['id']}", (e.get("title") or "").strip(), ccy, e.get("country"),
                                COUNTRY_FR.get(e.get("country"), e.get("country")), dt, TV_IMPORTANCE.get(e.get("importance"), "Low"),
                                _fmt_value(a, unit, scale), _fmt_value(f, unit, scale), _fmt_value(e.get("previous"), unit, scale), surprise, extra))

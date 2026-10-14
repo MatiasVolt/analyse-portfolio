@@ -47,7 +47,8 @@ export function EventReading({ e, isPast }) {
   const { t, lang } = useLang();
   return (
     <div className="ev-reading">
-      <div className="label">{t(isPast && e.actual != null ? 'Ce qui a été publié, et ce que ça veut dire' : 'Ce qui est attendu, et comment le lire')}</div>
+      {e.measure && <><div className="label">{t('Ce que représente le chiffre')}</div><div className="ev-measure-text">{e.measure}</div></>}
+      <div className="label" style={e.measure ? { marginTop: 8 } : undefined}>{t(isPast && e.actual != null ? 'Ce qui a été publié, et ce que ça veut dire' : 'Ce qui est attendu, et comment le lire')}</div>
       <div>{e.reading || t('Pas d’explication disponible pour cette annonce.')}</div>
       {e.why && <><div className="label" style={{ marginTop: 8 }}>{t('Pourquoi cet indicateur est suivi')}</div><div>{e.why}</div></>}
       {e.description && (

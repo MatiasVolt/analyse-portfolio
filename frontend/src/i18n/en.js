@@ -639,7 +639,6 @@ const EN = {
   'Importance minimale': 'Minimum importance',
   'Afficher les annonces d’importance {n} sur 5 et plus ({x})': 'Show releases of importance {n} out of 5 and above ({x})',
   'Revenir à maintenant': 'Back to now',
-  'Les annonces sont dans l’ordre du temps : les plus anciennes en haut, les prochaines en bas. La page s’ouvre sur « maintenant » : remontez pour voir ce qui a déjà été publié. ▲ / ▼ : chiffre publié supérieur / inférieur à la prévision.': 'Releases are in time order: the oldest at the top, the next ones at the bottom. The page opens at “now”: scroll up to see what has already been published. ▲ / ▼: published figure above / below the forecast.',
   'Maintenant': 'Now',
   '{n} annonces déjà publiées au-dessus · à venir en dessous': '{n} releases already published above · upcoming below',
   'à venir en dessous': 'upcoming below',
@@ -699,6 +698,9 @@ const EN = {
   'VAN = Σ Fₜ ÷ (1 + r)ᵗ': 'NPV = Σ CFₜ ÷ (1 + r)ᵗ',
   '§Fₜ': 'CFₜ',
   '§TRI': 'IRR',
+  'Ce que représente le chiffre': 'What the figure represents',
+  'Les annonces sont dans l’ordre du temps : les plus anciennes en haut, les prochaines en bas. La liste s’ouvre sur « maintenant » : remontez dans la liste pour voir ce qui a déjà été publié. ▲ / ▼ : chiffre publié supérieur / inférieur à la prévision.': 'Releases are in time order: the oldest at the top, the next ones at the bottom. The list opens at “now”: scroll up within the list to see what has already been published. ▲ / ▼: published figure above / below the forecast.',
+  'Liste des annonces': 'List of releases',
 };
 
 // Termes identiques en anglais (noms propres, sigles) : déclarés pour ne pas être signalés comme oubliés

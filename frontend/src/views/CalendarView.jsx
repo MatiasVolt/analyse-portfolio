@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { CalendarDays, ChevronRight, RotateCcw, Search, Clock, ArrowDownToLine } from 'lucide-react';
 import { ImpactBadge, ReactionChip, EventReading } from '../components/Calendar';
 import { EmptyState } from '../components/ui';
@@ -24,6 +24,8 @@ function EventRow({ e, isPast, open, onToggle, onAnalyze }) {
             <span style={{ color: 'var(--text)', fontWeight: level >= 4 ? 600 : 400 }}>{e.title_fr || e.title}</span>
             {e.title_fr && <span className="hint" style={{ marginLeft: 8 }}>{e.title}</span>}
           </div>
+          {/* Ce que représente le chiffre : « 29 k », oui, mais 29 000 quoi ? */}
+          {e.measure && <div className="ev-measure ellipsis" title={e.measure}>{e.measure}</div>}
         </td>
         <td className="num">
           {e.actual ?? '—'}
@@ -87,6 +89,9 @@ function CalendarView({ active, onAnalyze }) {
   const [openId, setOpenId] = useState(null);
   const [now, setNow] = useState(() => Date.now() / 1000);
   const nowRef = useRef(null);
+  const rootRef = useRef(null);
+  const scrollRef = useRef(null);
+  const [listHeight, setListHeight] = useState(null);
 
   // Chargement à l'ouverture de l'onglet, au changement de langue et toutes les 30 min (nouvelles annonces, chiffres publiés)
   useEffect(() => {
@@ -137,14 +142,39 @@ function CalendarView({ active, onAnalyze }) {
   const firstUpcomingId = events.find(e => e.timestamp >= now)?.id;
   const pastCount = events.filter(e => e.timestamp < now).length;
 
-  const scrollToNow = (smooth = true) => nowRef.current?.scrollIntoView({ block: 'start', behavior: smooth ? 'smooth' : 'auto' });
+  // Volets figés, comme dans Excel : tout ce qui est au-dessus de la liste reste à l'écran, seule la liste défile.
+  // Sa hauteur = la place restante entre son bord haut et la barre d'onglets du bas (recalculée si le haut change de taille).
+  useLayoutEffect(() => {
+    if (!active || !rootRef.current) return;
+    const fit = () => {
+      const box = scrollRef.current;
+      if (!box) return;
+      const top = box.getBoundingClientRect().top + window.scrollY;
+      const bottomBar = document.querySelector('.sheet-tabs')?.offsetHeight || 0;
+      setListHeight(Math.max(320, Math.floor(window.innerHeight - top - bottomBar - 28)));
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(rootRef.current);
+    window.addEventListener('resize', fit);
+    return () => { ro.disconnect(); window.removeEventListener('resize', fit); };
+  }, [active, data]);
+
+  // « Maintenant » : on fait défiler la liste (et non la page) jusqu'à la ligne, juste sous les titres de colonnes
+  const scrollToNow = (smooth = true) => {
+    const box = scrollRef.current, row = nowRef.current;
+    if (!box || !row) return;
+    const head = box.querySelector('thead')?.offsetHeight || 0;
+    box.scrollTo({ top: Math.max(0, row.offsetTop - head), behavior: smooth ? 'smooth' : 'auto' });
+  };
   // À l'ouverture de l'onglet, on se place sur « maintenant » : les annonces passées sont au-dessus, il suffit de remonter
   const ready = Boolean(data);
   useEffect(() => {
     if (!active || !ready) return;
     const id = setTimeout(() => scrollToNow(false), 60);
     return () => clearTimeout(id);
-  }, [active, ready]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, ready, listHeight === null]);
 
   const toggle = (arr, set, v) => set(arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v]);
   const todayKey = new Date().toLocaleDateString('sv-SE');
@@ -153,7 +183,7 @@ function CalendarView({ active, onAnalyze }) {
   const nextColor = impactOf(next ? levelOf(next) : 1).color;
 
   return (
-    <div>
+    <div ref={rootRef}>
       <div className="result-head">
         <div className="result-title">
           <h1>{t('Calendrier économique')}</h1>
@@ -230,13 +260,14 @@ function CalendarView({ active, onAnalyze }) {
         </div>
 
         <div className="hint" style={{ margin: '0 0 10px' }}>
-          {t('Les annonces sont dans l’ordre du temps : les plus anciennes en haut, les prochaines en bas. La page s’ouvre sur « maintenant » : remontez pour voir ce qui a déjà été publié. ▲ / ▼ : chiffre publié supérieur / inférieur à la prévision.')}
+          {t('Les annonces sont dans l’ordre du temps : les plus anciennes en haut, les prochaines en bas. La liste s’ouvre sur « maintenant » : remontez dans la liste pour voir ce qui a déjà été publié. ▲ / ▼ : chiffre publié supérieur / inférieur à la prévision.')}
         </div>
-        <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="panel" style={{ padding: 0, overflow: 'hidden', marginBottom: 0 }}>
           {days.length === 0 ? (
             <div style={{ padding: 30, textAlign: 'center', color: 'var(--muted)' }}>{t('Aucune annonce ne correspond aux filtres.')}</div>
           ) : (
-            <div style={{ overflowX: 'auto' }}>
+            <div ref={scrollRef} className="cal-scroll" style={listHeight ? { height: listHeight } : undefined}
+              tabIndex={0} aria-label={t('Liste des annonces')}>
               <table className="table cal-table">
                 <thead>
                   <tr>

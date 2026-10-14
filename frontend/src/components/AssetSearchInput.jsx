@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { Fragment, useEffect, useId, useRef, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { getAsset, searchAssets, DEFAULT_SUGGESTIONS, ASSET_DATABASE, categoryOf, assetsInCategory } from '../tickerDatabase';
 import { TAG_COLORS, fmtInt } from '../format';
@@ -30,6 +30,7 @@ export default function AssetSearchInput({ value, onChange, onSelect, onEnter, p
   const listId = useId();
   const [text, setText] = useState(() => getAsset(value)?.name ?? value ?? '');
   const [results, setResults] = useState([]);
+  const [catInfo, setCatInfo] = useState(null); // { cat, start } : les résultats à partir de `start` sont ceux d'une catégorie
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const wrapperRef = useRef(null);
@@ -51,22 +52,32 @@ export default function AssetSearchInput({ value, onChange, onSelect, onEnter, p
   }, []);
 
   useEffect(() => {
-    if (active >= 0 && listRef.current) listRef.current.children[active]?.scrollIntoView({ block: 'nearest' });
-  }, [active]);
+    if (active >= 0 && listRef.current) listRef.current.querySelector(`[id="${listId}-${active}"]`)?.scrollIntoView({ block: 'nearest' });
+  }, [active, listId]);
 
   // explicit=true (flèche bas) : on montre aussi les suggestions par défaut quand le champ est vide
   const refresh = (val, explicit = false) => {
     const skip = new Set((exclude || []).map(x => String(x).toUpperCase()));
     const keep = (list) => list.filter(a => !skip.has(a.ticker.toUpperCase()));
     const cat = categoryOf(val);
+    const partial = !cat && categoryOf(val, { prefix: true }); // début de mot : « indic », « cryp », « mati »…
     // Suggestions populaires : on puise dans tous les actifs vedettes pour en garder 8 même si certains sont exclus
     let next = keep(POPULAR).slice(0, DEFAULT_SUGGESTIONS.length);
+    let info = null;
     if (cat) {
       // « Actions », « crypto », « ETF »… : un symbole identique reste en tête, puis les actifs de la catégorie
       const exact = getAsset(val.trim());
-      next = keep([...(exact ? [exact] : []), ...assetsInCategory(cat).filter(a => a !== exact)]);
+      const head = keep(exact ? [exact] : []);
+      next = [...head, ...keep(assetsInCategory(cat)).filter(a => a !== exact)];
+      info = { cat, start: head.length };
+    } else if (partial) {
+      // Début de mot : les actifs dont le nom ou le symbole correspond d'abord (« Indra »…), puis toute la catégorie
+      const direct = keep(searchAssets(val, 4 + skip.size, 3)).slice(0, 4); // correspondances fortes seulement
+      next = [...direct, ...keep(assetsInCategory(partial)).filter(a => !direct.includes(a))];
+      info = { cat: partial, start: direct.length };
     } else if (val.trim()) next = keep(searchAssets(val, 8 + skip.size)).slice(0, 8);
     setResults(next);
+    setCatInfo(info);
     setActive(-1);
     setOpen(explicit || Boolean(val.trim()));
     return next;
@@ -123,8 +134,7 @@ export default function AssetSearchInput({ value, onChange, onSelect, onEnter, p
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: 'max(100%, 320px)', maxWidth: '90vw',
           background: 'var(--panel)', border: '1px solid var(--border-2)', borderRadius: 6, boxShadow: '0 8px 24px rgba(0,0,0,.16)', zIndex: 1000,
         }}>
-          {(!text.trim() || categoryOf(text)) && <div style={{ padding: '7px 12px 5px', fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-            {text.trim() ? t('Catégorie {c} · les plus suivis d’abord', { c: t(categoryOf(text)) }) : t('Suggestions populaires')}</div>}
+          {!text.trim() && <div className="search-group">{t('Suggestions populaires')}</div>}
           <div ref={listRef} id={listId} role="listbox" aria-label={t('Suggestions')} style={{ maxHeight: 300, overflowY: 'auto' }}>
             {results.length === 0 && (
               <div style={{ padding: '10px 12px', fontSize: 12, color: 'var(--muted-2)' }}>
@@ -134,7 +144,9 @@ export default function AssetSearchInput({ value, onChange, onSelect, onEnter, p
             {results.map((item, i) => {
               const c = themed(TAG_COLORS[item.category] || '#69716c');
               return (
-                <div key={item.ticker} id={`${listId}-${i}`} role="option" aria-selected={i === active} onMouseDown={(e) => { e.preventDefault(); choose(item); }} onMouseEnter={() => setActive(i)}
+                <Fragment key={item.ticker}>
+                {catInfo && i === catInfo.start && <div className="search-group" role="presentation">{t('Catégorie {c} · les plus suivis d’abord', { c: t(catInfo.cat) })}</div>}
+                <div id={`${listId}-${i}`} role="option" aria-selected={i === active} onMouseDown={(e) => { e.preventDefault(); choose(item); }} onMouseEnter={() => setActive(i)}
                   style={{ padding: '7px 12px', cursor: 'pointer', borderBottom: '1px solid var(--border)', background: i === active ? 'var(--raised)' : 'transparent' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'space-between' }}>
                     <strong style={{ color: 'var(--text)', fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{trName(item.name)}</strong>
@@ -145,6 +157,7 @@ export default function AssetSearchInput({ value, onChange, onSelect, onEnter, p
                     {item.country && <span> · {t(item.country)}</span>}
                   </div>
                 </div>
+                </Fragment>
               );
             })}
           </div>

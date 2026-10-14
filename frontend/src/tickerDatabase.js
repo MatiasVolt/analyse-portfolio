@@ -104,9 +104,16 @@ const CATEGORY_WORDS = {
 };
 const WORD_TO_CATEGORY = new Map(Object.entries(CATEGORY_WORDS).flatMap(([cat, words]) => words.map(w => [w, cat])));
 
-/** Catégorie désignée par le texte tapé (« Actions », « crypto », « ETF »…), sinon null. */
-export function categoryOf(query) {
-  return WORD_TO_CATEGORY.get(norm(query).trim().replace(/\s+/g, ' ')) || null;
+/**
+ * Catégorie désignée par le texte tapé (« Actions », « crypto », « ETF »…), sinon null.
+ * prefix : accepte aussi un début de mot d'au moins 3 lettres (« indic » -> Indices), s'il ne désigne qu'une catégorie.
+ */
+export function categoryOf(query, { prefix = false } = {}) {
+  const q = norm(query).trim().replace(/\s+/g, ' ');
+  const exact = WORD_TO_CATEGORY.get(q);
+  if (exact || !prefix || q.length < 3) return exact || null;
+  const cats = new Set([...WORD_TO_CATEGORY].filter(([w]) => w.startsWith(q)).map(([, c]) => c));
+  return cats.size === 1 ? [...cats][0] : null;
 }
 
 /** Actifs d'une catégorie, les plus connus d'abord. */
@@ -117,7 +124,8 @@ export function assetsInCategory(category, limit = 40) {
 }
 
 /** Recherche classée par pertinence : ticker exact > début de ticker > début de nom > mot du nom > alias > contient. */
-export function searchAssets(query, limit = 8) {
+/** maxScore : 3 = seulement les correspondances fortes (symbole, début du nom ou d'un mot du nom, alias exact). */
+export function searchAssets(query, limit = 8, maxScore = 5) {
   const q = norm(query).trim();
   if (!q) return [];
   const scored = [];
@@ -131,6 +139,7 @@ export function searchAssets(query, limit = 8) {
     else if (a._a.some(al => al.startsWith(q))) score = 4;
     else if (a._n.includes(q) || a._t.includes(q)) score = 5;
     else continue;
+    if (score > maxScore) continue;
     scored.push([score, a]);
   }
   scored.sort((x, y) => x[0] - y[0] || x[1].tier - y[1].tier || x[1].name.length - y[1].name.length);
