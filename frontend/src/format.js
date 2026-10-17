@@ -1,7 +1,8 @@
 import { getLocale, tr } from './i18n';
 
-// Adresse de l'API : réglée par VITE_API_URL une fois en ligne (ex. https://api.mondomaine.com), le serveur local sinon
-export const API = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+// Adresse de l'API : VITE_API_URL (frontend/.env.production pour le site en ligne). Le serveur local n'est utilisé
+// qu'en développement : un build de production sans adresse est refusé (voir vite.config.js).
+export const API = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://127.0.0.1:8000' : '')).replace(/\/$/, '');
 
 export const COLORS = ['#1e7145', '#2e75b6', '#c55a11', '#7f6000', '#7030a0', '#c00000', '#00a2c7', '#548235', '#bf9000', '#7f7f7f'];
 
