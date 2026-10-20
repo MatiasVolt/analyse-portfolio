@@ -1,5 +1,7 @@
 # The Yield Is Yours
 
+**Site en ligne : [analyse-portfolio.pages.dev](https://analyse-portfolio.pages.dev)**
+
 Site d'analyse de marchés : actions, ETF, indices, crypto, devises, portefeuilles, obligations et options.
 Chaque chiffre affiché est accompagné de sa définition et d'une phrase d'interprétation. Interface en français et en anglais.
 
@@ -60,3 +62,7 @@ Le site appelle l'API sur `http://127.0.0.1:8000` ; une autre adresse se règle 
 | `frontend/src/views/` | Un fichier par onglet |
 | `frontend/src/finance/` | Formules obligations, options et calculatrice |
 | `deploy/` | Scripts d'installation et de mise à jour du serveur |
+
+## Comment ce projet a été construit
+
+J'ai conçu ce site (choix des indicateurs, méthode de calcul, contenus pédagogiques, interface) et je l'ai développé avec l'aide d'un assistant de programmation IA (Claude), d'où sa présence dans l'historique des commits. J'ai vérifié les formules et les résultats affichés ; les choix méthodologiques et leurs limites sont décrits ci-dessus.
